@@ -42,7 +42,7 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 ## Design details
 
 - **Numerals** use `clamp(4rem, 30cqi, 11rem)` instead of `14vw`: the selector cards sit side by side and can number up to eight, so sizing against the card (container query units) keeps three huge digits inside it at every width.
-- **Fallback fonts** are metric-matched to Geist Mono (600/1000 advance, 1005/-295 ascent/descent read from the font file): Consolas at 109.13% and Menlo/DejaVu Sans Mono at 99.65%. `ui-monospace` can't be referenced from `@font-face`, so it stays in the stack after the adjusted faces.
+- **Fallback fonts** are generated, not hand-tuned. `scripts/font-fallbacks.mjs` (run by `npm run fonts` before `dev` and `build`) reads Geist Mono's metrics from the served woff2 with `@capsizecss/unpack` and writes `src/styles/fonts.generated.css` with Capsize's `createFontStack`: `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override` for Consolas, Menlo (also matching DejaVu Sans Mono) and Courier New (also matching the metric-compatible Liberation Mono and Cousine). Courier New's metrics come from `@capsizecss/metrics`; Consolas and Menlo aren't in that collection, so their metrics are written into the script from the font files. `ui-monospace` can't be referenced from `@font-face`, so it stays in the stack after the adjusted faces. An e2e test checks fallback widths stay within 2% of Geist Mono, and that delaying the web font by 1.5 s causes no layout shift.
 - **Fonts** are copied from the npm package into `public/fonts/` by `scripts/copy-fonts.mjs` (run before `dev` and `build`) so they're served from `/fonts/` with long-lived caching. Only Latin (preloaded) and Latin Extended are used.
 - **`[hidden]`** lives in the `utilities` layer. In `reset` it lost to components that set `display`, which is exactly the kind of layer-order surprise the tool explains.
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
@@ -72,6 +72,8 @@ Medians of five runs against `npm run preview` (`npm run lighthouse 5`):
 | `/about/`       | 100 / 100 / 100 / 100           | 100 / 100 / 100 / 100 |
 
 The one gap is mobile performance on `/specificity/` (individual runs 96 to 100; LCP about 0.76 s, CLS 0). Under Lighthouse's simulated slow CPU, the web font arrives after first paint and `font-display: swap` triggers one re-layout of the long page, which shows up as about 100 ms of total blocking time. With web fonts blocked the page scores 100. The brief requires `swap`; `font-display: optional` would close the gap at the cost of sometimes showing the fallback font. Below-the-fold sections already use `content-visibility: auto` to keep that re-layout small.
+
+**Update.** A trace showed the bigger cost wasn't the font swap but the island: setting up the tabs hid two panels and a heading right after load, forcing a full re-layout inside a long task. The head script already sets `data-js` before first paint, so CSS now draws the tabbed layout from the start and the island only adds behaviour (no layout change). With that and the generated fallbacks, mobile `/specificity/` scores a median of 100 over five runs (runs 99 to 100, TBT about 90 ms, CLS 0). The remaining blocking time is the page's first layout.
 
 ## Testing notes
 

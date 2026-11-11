@@ -1,15 +1,17 @@
 // Runs Lighthouse N times per route against a running preview server and prints medians.
 // Usage: npx astro preview --port 4330 (in another terminal), then: node scripts/lighthouse.mjs [runs]
+// Optional: LH_ROUTES=/specificity/ LH_PRESETS=mobile to narrow the run.
 import { execSync } from 'node:child_process';
 import { mkdirSync, readFileSync } from 'node:fs';
 
 const runs = Number(process.argv[2] ?? 3);
 const base = process.env.LH_BASE ?? 'http://localhost:4330';
-const routes = ['/', '/specificity/', '/about/'];
+const routes = process.env.LH_ROUTES?.split(',') ?? ['/', '/specificity/', '/about/'];
+const presets = process.env.LH_PRESETS?.split(',') ?? ['mobile', 'desktop'];
 const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 mkdirSync('.lighthouse', { recursive: true });
 
-for (const preset of ['mobile', 'desktop']) {
+for (const preset of presets) {
   for (const route of routes) {
     const scores = { performance: [], accessibility: [], 'best-practices': [], seo: [] };
     const tbt = [];

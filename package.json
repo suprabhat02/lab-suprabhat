@@ -11,7 +11,7 @@
     "node": ">=22.23.4"
   },
   "scripts": {
-    "fonts": "node scripts/copy-fonts.mjs",
+    "fonts": "node scripts/copy-fonts.mjs && node scripts/font-fallbacks.mjs",
     "predev": "npm run fonts",
     "dev": "astro dev",
     "prebuild": "npm run fonts",
@@ -38,6 +38,9 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.14.0",
+    "@capsizecss/core": "^4.1.3",
+    "@capsizecss/metrics": "^4.4.0",
+    "@capsizecss/unpack": "^4.0.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",

@@ -9,3 +9,4 @@ playwright-report/
 src/components/Explainer.astro
 src/components/LiveExample.astro
 src/pages/about/index.astro
+src/styles/fonts.generated.css

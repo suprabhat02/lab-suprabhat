@@ -23,26 +23,7 @@
     U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* Metric-matched fallbacks (Geist Mono: 600/1000 advance, 1005/-295 ascent/descent) to avoid layout shift. */
-@font-face {
-  font-family: 'Geist Mono Fallback Windows';
-  src: local('Consolas');
-  size-adjust: 109.13%;
-  ascent-override: 92.09%;
-  descent-override: 27.03%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: 'Geist Mono Fallback';
-  src:
-    local('Menlo'), local('SF Mono'), local('DejaVu Sans Mono'), local('Liberation Mono'),
-    local('Courier New');
-  size-adjust: 99.65%;
-  ascent-override: 100.85%;
-  descent-override: 29.6%;
-  line-gap-override: 0%;
-}
+/* Metric-matched fallbacks live in fonts.generated.css (scripts/font-fallbacks.mjs). */
 
 @layer tokens {
   :root {
@@ -70,7 +51,8 @@
     --radius-shell: 12px;
 
     --font:
-      'Geist Mono Variable', 'Geist Mono', 'Geist Mono Fallback Windows', 'Geist Mono Fallback', ui-monospace,
+      'Geist Mono Variable', 'Geist Mono', 'Geist Mono Variable Fallback: Consolas',
+      'Geist Mono Variable Fallback: Menlo', 'Geist Mono Variable Fallback: Courier New', ui-monospace,
       monospace;
 
     /* Modular scale, ratio 1.25, fluid between 320px and 1440px. */

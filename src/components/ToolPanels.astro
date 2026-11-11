@@ -15,7 +15,7 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
 
 <section class="section" aria-label="Inspect selectors and the cascade">
   <div class="wrap tabs" data-tabs>
-    <div class="tablist" role="tablist" aria-label="Inspect" data-tablist hidden>
+    <div class="tablist" role="tablist" aria-label="Inspect" data-tablist>
       <button
         class="tab"
         type="button"
@@ -23,6 +23,7 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
         id="tab-anatomy"
         aria-controls="panel-anatomy"
         data-tab="anatomy"
+        aria-selected="true"
       >
         Anatomy
       </button>
@@ -33,6 +34,8 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
         id="tab-nesting"
         aria-controls="panel-nesting"
         data-tab="nesting"
+        aria-selected="false"
+        tabindex="-1"
       >
         Nesting
       </button>
@@ -43,6 +46,8 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
         id="tab-cascade"
         aria-controls="panel-cascade"
         data-tab="cascade"
+        aria-selected="false"
+        tabindex="-1"
       >
         Cascade
       </button>
