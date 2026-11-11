@@ -22,7 +22,9 @@ test.describe('explainer navigation, wide screens', () => {
     expect(navBox && bodyBox && navBox.x > bodyBox.x).toBe(true);
 
     await page.locator('#layers').scrollIntoViewIfNeeded();
-    await page.evaluate(() => document.getElementById('layers')?.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await page.evaluate(() =>
+      document.getElementById('layers')?.scrollIntoView({ block: 'start', behavior: 'instant' }),
+    );
     const layersLink = nav(page).getByRole('link', { name: 'Does @layer beat specificity?' });
     await expect(layersLink).toHaveAttribute('aria-current', 'location', { timeout: 15_000 });
     await expect(nav(page).locator('[aria-current]')).toHaveCount(1);
@@ -34,9 +36,12 @@ test.describe('explainer navigation, wide screens', () => {
     await page.locator('[data-explainer]').scrollIntoViewIfNeeded();
     await nav(page).getByRole('link', { name: 'What is @scope proximity?' }).click();
     await expect(page).toHaveURL(/#scope$/);
-    await expect(page.locator('#scope')).toBeInViewport();
-    const top = await page.locator('#scope').evaluate((el) => el.getBoundingClientRect().top);
-    expect(top).toBeGreaterThanOrEqual(await headerBottom(page));
+    // Wait for the smooth scroll to settle before measuring.
+    await expect(async () => {
+      const top = await page.locator('#scope').evaluate((el) => el.getBoundingClientRect().top);
+      expect(top).toBeGreaterThanOrEqual(await headerBottom(page));
+      expect(top).toBeLessThan(200);
+    }).toPass();
     await expect(nav(page).getByRole('link', { name: 'What is @scope proximity?' })).toHaveAttribute(
       'aria-current',
       'location',
@@ -109,10 +114,10 @@ test.describe('live examples', () => {
         return {
           color: style.color,
           won: style.getPropertyValue('--won').trim().replace(/'/g, '"'),
-          after: getComputedStyle(p, '::after').content,
+          after: getComputedStyle(p, '::after').content.replace(/["'\s]/g, ''),
         };
       });
-      expect(result, caption).toEqual({ color: rgb, won: `"${name}"`, after: `" ${name}"` });
+      expect(result, caption).toEqual({ color: rgb, won: `"${name}"`, after: name });
     }
   });
 

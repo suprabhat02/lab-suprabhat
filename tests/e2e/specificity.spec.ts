@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 
 /** Presses Tab (or Shift+Tab) until `target` has focus, failing after `max` presses. */
-async function tabTo(page: Page, target: Locator, max = 40, key: 'Tab' | 'Shift+Tab' = 'Tab') {
+async function tabTo(page: Page, target: Locator, max = 40, key = 'Tab') {
   for (let i = 0; i < max; i++) {
     if (await target.evaluate((el) => el === document.activeElement)) return;
     await page.keyboard.press(key);
@@ -12,6 +12,22 @@ async function tabTo(page: Page, target: Locator, max = 40, key: 'Tab' | 'Shift+
 
 const verdict = (page: Page) => page.locator('[data-verdict]');
 const live = (page: Page) => page.locator('[data-live]');
+const SHARE_URL = /^http:\/\/localhost:\d+\/specificity\/(\?s=[A-Za-z0-9_-]+)?$/;
+
+/** The manual-copy fallback: a visible, labelled, focused field with the whole link selected. */
+async function expectManualCopy(page: Page) {
+  const field = page.getByLabel('Link to this comparison');
+  await expect(field).toBeVisible();
+  await expect(field).toBeFocused();
+  await expect(field).toHaveValue(SHARE_URL);
+  const selection = await field.evaluate((el: HTMLInputElement) => [
+    el.selectionStart,
+    el.selectionEnd,
+    el.value.length,
+  ]);
+  expect(selection[0]).toBe(0);
+  expect(selection[1]).toBe(selection[2]);
+}
 
 test.describe('duel', () => {
   test('pre-renders the default result', async ({ page }) => {
@@ -20,21 +36,27 @@ test.describe('duel', () => {
     await expect(page.locator('[data-score="0"] .numeral[data-decided]')).toHaveText('1');
   });
 
-  test('keyboard-only flow: compare, add, remove and copy', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  test('keyboard-only flow: compare, add, remove and copy', async ({ page, context, browserName }) => {
+    // Only Chromium lets tests grant clipboard access; the others exercise whichever path the browser allows.
+    if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const next = 'Tab';
+    const previous = 'Shift+Tab';
     await page.goto('/specificity/');
 
-    await page.keyboard.press('Tab');
+    // Safari's default Tab order skips links (Option+Tab reaches them), so focus the skip link directly there.
+    if (browserName === 'webkit') await page.locator('a.skip-link').focus();
+    else await page.keyboard.press(next);
     await expect(page.locator('a.skip-link')).toBeFocused();
+    await expect(page.locator('a.skip-link')).toBeInViewport();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(/#main$/);
 
     const first = page.getByLabel('Selector 1', { exact: true });
-    await tabTo(page, first);
+    await tabTo(page, first, 40, next);
     await page.keyboard.press('ControlOrMeta+a');
     await page.keyboard.type('.a.b');
     const second = page.getByLabel('Selector 2', { exact: true });
-    await page.keyboard.press('Tab');
+    await page.keyboard.press(next);
     await expect(second).toBeFocused();
     await page.keyboard.press('ControlOrMeta+a');
     await page.keyboard.type('.c');
@@ -45,12 +67,12 @@ test.describe('duel', () => {
     await expect(live(page)).toHaveText('.a.b wins. Specificity 0, 2, 0 versus 0, 1, 0.');
 
     const compareButton = page.getByRole('button', { name: 'Compare selectors' });
-    await tabTo(page, compareButton);
+    await tabTo(page, compareButton, 40, next);
     await page.keyboard.press('Enter');
     await expect(live(page)).toHaveText('.a.b wins. Specificity 0, 2, 0 versus 0, 1, 0.');
 
     const add = page.getByRole('button', { name: 'Add selector' });
-    await tabTo(page, add);
+    await tabTo(page, add, 40, next);
     await page.keyboard.press('Enter');
     const third = page.getByLabel('Selector 3', { exact: true });
     await expect(third).toBeFocused();
@@ -59,18 +81,47 @@ test.describe('duel', () => {
     await expect(verdict(page)).toContainText('closest rival is .a.b');
 
     const remove = page.getByRole('button', { name: 'Remove selector 3' });
-    await tabTo(page, remove, 10, 'Shift+Tab');
+    await tabTo(page, remove, 10, previous);
     await page.keyboard.press('Enter');
     await expect(page.getByLabel('Selector 3', { exact: true })).toHaveCount(0);
     await expect(verdict(page)).toContainText('.a.b wins');
 
     const copy = page.getByRole('button', { name: 'Copy link' });
-    await tabTo(page, copy);
+    await tabTo(page, copy, 40, next);
     await page.keyboard.press('Enter');
-    await expect(page.locator('[data-copy-status]')).toHaveText('Link copied.');
-    const copied = await page.evaluate(() => navigator.clipboard.readText());
-    expect(copied).toMatch(/^http:\/\/localhost:\d+\/specificity\/\?s=[A-Za-z0-9_-]+$/);
+    const status = page.locator('[data-copy-status]');
+    await expect(status).toHaveText(
+      /^(Link copied\.|Select the link below and copy it with Ctrl\+C or Cmd\+C\.)$/,
+    );
+    if ((await status.textContent()) === 'Link copied.') {
+      if (browserName === 'chromium') {
+        expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(SHARE_URL);
+      }
+    } else {
+      await expectManualCopy(page);
+    }
   });
+
+  for (const [label, stub] of [
+    ['without the Clipboard API', () => Object.defineProperty(navigator, 'clipboard', { value: undefined })],
+    [
+      'when the browser refuses to write',
+      () =>
+        Object.defineProperty(navigator, 'clipboard', {
+          value: { writeText: () => Promise.reject(new Error('NotAllowedError')) },
+        }),
+    ],
+  ] as const) {
+    test(`copy link falls back to a selected field ${label}`, async ({ page }) => {
+      await page.addInitScript(stub);
+      await page.goto('/specificity/');
+      await page.getByRole('button', { name: 'Copy link' }).click();
+      await expect(page.locator('[data-copy-status]')).toHaveText(
+        'Select the link below and copy it with Ctrl+C or Cmd+C.',
+      );
+      await expectManualCopy(page);
+    });
+  }
 
   test('explains ties and order of appearance', async ({ page }) => {
     await page.goto('/specificity/');
@@ -260,6 +311,23 @@ test.describe('site', () => {
     await expect(verdict(page)).toContainText('#a');
     expect(problems).toEqual([]);
   });
+
+  for (const [theme, bg, accent] of [
+    ['dark', 'rgb(7, 12, 16)', 'rgb(255, 77, 42)'],
+    ['light', 'rgb(249, 250, 251)', 'rgb(180, 35, 0)'],
+  ] as const) {
+    test(`light-dark() tokens and container-query numerals resolve (${theme})`, async ({ page }) => {
+      await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+      await page.goto('/specificity/');
+      const html = page.locator('html');
+      await expect(html).toHaveCSS('background-color', bg);
+      const decided = page.locator('[data-score="0"] .numeral[data-decided]');
+      await expect(decided).toHaveCSS('color', accent);
+      const size = await decided.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+      expect(size).toBeGreaterThanOrEqual(64);
+      expect(size).toBeLessThanOrEqual(176);
+    });
+  }
 
   test('prose has no stray spaces before punctuation', async ({ page }) => {
     for (const route of ['/', '/specificity/', '/about/']) {

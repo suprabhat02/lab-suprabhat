@@ -39,7 +39,10 @@ for (const theme of THEMES) {
     await page.goto('/specificity/');
     for (const name of ['Nesting', 'Cascade']) {
       await page.getByRole('tab', { name }).click();
-      await expect(page.getByRole('tabpanel', { name })).toBeVisible();
+      // A role-and-name query right before axe crashes Firefox's content process, so match the panel by id.
+      const panel = page.locator(`#panel-${name.toLowerCase()}`);
+      await expect(panel).toBeVisible();
+      await expect(panel).toHaveAttribute('role', 'tabpanel');
       expect(await seriousViolations(page, '[data-tabs]')).toEqual([]);
     }
   });

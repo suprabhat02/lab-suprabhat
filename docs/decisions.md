@@ -77,6 +77,12 @@ The one gap is mobile performance on `/specificity/` (individual runs 96 to 100;
 
 - Playwright disables JavaScript through DevTools, but Chromium's parser still treats scripting as on, so the no-JS test checks the `<noscript>` markup rather than its visibility. The pre-rendered results are checked directly.
 - The axe scans use the WCAG 2.0 to 2.2 A/AA tags plus best practices and fail on any serious or critical violation, on every route in both themes, for each tab panel, and in forced-colors mode.
+- **Every e2e test runs in Chromium, Firefox and WebKit.** Differences handled in the tests, not the site:
+  - Only Chromium lets a test grant clipboard permissions. Elsewhere the copy test accepts whichever path the browser takes, and two extra tests force the manual-copy fallback (no Clipboard API, and a refused write) in all three browsers.
+  - Safari's default Tab order skips links (Option+Tab reaches them), so in WebKit the keyboard test focuses the skip link directly; buttons and fields are still reached with Tab.
+  - Firefox and WebKit serialise `content: " " var(--won)` differently from Chromium, so the live-example test compares the words, not the string.
+  - In Firefox, a Playwright role-and-name query on a tab panel followed immediately by an axe scan crashes the content process. The panel scan locates the panel by id instead. It doesn't happen in normal browsing.
+  - Firefox ignores `@view-transition`; navigation works the same without the animation.
 
 ## Scaffold clean-up
 
