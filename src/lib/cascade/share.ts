@@ -53,7 +53,8 @@ export const LIMITS = {
 
 export const LAYER_NAME = /^[A-Za-z_-][\w-]*(?:\.[A-Za-z_-][\w-]*)*$/;
 
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
 const isMode = (v: unknown): v is Mode => typeof v === 'string' && (MODES as readonly string[]).includes(v);
 const isString = (v: unknown, max: number): v is string => typeof v === 'string' && v.length <= max;
 const isInt = (v: unknown, min: number, max: number): v is number =>
@@ -68,7 +69,11 @@ function readRow(v: unknown): CascadeRow | null {
   if (!isInt(order, 1, LIMITS.order)) return null;
   let readScope: CascadeRow['scope'] = null;
   if (scope !== null) {
-    if (!isRecord(scope) || !isString(scope['root'], LIMITS.scopeRoot) || !isInt(scope['proximity'], 0, LIMITS.proximity)) {
+    if (
+      !isRecord(scope) ||
+      !isString(scope['root'], LIMITS.scopeRoot) ||
+      !isInt(scope['proximity'], 0, LIMITS.proximity)
+    ) {
       return null;
     }
     readScope = { root: scope['root'], proximity: scope['proximity'] };
@@ -151,7 +156,11 @@ const UNREADABLE = "This link's settings couldn't be read, so the default exampl
 /** Validates size, alphabet, encoding, JSON and shape before anything is used. Never evaluates input. */
 export function decodeState(param: string): Result<ShareState> {
   if (param.length === 0 || param.length > MAX_ENCODED_LENGTH) {
-    return err(param.length > MAX_ENCODED_LENGTH ? "This link's settings are too large to load, so the default example is shown instead." : UNREADABLE);
+    return err(
+      param.length > MAX_ENCODED_LENGTH
+        ? "This link's settings are too large to load, so the default example is shown instead."
+        : UNREADABLE,
+    );
   }
   if (!/^[A-Za-z0-9_-]+$/.test(param)) return err(UNREADABLE);
   const bytes = fromBase64Url(param);
@@ -163,7 +172,9 @@ export function decodeState(param: string): Result<ShareState> {
     return err(UNREADABLE);
   }
   if (isRecord(json) && json['v'] !== SHARE_VERSION) {
-    return err("This link was made with a different version of the tool, so the default example is shown instead.");
+    return err(
+      'This link was made with a different version of the tool, so the default example is shown instead.',
+    );
   }
   const state = readState(json);
   return state ? ok(state) : err(UNREADABLE);

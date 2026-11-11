@@ -22,23 +22,118 @@ const CLASS: Specificity = [0, 1, 0];
 const TYPE: Specificity = [0, 0, 1];
 
 const KNOWN_PSEUDO_CLASSES = new Set([
-  'active', 'any-link', 'autofill', 'blank', 'buffering', 'checked', 'closed', 'current', 'default', 'defined',
-  'dir', 'disabled', 'empty', 'enabled', 'first', 'first-child', 'first-of-type', 'focus', 'focus-visible',
-  'focus-within', 'fullscreen', 'future', 'has', 'has-slotted', 'heading', 'host', 'host-context', 'hover',
-  'in-range', 'indeterminate', 'invalid', 'is', 'lang', 'last-child', 'last-of-type', 'left', 'link',
-  'local-link', 'modal', 'muted', 'not', 'nth-child', 'nth-col', 'nth-last-child', 'nth-last-col',
-  'nth-last-of-type', 'nth-of-type', 'only-child', 'only-of-type', 'open', 'optional', 'out-of-range', 'past',
-  'paused', 'picture-in-picture', 'placeholder-shown', 'playing', 'popover-open', 'read-only', 'read-write',
-  'required', 'right', 'root', 'scope', 'seeking', 'stalled', 'state', 'target', 'target-current',
-  'target-within', 'user-invalid', 'user-valid', 'valid', 'visited', 'volume-locked', 'where', 'matches', 'any',
+  'active',
+  'any-link',
+  'autofill',
+  'blank',
+  'buffering',
+  'checked',
+  'closed',
+  'current',
+  'default',
+  'defined',
+  'dir',
+  'disabled',
+  'empty',
+  'enabled',
+  'first',
+  'first-child',
+  'first-of-type',
+  'focus',
+  'focus-visible',
+  'focus-within',
+  'fullscreen',
+  'future',
+  'has',
+  'has-slotted',
+  'heading',
+  'host',
+  'host-context',
+  'hover',
+  'in-range',
+  'indeterminate',
+  'invalid',
+  'is',
+  'lang',
+  'last-child',
+  'last-of-type',
+  'left',
+  'link',
+  'local-link',
+  'modal',
+  'muted',
+  'not',
+  'nth-child',
+  'nth-col',
+  'nth-last-child',
+  'nth-last-col',
+  'nth-last-of-type',
+  'nth-of-type',
+  'only-child',
+  'only-of-type',
+  'open',
+  'optional',
+  'out-of-range',
+  'past',
+  'paused',
+  'picture-in-picture',
+  'placeholder-shown',
+  'playing',
+  'popover-open',
+  'read-only',
+  'read-write',
+  'required',
+  'right',
+  'root',
+  'scope',
+  'seeking',
+  'stalled',
+  'state',
+  'target',
+  'target-current',
+  'target-within',
+  'user-invalid',
+  'user-valid',
+  'valid',
+  'visited',
+  'volume-locked',
+  'where',
+  'matches',
+  'any',
 ]);
 
 const KNOWN_PSEUDO_ELEMENTS = new Set([
-  'after', 'backdrop', 'before', 'checkmark', 'column', 'cue', 'cue-region', 'details-content',
-  'file-selector-button', 'first-letter', 'first-line', 'grammar-error', 'highlight', 'marker', 'part',
-  'picker', 'picker-icon', 'placeholder', 'scroll-button', 'scroll-marker', 'scroll-marker-group',
-  'search-text', 'selection', 'slotted', 'spelling-error', 'target-text', 'view-transition',
-  'view-transition-group', 'view-transition-image-pair', 'view-transition-new', 'view-transition-old',
+  'after',
+  'backdrop',
+  'before',
+  'checkmark',
+  'column',
+  'cue',
+  'cue-region',
+  'details-content',
+  'file-selector-button',
+  'first-letter',
+  'first-line',
+  'grammar-error',
+  'highlight',
+  'marker',
+  'part',
+  'picker',
+  'picker-icon',
+  'placeholder',
+  'scroll-button',
+  'scroll-marker',
+  'scroll-marker-group',
+  'search-text',
+  'selection',
+  'slotted',
+  'spelling-error',
+  'target-text',
+  'view-transition',
+  'view-transition-group',
+  'view-transition-image-pair',
+  'view-transition-new',
+  'view-transition-old',
 ]);
 
 const LEGACY_PSEUDO_ELEMENTS = new Set(['before', 'after', 'first-letter', 'first-line']);
@@ -55,8 +150,10 @@ interface WalkContext {
   readonly source: string;
 }
 
-const textOf = (node: { loc?: { start: { offset: number }; end: { offset: number } } | null }, ctx: WalkContext) =>
-  node.loc ? ctx.source.slice(node.loc.start.offset, node.loc.end.offset) : '';
+const textOf = (
+  node: { loc?: { start: { offset: number }; end: { offset: number } } | null },
+  ctx: WalkContext,
+) => (node.loc ? ctx.source.slice(node.loc.start.offset, node.loc.end.offset) : '');
 
 const sum = (values: Iterable<Specificity>): Specificity => {
   let total = ZERO;
@@ -75,7 +172,8 @@ function maxOfList(list: SelectorList, ctx: WalkContext): { value: Specificity; 
   let best: { value: Specificity; text: string } | null = null;
   for (const selector of list.children) {
     const value = valueOfNodes(selector.children, ctx);
-    if (!best || compareSpecificity(value, best.value) > 0) best = { value, text: textOf(selector, ctx).trim() };
+    if (!best || compareSpecificity(value, best.value) > 0)
+      best = { value, text: textOf(selector, ctx).trim() };
   }
   return best;
 }
@@ -113,7 +211,11 @@ function describePseudoClass(node: PseudoClassSelector, ctx: WalkContext): Descr
 
   switch (name) {
     case 'where':
-      return { kind: 'functional', contributes: ZERO, note: '`:where()` always adds zero, whatever is inside it.' };
+      return {
+        kind: 'functional',
+        contributes: ZERO,
+        note: '`:where()` always adds zero, whatever is inside it.',
+      };
 
     case 'is':
     case 'matches':
@@ -123,7 +225,11 @@ function describePseudoClass(node: PseudoClassSelector, ctx: WalkContext): Descr
       const list = argumentList(first);
       const best = list ? maxOfList(list, ctx) : null;
       if (!best) {
-        return { kind: 'functional', contributes: ZERO, note: 'Empty argument list: adds nothing and matches nothing.' };
+        return {
+          kind: 'functional',
+          contributes: ZERO,
+          note: 'Empty argument list: adds nothing and matches nothing.',
+        };
       }
       const which = `its most specific argument, \`${best.text}\` ${formatSpecificity(best.value)}`;
       const tail =
@@ -196,12 +302,20 @@ function describePseudoElement(node: PseudoElementSelector, ctx: WalkContext): D
     case 'view-transition-old':
     case 'view-transition-new':
       return isStar
-        ? { kind: 'pseudo-element', contributes: ZERO, note: 'With `*` as its argument this pseudo-element adds nothing.' }
+        ? {
+            kind: 'pseudo-element',
+            contributes: ZERO,
+            note: 'With `*` as its argument this pseudo-element adds nothing.',
+          }
         : { kind: 'pseudo-element', contributes: TYPE };
     case 'highlight':
       if (!node.children || node.children.size === 0) return { kind: 'pseudo-element', contributes: ZERO };
       return isStar
-        ? { kind: 'pseudo-element', contributes: ZERO, note: 'With `*` as its argument this pseudo-element adds nothing.' }
+        ? {
+            kind: 'pseudo-element',
+            contributes: ZERO,
+            note: 'With `*` as its argument this pseudo-element adds nothing.',
+          }
         : { kind: 'pseudo-element', contributes: TYPE };
     default:
       if (!KNOWN_PSEUDO_ELEMENTS.has(name) && !isVendor(name)) {
@@ -227,7 +341,9 @@ function describe(node: SelectorChild, ctx: WalkContext): Described {
         return {
           kind: 'universal',
           contributes: ZERO,
-          note: hasNamespace ? 'Universal selector with a namespace: adds nothing.' : 'The universal selector adds nothing.',
+          note: hasNamespace
+            ? 'Universal selector with a namespace: adds nothing.'
+            : 'The universal selector adds nothing.',
         };
       }
       return hasNamespace
@@ -241,7 +357,8 @@ function describe(node: SelectorChild, ctx: WalkContext): Described {
     case 'PseudoElementSelector':
       return describePseudoElement(node, ctx);
     case 'NestingSelector': {
-      const message = '`&` only has a meaning inside nested CSS. Use the nesting expander to see what it becomes.';
+      const message =
+        '`&` only has a meaning inside nested CSS. Use the nesting expander to see what it becomes.';
       return { kind: 'functional', contributes: ZERO, note: message, warning: message };
     }
   }
@@ -340,7 +457,8 @@ function syntaxMessage(error: unknown, input: string, base: number): ParseError 
   else if (raw === 'Identifier is expected' || raw === 'Name is expected') hint = ' Expected a name there.';
   else if (expected?.[1]) hint = ` Expected \`${expected[1]}\` there.`;
 
-  if (offset === null) return { message: "This selector couldn't be parsed. Check it for typos.", position: null };
+  if (offset === null)
+    return { message: "This selector couldn't be parsed. Check it for typos.", position: null };
   if (offset >= trimmedEnd) {
     return { message: `This selector couldn't be parsed: it ends too early.${hint}`, position: trimmedEnd };
   }

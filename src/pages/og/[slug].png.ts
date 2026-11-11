@@ -30,8 +30,20 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     padding: 80,
     fonts: [FONT],
     font: {
-      title: { families: ['Geist Mono Variable'], weight: 'Bold', size: 76, lineHeight: 1.1, color: [243, 245, 248] },
-      description: { families: ['Geist Mono Variable'], weight: 'Normal', size: 34, lineHeight: 1.4, color: [190, 197, 204] },
+      title: {
+        families: ['Geist Mono Variable'],
+        weight: 'Bold',
+        size: 76,
+        lineHeight: 1.1,
+        color: [243, 245, 248],
+      },
+      description: {
+        families: ['Geist Mono Variable'],
+        weight: 'Normal',
+        size: 34,
+        lineHeight: 1.4,
+        color: [190, 197, 204],
+      },
     },
   }),
 });

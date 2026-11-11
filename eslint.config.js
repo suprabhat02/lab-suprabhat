@@ -1,8 +1,9 @@
+import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
 
-export default tseslint.config(
+export default defineConfig(
   { ignores: ['dist/', '.astro/', 'node_modules/', 'public/', 'test-results/', 'playwright-report/'] },
   js.configs.recommended,
   ...tseslint.configs.strict,
@@ -27,6 +28,8 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      // The public engine API uses ReadonlyArray<T> for readability; both forms are fine.
+      '@typescript-eslint/array-type': 'off',
     },
   },
   {

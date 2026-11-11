@@ -25,10 +25,6 @@
   :where(table) {
     border-collapse: collapse;
   }
-
-  :where([hidden]) {
-    display: none;
-  }
 }
 
 @layer base {

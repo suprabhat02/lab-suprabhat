@@ -67,7 +67,8 @@ export function renderToDom(node: VNode, doc: Document = document, svg = false):
   }
   if (typeof node === 'string' || typeof node === 'number') return doc.createTextNode(String(node));
   const inSvg = svg || node.tag === 'svg';
-  const el = inSvg && SVG_TAGS.has(node.tag) ? doc.createElementNS(SVG_NS, node.tag) : doc.createElement(node.tag);
+  const el =
+    inSvg && SVG_TAGS.has(node.tag) ? doc.createElementNS(SVG_NS, node.tag) : doc.createElement(node.tag);
   for (const [name, value] of Object.entries(node.attrs)) {
     if (!ATTR.test(name) || name.toLowerCase().startsWith('on')) continue;
     if (value === false || value === null || value === undefined) continue;

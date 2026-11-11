@@ -78,7 +78,9 @@ describe('share state', () => {
   });
 
   it('drops unknown keys and does not keep prototypes', () => {
-    const withExtra = JSON.parse(`{"__proto__":{"polluted":true},"extra":1,${JSON.stringify(state).slice(1)}`) as unknown;
+    const withExtra = JSON.parse(
+      `{"__proto__":{"polluted":true},"extra":1,${JSON.stringify(state).slice(1)}`,
+    ) as unknown;
     const read = readState(withExtra);
     expect(read).toEqual(state);
     expect(({} as Record<string, unknown>)['polluted']).toBeUndefined();

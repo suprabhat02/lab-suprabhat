@@ -200,7 +200,10 @@ export function expandNesting(css: string): Result<NestingOutput> {
               return rule;
             })
           : null;
-        if (!CONDITIONAL.test(prelude)) notes.add(`\`${prelude.split(/\s/)[0] ?? prelude}\` isn't expanded; its contents are treated like a conditional block.`);
+        if (!CONDITIONAL.test(prelude))
+          notes.add(
+            `\`${prelude.split(/\s/)[0] ?? prelude}\` isn't expanded; its contents are treated like a conditional block.`,
+          );
         stack.push({ parents, atRules, depth: frame.depth, sink });
       } else {
         const ranges = splitTopLevel(prelude);
@@ -239,7 +242,8 @@ export function expandNesting(css: string): Result<NestingOutput> {
       opens.push(i);
       from = i + 1;
     } else if (depth === 0 && ch === '}') {
-      if (stack.length <= 1) return err(`Unexpected \`}\` at character ${i + 1}: there's no rule to close.`, i);
+      if (stack.length <= 1)
+        return err(`Unexpected \`}\` at character ${i + 1}: there's no rule to close.`, i);
       flushDeclaration(i);
       stack.pop();
       opens.pop();

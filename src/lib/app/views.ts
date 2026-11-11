@@ -14,25 +14,65 @@ export const icon = {
   error: () =>
     h(
       'svg',
-      { class: 'icon', viewBox: '0 0 16 16', width: 16, height: 16, 'aria-hidden': 'true', focusable: 'false' },
+      {
+        class: 'icon',
+        viewBox: '0 0 16 16',
+        width: 16,
+        height: 16,
+        'aria-hidden': 'true',
+        focusable: 'false',
+      },
       h('circle', { cx: 8, cy: 8, r: 7, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5 }),
-      h('path', { d: 'M8 4v5M8 11v1.5', stroke: 'currentColor', 'stroke-width': 1.5, 'stroke-linecap': 'round' }),
+      h('path', {
+        d: 'M8 4v5M8 11v1.5',
+        stroke: 'currentColor',
+        'stroke-width': 1.5,
+        'stroke-linecap': 'round',
+      }),
     ),
   note: () =>
     h(
       'svg',
-      { class: 'icon', viewBox: '0 0 16 16', width: 16, height: 16, 'aria-hidden': 'true', focusable: 'false' },
-      h('path', { d: 'M8 1.5 15 14H1z', fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }),
-      h('path', { d: 'M8 6v4M8 11.5v1', stroke: 'currentColor', 'stroke-width': 1.5, 'stroke-linecap': 'round' }),
+      {
+        class: 'icon',
+        viewBox: '0 0 16 16',
+        width: 16,
+        height: 16,
+        'aria-hidden': 'true',
+        focusable: 'false',
+      },
+      h('path', {
+        d: 'M8 1.5 15 14H1z',
+        fill: 'none',
+        stroke: 'currentColor',
+        'stroke-width': 1.5,
+        'stroke-linejoin': 'round',
+      }),
+      h('path', {
+        d: 'M8 6v4M8 11.5v1',
+        stroke: 'currentColor',
+        'stroke-width': 1.5,
+        'stroke-linecap': 'round',
+      }),
     ),
 };
 
 export function errorMessage(message: string, id?: string): VElement {
-  return h('p', { class: 'message message-error', id }, icon.error(), h('span', {}, h('span', { class: 'visually-hidden' }, 'Error: '), ...rich(message)));
+  return h(
+    'p',
+    { class: 'message message-error', id },
+    icon.error(),
+    h('span', {}, h('span', { class: 'visually-hidden' }, 'Error: '), ...rich(message)),
+  );
 }
 
 function warningMessage(message: string): VElement {
-  return h('p', { class: 'message message-warning' }, icon.note(), h('span', {}, h('span', { class: 'visually-hidden' }, 'Note: '), ...rich(message)));
+  return h(
+    'p',
+    { class: 'message message-warning' },
+    icon.note(),
+    h('span', {}, h('span', { class: 'visually-hidden' }, 'Note: '), ...rich(message)),
+  );
 }
 
 /* ---------- Duel ---------- */
@@ -57,13 +97,24 @@ export function scoreView(
       const changed = previous !== null && value !== null && previous[i] !== value;
       return h(
         'span',
-        { class: 'numeral', 'data-col': key, 'data-decided': decided === key, 'data-roll': changed, 'data-empty': value === null },
+        {
+          class: 'numeral',
+          'data-col': key,
+          'data-decided': decided === key,
+          'data-roll': changed,
+          'data-empty': value === null,
+        },
         value === null ? '–' : String(value),
       );
     }),
     COLUMN_LABELS.map((label) => h('span', { class: 'numeral-caption' }, label)),
     decided
-      ? h('span', { class: 'decided-marker', 'data-col': decided }, h('span', { class: 'marker-arrow' }, '▲'), ' decided here')
+      ? h(
+          'span',
+          { class: 'decided-marker', 'data-col': decided },
+          h('span', { class: 'marker-arrow' }, '▲'),
+          ' decided here',
+        )
       : null,
   );
 
@@ -73,14 +124,24 @@ export function scoreView(
 
   let outcome: VNode = null;
   if (isWinner && comparison) {
-    outcome = h('p', { class: 'outcome outcome-win' }, comparison.winner === 'tie' ? 'Wins: written later' : 'Wins');
+    outcome = h(
+      'p',
+      { class: 'outcome outcome-win' },
+      comparison.winner === 'tie' ? 'Wins: written later' : 'Wins',
+    );
   } else if (comparison) {
     outcome = h('p', { class: 'outcome' }, 'Loses');
   }
 
   const listNote =
     contender.parsed.ok && contender.parsed.value.length > 1 && best
-      ? h('p', { class: 'list-note' }, ...rich(`Selector list: each selector has its own score. This uses the strongest, \`${best.selector}\`.`))
+      ? h(
+          'p',
+          { class: 'list-note' },
+          ...rich(
+            `Selector list: each selector has its own score. This uses the strongest, \`${best.selector}\`.`,
+          ),
+        )
       : null;
 
   return [numerals, h('p', { class: 'visually-hidden' }, text), outcome, listNote];
@@ -92,7 +153,12 @@ export function fieldMessages(contender: ContenderModel, id: string): VNode[] {
   return [...new Set(warnings)].map(warningMessage);
 }
 
-export function contenderView(index: number, total: number, contender: ContenderModel, duel: DuelModel): VElement {
+export function contenderView(
+  index: number,
+  total: number,
+  contender: ContenderModel,
+  duel: DuelModel,
+): VElement {
   const id = `sel-${index}`;
   const invalid = !contender.parsed.ok;
   return h(
@@ -105,7 +171,12 @@ export function contenderView(index: number, total: number, contender: Contender
       total > LIMITS.selectors.min
         ? h(
             'button',
-            { type: 'button', class: 'button-quiet', 'data-remove': index, 'aria-label': `Remove selector ${index + 1}` },
+            {
+              type: 'button',
+              class: 'button-quiet',
+              'data-remove': index,
+              'aria-label': `Remove selector ${index + 1}`,
+            },
             'Remove',
           )
         : null,
@@ -124,7 +195,11 @@ export function contenderView(index: number, total: number, contender: Contender
       'aria-invalid': invalid ? 'true' : null,
       'data-selector': index,
     }),
-    h('div', { class: 'field-messages', id: `${id}-msg`, 'data-messages': index }, fieldMessages(contender, `${id}-error`)),
+    h(
+      'div',
+      { class: 'field-messages', id: `${id}-msg`, 'data-messages': index },
+      fieldMessages(contender, `${id}-error`),
+    ),
     h('div', { class: 'score', 'data-score': index }, scoreView(contender, index, duel)),
   );
 }
@@ -144,7 +219,13 @@ export function suggestionsView(duel: DuelModel): VNode[] {
   const options = duel.contenders.flatMap((c, i) =>
     i === comparison.effectiveWinner
       ? []
-      : [h('option', { value: i, selected: i === duel.targetIndex }, `Selector ${i + 1}: ${c.best?.selector ?? c.input}`)],
+      : [
+          h(
+            'option',
+            { value: i, selected: i === duel.targetIndex },
+            `Selector ${i + 1}: ${c.best?.selector ?? c.input}`,
+          ),
+        ],
   );
   return [
     h(
@@ -193,7 +274,8 @@ const DEFAULT_NOTE: Partial<Record<PartKind, string>> = {
   'pseudo-element': 'Adds 1 to the third column, like a type.',
 };
 
-const partText = (p: SelectorPart) => (p.kind === 'combinator' && p.text.trim() === '' ? 'space' : p.text.trim());
+const partText = (p: SelectorPart) =>
+  p.kind === 'combinator' && p.text.trim() === '' ? 'space' : p.text.trim();
 
 function highlighted(result: SpecificityResult): VElement {
   const offset = result.parts[0]?.start ?? 0;
@@ -259,7 +341,12 @@ function anatomyTable(result: SpecificityResult, caption: string): VElement {
 export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] {
   return contenders.map((c, i) => {
     if (!c.parsed.ok) {
-      return h('section', { class: 'anatomy-item' }, h('h3', { class: 'anatomy-title' }, `Selector ${i + 1}`), errorMessage(c.parsed.error.message));
+      return h(
+        'section',
+        { class: 'anatomy-item' },
+        h('h3', { class: 'anatomy-title' }, `Selector ${i + 1}`),
+        errorMessage(c.parsed.error.message),
+      );
     }
     return h(
       'section',
@@ -335,9 +422,18 @@ export function nestingView(model: NestingModel): VNode[] {
               h(
                 'td',
                 { class: 'num' },
-                specificities.map((s, k) => [k > 0 ? h('br', {}) : null, s.ok ? formatSpecificity(s.value) : 'invalid']),
+                specificities.map((s, k) => [
+                  k > 0 ? h('br', {}) : null,
+                  s.ok ? formatSpecificity(s.value) : 'invalid',
+                ]),
               ),
-              h('td', {}, rule.atRules.length ? rule.atRules.map((a, k) => [k > 0 ? h('br', {}) : null, h('code', {}, a)]) : '–'),
+              h(
+                'td',
+                {},
+                rule.atRules.length
+                  ? rule.atRules.map((a, k) => [k > 0 ? h('br', {}) : null, h('code', {}, a)])
+                  : '–',
+              ),
             ),
           ),
         ),
@@ -349,20 +445,33 @@ export function nestingView(model: NestingModel): VNode[] {
 
 /* ---------- Cascade ---------- */
 
-export function cascadeRowView(index: number, total: number, row: CascadeRow, layers: ReadonlyArray<string>, error: string | null): VElement {
+export function cascadeRowView(
+  index: number,
+  total: number,
+  row: CascadeRow,
+  layers: ReadonlyArray<string>,
+  error: string | null,
+): VElement {
   const id = (f: string) => `c${index}-${f}`;
   const scoped = row.scope !== null;
-  const layerOptions = [...new Set([...layers, ...(row.layer && !layers.includes(row.layer) ? [row.layer] : [])])];
+  const layerOptions = [
+    ...new Set([...layers, ...(row.layer && !layers.includes(row.layer) ? [row.layer] : [])]),
+  ];
   return h(
     'fieldset',
     { class: 'decl', 'data-row': index },
-    h(
-      'legend',
-      { class: 'decl-legend' },
-      `Declaration ${index + 1}`,
-    ),
+    h('legend', { class: 'decl-legend' }, `Declaration ${index + 1}`),
     total > LIMITS.rows.min
-      ? h('button', { type: 'button', class: 'button-quiet decl-remove', 'data-remove-row': index, 'aria-label': `Remove declaration ${index + 1}` }, 'Remove')
+      ? h(
+          'button',
+          {
+            type: 'button',
+            class: 'button-quiet decl-remove',
+            'data-remove-row': index,
+            'aria-label': `Remove declaration ${index + 1}`,
+          },
+          'Remove',
+        )
       : null,
     h(
       'div',
@@ -390,13 +499,32 @@ export function cascadeRowView(index: number, total: number, row: CascadeRow, la
         'div',
         { class: 'field' },
         h('label', { class: 'label', for: id('value') }, 'Value'),
-        h('input', { class: 'input', id: id('value'), type: 'text', value: row.value, 'data-field': 'value', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', maxlength: LIMITS.value }),
+        h('input', {
+          class: 'input',
+          id: id('value'),
+          type: 'text',
+          value: row.value,
+          'data-field': 'value',
+          spellcheck: 'false',
+          autocapitalize: 'off',
+          autocomplete: 'off',
+          maxlength: LIMITS.value,
+        }),
       ),
       h(
         'div',
         { class: 'field' },
         h('label', { class: 'label', for: id('order') }, 'Source order'),
-        h('input', { class: 'input', id: id('order'), type: 'number', inputmode: 'numeric', min: 1, max: LIMITS.order, value: row.order, 'data-field': 'order' }),
+        h('input', {
+          class: 'input',
+          id: id('order'),
+          type: 'number',
+          inputmode: 'numeric',
+          min: 1,
+          max: LIMITS.order,
+          value: row.order,
+          'data-field': 'order',
+        }),
       ),
       h(
         'div',
@@ -413,19 +541,52 @@ export function cascadeRowView(index: number, total: number, row: CascadeRow, la
         'div',
         { class: 'field' },
         h('label', { class: 'label', for: id('scope') }, '@scope root'),
-        h('input', { class: 'input', id: id('scope'), type: 'text', value: row.scope?.root ?? '', placeholder: 'none', 'data-field': 'scope', disabled: row.inline, spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', maxlength: LIMITS.scopeRoot }),
+        h('input', {
+          class: 'input',
+          id: id('scope'),
+          type: 'text',
+          value: row.scope?.root ?? '',
+          placeholder: 'none',
+          'data-field': 'scope',
+          disabled: row.inline,
+          spellcheck: 'false',
+          autocapitalize: 'off',
+          autocomplete: 'off',
+          maxlength: LIMITS.scopeRoot,
+        }),
       ),
       h(
         'div',
         { class: 'field' },
         h('label', { class: 'label', for: id('proximity') }, 'DOM steps from root'),
-        h('input', { class: 'input', id: id('proximity'), type: 'number', inputmode: 'numeric', min: 0, max: LIMITS.proximity, value: row.scope?.proximity ?? 1, 'data-field': 'proximity', disabled: row.inline || !scoped }),
+        h('input', {
+          class: 'input',
+          id: id('proximity'),
+          type: 'number',
+          inputmode: 'numeric',
+          min: 0,
+          max: LIMITS.proximity,
+          value: row.scope?.proximity ?? 1,
+          'data-field': 'proximity',
+          disabled: row.inline || !scoped,
+        }),
       ),
       h(
         'div',
         { class: 'checks' },
-        h('label', { class: 'check' }, h('input', { type: 'checkbox', 'data-field': 'important', checked: row.important }), h('code', {}, '!important')),
-        h('label', { class: 'check' }, h('input', { type: 'checkbox', 'data-field': 'inline', checked: row.inline }), 'Inline ', h('code', {}, 'style')),
+        h(
+          'label',
+          { class: 'check' },
+          h('input', { type: 'checkbox', 'data-field': 'important', checked: row.important }),
+          h('code', {}, '!important'),
+        ),
+        h(
+          'label',
+          { class: 'check' },
+          h('input', { type: 'checkbox', 'data-field': 'inline', checked: row.inline }),
+          'Inline ',
+          h('code', {}, 'style'),
+        ),
       ),
     ),
   );
@@ -434,8 +595,14 @@ export function cascadeRowView(index: number, total: number, row: CascadeRow, la
 const OUTCOME_LABEL = { decided: 'Decided here', tie: 'Tie', 'not-reached': 'Not reached' } as const;
 
 export function cascadeResultView(model: CascadeModel): VNode[] {
-  const css = h('details', { class: 'as-css' }, h('summary', {}, 'Show as CSS'), h('pre', { class: 'code' }, h('code', {}, cascadeAsCss(model))));
-  if (!model.result) return [errorMessage(model.problem ?? 'Fill in the declarations to resolve the cascade.'), css];
+  const css = h(
+    'details',
+    { class: 'as-css' },
+    h('summary', {}, 'Show as CSS'),
+    h('pre', { class: 'code' }, h('code', {}, cascadeAsCss(model))),
+  );
+  if (!model.result)
+    return [errorMessage(model.problem ?? 'Fill in the declarations to resolve the cascade.'), css];
   const result = model.result;
   const winner = model.rows.find((r) => r.id === result.winnerId);
   const property = model.property.trim() || 'color';
@@ -456,7 +623,11 @@ export function cascadeResultView(model: CascadeModel): VNode[] {
             { class: 'ladder-head' },
             h('span', { class: 'ladder-name' }, s.name),
             ' ',
-            h('span', { class: 'ladder-outcome' }, s.outcome === 'decided' ? h('strong', {}, OUTCOME_LABEL[s.outcome]) : OUTCOME_LABEL[s.outcome]),
+            h(
+              'span',
+              { class: 'ladder-outcome' },
+              s.outcome === 'decided' ? h('strong', {}, OUTCOME_LABEL[s.outcome]) : OUTCOME_LABEL[s.outcome],
+            ),
           ),
           s.outcome === 'not-reached' ? null : h('p', { class: 'ladder-text' }, ...rich(s.explanation)),
         ),

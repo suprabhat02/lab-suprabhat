@@ -1,4 +1,9 @@
 @layer utilities {
+  /* In the last layer so `hidden` beats any component's display value, whatever its specificity. */
+  :where([hidden]) {
+    display: none;
+  }
+
   .visually-hidden {
     position: absolute;
     inline-size: 1px;

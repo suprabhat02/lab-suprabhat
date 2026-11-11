@@ -28,13 +28,11 @@ const tryHref = encoded.ok ? `/specificity/?s=${encoded.value}` : null;
 <figure class="example">
   <div class="example-head">
     <figcaption>{caption}</figcaption>
-    {
-      tryHref && (
-        <a href={tryHref} data-try rel="nofollow">
-          Try this in the cascade resolver
-        </a>
-      )
-    }
+    {tryHref && (
+      <a href={tryHref} data-try rel="nofollow">
+        Try this in the cascade resolver
+      </a>
+    )}
   </div>
   <pre class="code mt-s"><code>{code}</code></pre>
   <p class="mt-s" set:html={summaryHtml} />

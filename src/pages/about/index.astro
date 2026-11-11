@@ -23,53 +23,57 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <div class="wrap">
       <div class="prose">
         <p>
-          The web is the one platform anyone can build on, with nothing more than a text editor and curiosity. The
-          knowledge that makes it work should be just as open.
+          The web is the one platform anyone can build on, with nothing more than a text editor and curiosity.
+          The knowledge that makes it work should be just as open.
         </p>
         <p>
           This lab is a home for frontend resources that anyone can use: tools that answer real questions, and
-          explainers that teach the idea behind the answer. Every one of them is free, needs no account and works with a
-          keyboard, a screen reader, a phone or a ten-year-old laptop.
+          explainers that teach the idea behind the answer. Every one of them is free, needs no account and
+          works with a keyboard, a screen reader, a phone or a ten-year-old laptop.
         </p>
 
         <h2>Privacy</h2>
-        <p><strong>No cookies. No tracking. Nothing to accept.</strong></p>
         <p>
-          The site sets no cookies, loads nothing from other servers and runs no analytics. The fonts are served from
-          this domain. Your theme choice is kept in your own browser's local storage, and the tools run entirely on your
-          device. When you copy a link, your inputs are encoded in the link itself, so they only go where you send them.
+          <strong>No cookies. No tracking. Nothing to accept.</strong>
         </p>
         <p>
-          If privacy-respecting, cookieless visit counts are ever added, this page will say so first.
+          The site sets no cookies, loads nothing from other servers and runs no analytics. The fonts are
+          served from this domain. Your theme choice is kept in your own browser's local storage, and the
+          tools run entirely on your device. When you copy a link, your inputs are encoded in the link itself,
+          so they only go where you send them.
         </p>
+        <p>If privacy-respecting, cookieless visit counts are ever added, this page will say so first.</p>
 
         <h2>How it's built</h2>
         <p>
-          Pages are static HTML built with Astro. The specificity tool is one small script in plain TypeScript, with no
-          framework, and the selector parser only loads when you start typing. With JavaScript off you still get a
-          correct, pre-calculated example and the full explainer.
+          Pages are static HTML built with Astro. The specificity tool is one small script in plain
+          TypeScript, with no framework, and the selector parser only loads when you start typing. With
+          JavaScript off you still get a correct, pre-calculated example and the full explainer.
         </p>
         <p>
-          The CSS practises what the tool teaches. It declares its cascade layers up front
-          (<code>@layer reset, tokens, base, layout, components, utilities;</code>), wraps base styles in
-          <code>:where()</code> so they have zero specificity, uses no IDs in selectors and no <code>!important</code>
-          outside the reduced-motion override. It uses logical properties, fluid type with <code>clamp()</code>,
-          container queries and <code>light-dark()</code> for the two themes.
+          The CSS practises what the tool teaches. It declares its cascade layers up front (
+          <code>@layer reset, tokens, base, layout, components, utilities;</code>), wraps base styles in
+          <code>:where()</code> so they have zero specificity, uses no IDs in selectors and no{' '}
+          <code>!important</code>
+          outside the reduced-motion override. It uses logical properties, fluid type with{' '}
+          <code>clamp()</code>, container queries and <code>light-dark()</code> for the two themes.
         </p>
         <p>
-          The calculation engine is plain TypeScript with no browser or framework code, so it can be tested on its own:
-          specificity, nesting, the full cascade and shareable links all have their own test suites. Accessibility is
-          checked automatically on every page, in both themes, and by hand with a keyboard.
+          The calculation engine is plain TypeScript with no browser or framework code, so it can be tested on
+          its own: specificity, nesting, the full cascade and shareable links all have their own test suites.
+          Accessibility is checked automatically on every page, in both themes, and by hand with a keyboard.
         </p>
 
         <h2>Who makes it</h2>
         <p>
-          Suprabhat Kumar, a frontend engineer. More work and contact details are on <a href="https://suprabhat-dev.com"
-            >suprabhat-dev.com</a
-          >. Found a mistake? Saying so helps everyone who uses these tools.
+          Suprabhat Kumar, a frontend engineer. More work and contact details are on{' '}
+          <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>. Found a mistake? Saying so helps everyone
+          who uses these tools.
         </p>
 
-        <p><a href="/specificity/">Open CSS Specificity Wars</a></p>
+        <p>
+          <a href="/specificity/">Open CSS Specificity Wars</a>
+        </p>
       </div>
     </div>
   </section>

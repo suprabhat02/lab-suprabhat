@@ -38,7 +38,9 @@ function staticGraph(entry, seen = new Set()) {
   seen.add(entry);
   const code = readFileSync(join(dist, entry), 'utf8');
   const dir = entry.split('/').slice(0, -1).join('/');
-  for (const m of code.matchAll(/\b(?:import|export)\s*(?:[\w*{}\s,$]+from\s*)?["'](\.\.?\/[^"']+\.js)["']/g)) {
+  for (const m of code.matchAll(
+    /\b(?:import|export)\s*(?:[\w*{}\s,$]+from\s*)?["'](\.\.?\/[^"']+\.js)["']/g,
+  )) {
     const resolved = posix.normalize(`${dir}/${m[1]}`);
     staticGraph(resolved, seen);
   }

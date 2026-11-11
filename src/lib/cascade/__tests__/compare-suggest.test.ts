@@ -59,7 +59,11 @@ describe('suggest', () => {
   });
 
   it('raises the loser by repeating a class, never adding an ID', () => {
-    const fixes = suggestFixes({ winner: one('.menu .link:hover'), target: one('.nav .link'), targetIsLater: true });
+    const fixes = suggestFixes({
+      winner: one('.menu .link:hover'),
+      target: one('.nav .link'),
+      targetIsLater: true,
+    });
     const raise = fixes.find((f) => f.kind === 'raise');
     expect(raise?.code).toContain('.nav .link.link');
     expect(raise?.detail).toMatch(/\(0,3,0\) ties with \(0,3,0\), and `\.nav \.link` is written later/);
@@ -67,7 +71,11 @@ describe('suggest', () => {
   });
 
   it('says plainly when classes cannot beat an ID', () => {
-    const fixes = suggestFixes({ winner: one('#nav a'), target: one('.menu .link:hover'), targetIsLater: true });
+    const fixes = suggestFixes({
+      winner: one('#nav a'),
+      target: one('.menu .link:hover'),
+      targetIsLater: true,
+    });
     const raise = fixes.find((f) => f.kind === 'raise');
     expect(raise?.code).toBeNull();
     expect(raise?.detail).toMatch(/no number of classes beats an ID/);

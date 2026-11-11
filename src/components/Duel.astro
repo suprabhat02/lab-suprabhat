@@ -18,8 +18,8 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
     <p class="tool-lead">Type two selectors. See the score, and exactly why.</p>
     <noscript>
       <p class="notice mt-m">
-        JavaScript is off, so this shows a worked example that won't update. The explainer below covers everything the
-        tool does.
+        JavaScript is off, so this shows a worked example that won't update. The explainer below covers
+        everything the tool does.
       </p>
     </noscript>
     <p class="notice mt-m" data-share-notice role="status" hidden></p>
@@ -28,12 +28,20 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
       <div class="contenders" data-contenders set:html={contenders} />
       <p class="verdict" data-verdict set:html={html(verdictView(duel))} />
       <div class="duel-actions">
-        <button class="button button-primary js-only" type="submit">Compare selectors</button>
-        <button class="button js-only" type="button" data-add>Add selector</button>
-        <button class="button js-only" type="button" data-copy>Copy link</button>
+        <button class="button button-primary js-only" type="submit">
+          Compare selectors
+        </button>
+        <button class="button js-only" type="button" data-add>
+          Add selector
+        </button>
+        <button class="button js-only" type="button" data-copy>
+          Copy link
+        </button>
         <p class="status" data-copy-status role="status"></p>
         <div class="share-fallback field" data-share-wrap hidden>
-          <label class="label" for="share-link">Link to this comparison</label>
+          <label class="label" for="share-link">
+            Link to this comparison
+          </label>
           <input class="input" id="share-link" type="text" readonly data-share-fallback />
         </div>
       </div>
@@ -46,9 +54,8 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
   <div class="wrap">
     <h2 id="fix-title">Want a different winner?</h2>
     <p class="panel-intro mt-s">
-      Ways to change the result, from the gentlest to the most heavy-handed. Read more in <a href="#why-not-applying"
-        >why is my CSS not applying?</a
-      >
+      Ways to change the result, from the gentlest to the most heavy-handed. Read more in{' '}
+      <a href="#why-not-applying">why is my CSS not applying?</a>
     </p>
     <div class="mt-l" data-suggestions set:html={html(suggestionsView(duel))} />
   </div>

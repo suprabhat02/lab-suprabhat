@@ -55,7 +55,10 @@ function one(selector: string): SpecificityResult {
 }
 
 const partsTotal = (r: SpecificityResult): Specificity =>
-  r.parts.reduce<Specificity>((t, p) => [t[0] + p.contributes[0], t[1] + p.contributes[1], t[2] + p.contributes[2]], [0, 0, 0]);
+  r.parts.reduce<Specificity>(
+    (t, p) => [t[0] + p.contributes[0], t[1] + p.contributes[1], t[2] + p.contributes[2]],
+    [0, 0, 0],
+  );
 
 describe('specificity: the 40 reference vectors', () => {
   it.each(VECTORS)('%s → %j', (selector, expected) => {

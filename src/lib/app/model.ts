@@ -38,7 +38,11 @@ export interface NestingRuleModel {
 }
 
 export type NestingModel =
-  | { readonly ok: true; readonly rules: ReadonlyArray<NestingRuleModel>; readonly notes: ReadonlyArray<string> }
+  | {
+      readonly ok: true;
+      readonly rules: ReadonlyArray<NestingRuleModel>;
+      readonly notes: ReadonlyArray<string>;
+    }
   | { readonly ok: false; readonly error: ParseError };
 
 export interface CascadeRowModel {
@@ -61,11 +65,16 @@ const spoken = (s: Specificity) => `${s[0]}, ${s[1]}, ${s[2]}`;
 export function buildContender(input: string, calc: Calc): ContenderModel {
   const parsed = calc(input);
   let best: SpecificityResult | null = null;
-  if (parsed.ok) for (const r of parsed.value) if (!best || compareSpecificity(r.value, best.value) > 0) best = r;
+  if (parsed.ok)
+    for (const r of parsed.value) if (!best || compareSpecificity(r.value, best.value) > 0) best = r;
   return { input, parsed, best };
 }
 
-export function buildDuel(selectors: ReadonlyArray<string>, calc: Calc, requestedTarget: number | null = null): DuelModel {
+export function buildDuel(
+  selectors: ReadonlyArray<string>,
+  calc: Calc,
+  requestedTarget: number | null = null,
+): DuelModel {
   const contenders = selectors.map((s) => buildContender(s, calc));
   const valid = contenders.every((c) => c.best !== null);
   if (!valid || contenders.length < 2) {
@@ -75,7 +84,8 @@ export function buildDuel(selectors: ReadonlyArray<string>, calc: Calc, requeste
       comparison: null,
       targetIndex: null,
       suggestions: [],
-      announcement: broken >= 0 ? `Selector ${broken + 1} has a problem. ${messageOf(contenders[broken])}` : '',
+      announcement:
+        broken >= 0 ? `Selector ${broken + 1} has a problem. ${messageOf(contenders[broken])}` : '',
     };
   }
 
@@ -122,7 +132,9 @@ export function buildNesting(css: string, calc: Calc): NestingModel {
       const r = calc(s);
       if (!r.ok) return r;
       const first = r.value[0];
-      return first ? { ok: true, value: first.value } : { ok: false, error: { message: 'Empty selector.', position: null } };
+      return first
+        ? { ok: true, value: first.value }
+        : { ok: false, error: { message: 'Empty selector.', position: null } };
     }),
   }));
   return { ok: true, rules, notes: expanded.value.notes };
@@ -184,7 +196,11 @@ export function cascadeAsCss(model: CascadeModel): string {
     let block = `${row.selector.trim() || '*'} { ${decl} }`;
     if (row.scope) block = `@scope (${row.scope.root}) {\n  ${block.replace(/\n/g, '\n  ')}\n}`;
     if (row.layer) block = `@layer ${row.layer} {\n  ${block.replace(/\n/g, '\n  ')}\n}`;
-    lines.push(`/* order ${row.order}${row.scope ? `, ${row.scope.proximity} steps from ${row.scope.root}` : ''} */`, block, '');
+    lines.push(
+      `/* order ${row.order}${row.scope ? `, ${row.scope.proximity} steps from ${row.scope.root}` : ''} */`,
+      block,
+      '',
+    );
   }
   return lines.join('\n').trim();
 }

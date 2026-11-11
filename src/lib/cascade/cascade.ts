@@ -82,7 +82,8 @@ function originRank(d: CascadeDeclaration): number {
   return table[d.origin][d.important ? 1 : 0];
 }
 
-const isImportant = (d: CascadeDeclaration) => d.important && d.origin !== 'animation' && d.origin !== 'transition';
+const isImportant = (d: CascadeDeclaration) =>
+  d.important && d.origin !== 'animation' && d.origin !== 'transition';
 
 const ORIGIN_NAMES: Record<Origin, string> = {
   'user-agent': 'browser default',
@@ -107,9 +108,7 @@ export function resolveLayerOrder(input: CascadeInput): string[] {
 
 const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
 const list = (items: readonly string[]) =>
-  items.length <= 1
-    ? (items[0] ?? '')
-    : `${items.slice(0, -1).join(', ')} and ${items.at(-1) ?? ''}`;
+  items.length <= 1 ? (items[0] ?? '') : `${items.slice(0, -1).join(', ')} and ${items.at(-1) ?? ''}`;
 
 /** Resolves which declaration wins, following css-cascade-6 step by step. Never throws. */
 export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
@@ -120,7 +119,9 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
   const layerOrder = resolveLayerOrder(input);
   const index = new Map(all.map((d, i) => [d.id, i]));
   const duplicates = new Set(
-    all.filter((d, i) => all.findIndex((o) => o.selector === d.selector && o.inline === d.inline) !== i).map((d) => d.selector),
+    all
+      .filter((d, i) => all.findIndex((o) => o.selector === d.selector && o.inline === d.inline) !== i)
+      .map((d) => d.selector),
   );
   const label = (d: CascadeDeclaration) => {
     const base = d.inline ? 'the inline style' : `\`${d.selector}\``;
@@ -140,10 +141,14 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
     return i === -1 ? n : i;
   };
 
-  const comparators: Record<StepNumber, (x: CascadeDeclaration, y: CascadeDeclaration, important: boolean) => number> = {
+  const comparators: Record<
+    StepNumber,
+    (x: CascadeDeclaration, y: CascadeDeclaration, important: boolean) => number
+  > = {
     1: (x, y) => originRank(x) - originRank(y),
     2: (x, y, important) => {
-      const rank = (d: CascadeDeclaration) => (important ? (d.context === 'inner' ? 1 : 0) : d.context === 'outer' ? 1 : 0);
+      const rank = (d: CascadeDeclaration) =>
+        important ? (d.context === 'inner' ? 1 : 0) : d.context === 'outer' ? 1 : 0;
       return rank(x) - rank(y);
     },
     3: (x, y) => Number(x.inline) - Number(y.inline),
@@ -154,7 +159,12 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
   };
 
   /** Why `w` beat `l` at a step. */
-  const reason = (step: StepNumber, w: CascadeDeclaration, l: CascadeDeclaration, important: boolean): string => {
+  const reason = (
+    step: StepNumber,
+    w: CascadeDeclaration,
+    l: CascadeDeclaration,
+    important: boolean,
+  ): string => {
     switch (step) {
       case 1:
         return `${Label(w)} is one of the ${bucketName(w)}, which beat ${bucketName(l)}.`;
@@ -195,11 +205,15 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
       case 1:
         return `All are ${bucketName(first)}.`;
       case 2:
-        return first.context === 'outer' ? 'All come from the page itself; no shadow tree is involved.' : 'All come from the same shadow tree.';
+        return first.context === 'outer'
+          ? 'All come from the page itself; no shadow tree is involved.'
+          : 'All come from the same shadow tree.';
       case 3:
         return first.inline ? 'All are inline styles.' : 'None are inline styles.';
       case 4:
-        return first.layer === null || first.inline ? 'All are unlayered.' : `All are in the same layer, \`${first.layer}\`.`;
+        return first.layer === null || first.inline
+          ? 'All are unlayered.'
+          : `All are in the same layer, \`${first.layer}\`.`;
       case 5:
         return first.inline
           ? "Inline styles have no selector, so there's no specificity to compare."
@@ -224,7 +238,9 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
         step,
         name,
         outcome: 'not-reached',
-        explanation: decidedAtStep ? 'Not reached: the winner was already decided.' : 'Only one declaration, so there is nothing to compare.',
+        explanation: decidedAtStep
+          ? 'Not reached: the winner was already decided.'
+          : 'Only one declaration, so there is nothing to compare.',
         remaining: alive.map((d) => d.id),
       });
       continue;
@@ -243,7 +259,13 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
 
     if (survivors.length === 1 && rival) {
       decidedAtStep = step;
-      steps.push({ step, name, outcome: 'decided', explanation: reason(step, top, rival, important), remaining: [top.id] });
+      steps.push({
+        step,
+        name,
+        outcome: 'decided',
+        explanation: reason(step, top, rival, important),
+        remaining: [top.id],
+      });
     } else if (rival) {
       steps.push({
         step,
@@ -253,7 +275,13 @@ export function resolveCascade(input: CascadeInput): Result<CascadeResult> {
         remaining: survivors.map((d) => d.id),
       });
     } else {
-      steps.push({ step, name, outcome: 'tie', explanation: sameness(step, alive), remaining: alive.map((d) => d.id) });
+      steps.push({
+        step,
+        name,
+        outcome: 'tie',
+        explanation: sameness(step, alive),
+        remaining: alive.map((d) => d.id),
+      });
     }
     alive = survivors;
   }

@@ -84,10 +84,25 @@ const ldJson = graph.map((g) => JSON.stringify(g).replace(/</g, '\\u003c'));
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="preload" href="/fonts/geist-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/geist-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <script is:inline set:html={themeScript} />
-    {ldJson.map((json) => <script type="application/ld+json" set:html={json} />)}
+    {ldJson.map((json) => (
+      <script type="application/ld+json" set:html={json} />
+    ))}
+    {/*
+        Analytics hook, off in v1. To add a cookieless counter later (GoatCounter or self-hosted Umami):
+        1. add its script here, for example
+           <script async src="https://stats.example.com/script.js" data-website-id="..."></script>
+        2. allow its origin in security.csp (script-src and connect-src) in astro.config.mjs
+        3. update the privacy section on /about/ before shipping.
+      */}
     <slot name="head" />
   </head>
   <body>

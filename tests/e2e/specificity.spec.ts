@@ -1,0 +1,281 @@
+import { expect, test } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+
+/** Presses Tab (or Shift+Tab) until `target` has focus, failing after `max` presses. */
+async function tabTo(page: Page, target: Locator, max = 40, key: 'Tab' | 'Shift+Tab' = 'Tab') {
+  for (let i = 0; i < max; i++) {
+    if (await target.evaluate((el) => el === document.activeElement)) return;
+    await page.keyboard.press(key);
+  }
+  throw new Error(`Could not reach the element with ${key}`);
+}
+
+const verdict = (page: Page) => page.locator('[data-verdict]');
+const live = (page: Page) => page.locator('[data-live]');
+
+test.describe('duel', () => {
+  test('pre-renders the default result', async ({ page }) => {
+    await page.goto('/specificity/');
+    await expect(verdict(page)).toHaveText('#nav a wins in the first column: 1 ID beats 0.');
+    await expect(page.locator('[data-score="0"] .numeral[data-decided]')).toHaveText('1');
+  });
+
+  test('keyboard-only flow: compare, add, remove and copy', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/specificity/');
+
+    await page.keyboard.press('Tab');
+    await expect(page.locator('a.skip-link')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/#main$/);
+
+    const first = page.getByLabel('Selector 1', { exact: true });
+    await tabTo(page, first);
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('.a.b');
+    const second = page.getByLabel('Selector 2', { exact: true });
+    await page.keyboard.press('Tab');
+    await expect(second).toBeFocused();
+    await page.keyboard.press('ControlOrMeta+a');
+    await page.keyboard.type('.c');
+
+    await expect(verdict(page)).toHaveText(
+      '.a.b wins in the second column: 2 classes, attributes or pseudo-classes beat 1.',
+    );
+    await expect(live(page)).toHaveText('.a.b wins. Specificity 0, 2, 0 versus 0, 1, 0.');
+
+    const compareButton = page.getByRole('button', { name: 'Compare selectors' });
+    await tabTo(page, compareButton);
+    await page.keyboard.press('Enter');
+    await expect(live(page)).toHaveText('.a.b wins. Specificity 0, 2, 0 versus 0, 1, 0.');
+
+    const add = page.getByRole('button', { name: 'Add selector' });
+    await tabTo(page, add);
+    await page.keyboard.press('Enter');
+    const third = page.getByLabel('Selector 3', { exact: true });
+    await expect(third).toBeFocused();
+    await page.keyboard.type('#x');
+    await expect(verdict(page)).toContainText('#x wins in the first column');
+    await expect(verdict(page)).toContainText('closest rival is .a.b');
+
+    const remove = page.getByRole('button', { name: 'Remove selector 3' });
+    await tabTo(page, remove, 10, 'Shift+Tab');
+    await page.keyboard.press('Enter');
+    await expect(page.getByLabel('Selector 3', { exact: true })).toHaveCount(0);
+    await expect(verdict(page)).toContainText('.a.b wins');
+
+    const copy = page.getByRole('button', { name: 'Copy link' });
+    await tabTo(page, copy);
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[data-copy-status]')).toHaveText('Link copied.');
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    expect(copied).toMatch(/^http:\/\/localhost:\d+\/specificity\/\?s=[A-Za-z0-9_-]+$/);
+  });
+
+  test('explains ties and order of appearance', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByLabel('Selector 1', { exact: true }).fill('.a');
+    await page.getByLabel('Selector 2', { exact: true }).fill('.b');
+    await expect(verdict(page)).toHaveText('Same specificity: the one written later wins, so .b wins.');
+    await expect(page.locator('[data-score="1"] .outcome')).toHaveText('Wins: written later');
+  });
+
+  test('shows parse errors with position, icon and text', async ({ page }) => {
+    await page.goto('/specificity/');
+    const input = page.getByLabel('Selector 2', { exact: true });
+    await input.fill('.menu a)');
+    const message = page.locator('#sel-1-msg .message-error');
+    await expect(message).toContainText("This selector couldn't be parsed: unexpected ) at character 8.");
+    await expect(message.locator('svg')).toHaveCount(1);
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(verdict(page)).toHaveText('Fix selector 2 to see who wins.');
+  });
+
+  test('suggests fixes in order, including :where() and layers', async ({ page }) => {
+    await page.goto('/specificity/');
+    const titles = page.locator('[data-suggestions] .fix-title');
+    await expect(titles).toHaveText([
+      'Lower the winner with :where()',
+      'Move the rules into ordered layers',
+      'Raise the loser',
+      'Use !important (last resort)',
+    ]);
+  });
+});
+
+test.describe('shareable state', () => {
+  test('encodes input in the URL and restores it, keeping the canonical URL clean', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByLabel('Selector 1', { exact: true }).fill('ul li.active');
+    await expect(page).toHaveURL(/\?s=[A-Za-z0-9_-]+/);
+    const url = page.url();
+    await page.goto(url);
+    await expect(page.getByLabel('Selector 1', { exact: true })).toHaveValue('ul li.active');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://lab.suprabhat-dev.com/specificity/',
+    );
+  });
+
+  test('falls back to the default demo with a calm notice for a bad link', async ({ page }) => {
+    await page.goto('/specificity/?s=not-a-real-payload');
+    await expect(page.locator('[data-share-notice]')).toHaveText(
+      "This link's settings couldn't be read, so the default example is shown instead.",
+    );
+    await expect(verdict(page)).toHaveText('#nav a wins in the first column: 1 ID beats 0.');
+    await expect(page).toHaveURL(/\/specificity\/$/);
+  });
+
+  test('rejects an oversized payload', async ({ page }) => {
+    await page.goto(`/specificity/?s=${'A'.repeat(9000)}`);
+    await expect(page.locator('[data-share-notice]')).toContainText('too large');
+  });
+
+  test('"Try this" links load an example into the duel', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByRole('link', { name: 'Try this in the duel' }).nth(1).click();
+    await expect(page.getByLabel('Selector 2', { exact: true })).toHaveValue('#b');
+    await expect(verdict(page)).toHaveText('#b wins in the first column: 1 ID beats 0.');
+  });
+});
+
+test.describe('tabs', () => {
+  test('follow the WAI-ARIA tabs pattern', async ({ page }) => {
+    await page.goto('/specificity/');
+    const anatomy = page.getByRole('tab', { name: 'Anatomy' });
+    const nesting = page.getByRole('tab', { name: 'Nesting' });
+    const cascade = page.getByRole('tab', { name: 'Cascade' });
+    await expect(anatomy).toHaveAttribute('aria-selected', 'true');
+    await anatomy.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(nesting).toBeFocused();
+    await expect(nesting).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tabpanel', { name: 'Nesting' })).toBeVisible();
+    await page.keyboard.press('End');
+    await expect(cascade).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(anatomy).toBeFocused();
+    await page.keyboard.press('ArrowLeft');
+    await expect(cascade).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('tabpanel', { name: 'Anatomy' })).toBeHidden();
+  });
+
+  test('anatomy uses real tables with header scopes', async ({ page }) => {
+    await page.goto('/specificity/');
+    const table = page.locator('[data-anatomy] table').first();
+    await expect(table.locator('th[scope="col"]')).toHaveCount(6);
+    await expect(table.locator('tbody th[scope="row"]').first()).toHaveText('#nav');
+  });
+});
+
+test.describe('nesting and cascade', () => {
+  test('nesting expander shows the :is() form and its specificity', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByRole('tab', { name: 'Nesting' }).click();
+    await page.getByLabel('Nested CSS').fill('.a, #b { & .c {} }');
+    const output = page.locator('[data-nesting-output]');
+    await expect(output).toContainText(':is(.a, #b) .c');
+    await expect(output).toContainText('(1,1,0)');
+  });
+
+  test('cascade resolver marks the deciding step with text', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByRole('tab', { name: 'Cascade' }).click();
+    const output = page.locator('[data-cascade-output]');
+    await expect(output.locator('.cascade-summary')).toHaveText(
+      'Decided at step 4, layers: the unlayered rule beats any layered rule for normal declarations, so specificity never got a vote.',
+    );
+    await expect(output.locator('.ladder-step')).toHaveCount(7);
+    await expect(output.locator('.ladder-step[data-outcome="decided"]')).toContainText('Decided here');
+
+    // Make the first declaration !important: it now wins at step 1.
+    await page.locator('[data-row="0"] [data-field="important"]').check();
+    await expect(output.locator('.cascade-summary')).toContainText('Decided at step 1');
+
+    // Inline styles disable the selector, layer and scope fields.
+    await page.locator('[data-row="1"] [data-field="inline"]').check();
+    await expect(page.locator('[data-row="1"] [data-field="selector"]')).toBeDisabled();
+  });
+
+  test('adds and removes declarations within 2 to 4', async ({ page }) => {
+    await page.goto('/specificity/');
+    await page.getByRole('tab', { name: 'Cascade' }).click();
+    const add = page.getByRole('button', { name: 'Add declaration' });
+    await add.click();
+    await expect(page.locator('[data-row]')).toHaveCount(4);
+    await expect(add).toBeDisabled();
+    await page.getByRole('button', { name: 'Remove declaration 4' }).click();
+    await expect(page.locator('[data-row]')).toHaveCount(3);
+  });
+});
+
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('shows the pre-rendered demo and a noscript note', async ({ page }) => {
+    await page.goto('/specificity/');
+    await expect(verdict(page)).toHaveText('#nav a wins in the first column: 1 ID beats 0.');
+    // Chromium's parser still treats scripting as on when JS is disabled through DevTools,
+    // so check the <noscript> content rather than its visibility.
+    const noscript = await page.locator('noscript').evaluate((n) => n.innerHTML);
+    expect(noscript).toContain('JavaScript is off');
+    await expect(page.getByRole('heading', { name: 'Cascade', level: 2, exact: true })).toBeVisible();
+    await expect(page.getByRole('tablist')).toBeHidden();
+    await expect(page.locator('.cascade-summary')).toContainText('Decided at step 4');
+    await expect(page.getByRole('button', { name: 'Add selector' })).toBeHidden();
+  });
+});
+
+test.describe('site', () => {
+  test('theme toggle switches and persists', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/');
+    const toggle = page.getByRole('button', { name: 'Dark theme' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await toggle.click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  });
+
+  test('home and about ship no JavaScript besides the theme script', async ({ page }) => {
+    for (const route of ['/', '/about/']) {
+      await page.goto(route);
+      await expect(page.locator('script[src]')).toHaveCount(0);
+    }
+  });
+
+  test('no CSP violations or console errors', async ({ page }) => {
+    const problems: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') problems.push(m.text());
+    });
+    page.on('pageerror', (e) => problems.push(e.message));
+    for (const route of ['/', '/about/', '/specificity/']) {
+      await page.goto(route);
+      await page.waitForLoadState('networkidle');
+    }
+    await page.getByLabel('Selector 1', { exact: true }).fill('#a');
+    await expect(verdict(page)).toContainText('#a');
+    expect(problems).toEqual([]);
+  });
+
+  test('the slogan appears exactly twice across the site', async ({ page }) => {
+    let count = 0;
+    for (const route of ['/', '/specificity/', '/about/']) {
+      await page.goto(route);
+      const text = await page.locator('body').innerText();
+      count += text.split('Web for all, all for web.').length - 1;
+    }
+    // Once in the footer of each page, plus the /about/ title.
+    expect(count).toBe(4);
+  });
+
+  test('has JSON-LD for the tool', async ({ page }) => {
+    await page.goto('/specificity/');
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const types = blocks.map((b) => (JSON.parse(b) as { '@type': string })['@type']);
+    expect(types).toEqual(expect.arrayContaining(['WebApplication', 'BreadcrumbList']));
+  });
+});

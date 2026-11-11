@@ -11,12 +11,13 @@ const html = anatomyView(duel.contenders).map(renderToString).join('');
 ---
 
 <section class="panel" id="panel-anatomy" aria-labelledby="h-anatomy" data-panel="anatomy">
-  <h2 id="h-anatomy" data-panel-heading>Anatomy</h2>
+  <h2 id="h-anatomy" data-panel-heading>
+    Anatomy
+  </h2>
   <p class="panel-intro mt-s">
-    Every part of each selector above and what it adds. Underlines show the column: solid for IDs, dashed for the
-    class column, dotted for the type column, double for functional pseudo-classes. Read <a href="#how-calculated"
-      >how specificity is calculated</a
-    >.
+    Every part of each selector above and what it adds. Underlines show the column: solid for IDs, dashed for
+    the class column, dotted for the type column, double for functional pseudo-classes. Read{' '}
+    <a href="#how-calculated">how specificity is calculated</a>.
   </p>
   <div class="anatomy mt-l" data-anatomy set:html={html} />
 </section>

@@ -41,7 +41,8 @@ interface State {
 }
 
 export function start(app: HTMLElement, tabs: TabsController): void {
-  const q = <T extends Element>(selector: string, scope: ParentNode = document): T | null => scope.querySelector<T>(selector);
+  const q = <T extends Element>(selector: string, scope: ParentNode = document): T | null =>
+    scope.querySelector<T>(selector);
 
   const els = {
     contenders: q<HTMLElement>('[data-contenders]', app),
@@ -188,7 +189,10 @@ export function start(app: HTMLElement, tabs: TabsController): void {
     state.target = null;
     void loadCalc().then(() => {
       renderDuel({ full: true });
-      const next = q<HTMLInputElement>(`[data-selector="${Math.min(index, state.selectors.length - 1)}"]`, app);
+      const next = q<HTMLInputElement>(
+        `[data-selector="${Math.min(index, state.selectors.length - 1)}"]`,
+        app,
+      );
       next?.focus();
       syncUrl();
     });
@@ -244,12 +248,9 @@ export function start(app: HTMLElement, tabs: TabsController): void {
       if (status) status.textContent = 'Select the link below and copy it with Ctrl+C or Cmd+C.';
     };
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(link).then(
-        () => {
-          if (status) status.textContent = 'Link copied.';
-        },
-        fallback,
-      );
+      navigator.clipboard.writeText(link).then(() => {
+        if (status) status.textContent = 'Link copied.';
+      }, fallback);
     } else fallback();
   });
 
@@ -285,7 +286,13 @@ export function start(app: HTMLElement, tabs: TabsController): void {
       mount(
         els.layerError,
         first
-          ? h('p', { class: 'message message-error' }, ...rich(`\`${first}\` isn't a valid layer name. Start with a letter, then use letters, digits, hyphens or underscores.`))
+          ? h(
+              'p',
+              { class: 'message message-error' },
+              ...rich(
+                `\`${first}\` isn't a valid layer name. Start with a letter, then use letters, digits, hyphens or underscores.`,
+              ),
+            )
           : [],
       );
     }
@@ -295,7 +302,8 @@ export function start(app: HTMLElement, tabs: TabsController): void {
   function readRows(): void {
     const rows: CascadeRow[] = [];
     els.decls?.querySelectorAll<HTMLFieldSetElement>('[data-row]').forEach((fieldset, i) => {
-      const field = <T extends HTMLElement>(name: string) => fieldset.querySelector<T>(`[data-field="${name}"]`);
+      const field = <T extends HTMLElement>(name: string) =>
+        fieldset.querySelector<T>(`[data-field="${name}"]`);
       const previous = state.rows[i];
       const inline = field<HTMLInputElement>('inline')?.checked ?? false;
       const scopeRoot = (field<HTMLInputElement>('scope')?.value ?? '').slice(0, LIMITS.scopeRoot);
@@ -307,9 +315,17 @@ export function start(app: HTMLElement, tabs: TabsController): void {
         inline,
         layer: layer && LAYER_NAME.test(layer) ? layer : null,
         scope: scopeRoot.trim()
-          ? { root: scopeRoot, proximity: clampInt(field<HTMLInputElement>('proximity')?.value ?? '', 0, LIMITS.proximity, 1) }
+          ? {
+              root: scopeRoot,
+              proximity: clampInt(field<HTMLInputElement>('proximity')?.value ?? '', 0, LIMITS.proximity, 1),
+            }
           : null,
-        order: clampInt(field<HTMLInputElement>('order')?.value ?? '', 1, LIMITS.order, previous?.order ?? i + 1),
+        order: clampInt(
+          field<HTMLInputElement>('order')?.value ?? '',
+          1,
+          LIMITS.order,
+          previous?.order ?? i + 1,
+        ),
       };
       rows.push(row);
       // Inline styles have no selector, layer or scope; keep the controls in step without re-rendering.
@@ -325,10 +341,15 @@ export function start(app: HTMLElement, tabs: TabsController): void {
 
   function renderRows(focusRow: number | null = null): void {
     if (!els.decls || !calc) return;
-    const model = buildCascade({ property: state.property, layerOrder: state.layerOrder, rows: state.rows }, calc);
+    const model = buildCascade(
+      { property: state.property, layerOrder: state.layerOrder, rows: state.rows },
+      calc,
+    );
     mount(
       els.decls,
-      model.rows.map((r, i) => cascadeRowView(i, model.rows.length, r.row, state.layerOrder, r.error?.message ?? null)),
+      model.rows.map((r, i) =>
+        cascadeRowView(i, model.rows.length, r.row, state.layerOrder, r.error?.message ?? null),
+      ),
     );
     if (els.addRow) els.addRow.disabled = state.rows.length >= LIMITS.rows.max;
     if (focusRow !== null) q<HTMLInputElement>(`[data-row="${focusRow}"] input`, els.decls)?.focus();
@@ -337,7 +358,12 @@ export function start(app: HTMLElement, tabs: TabsController): void {
   function refreshLayerSelects(): void {
     els.decls?.querySelectorAll<HTMLSelectElement>('[data-field="layer"]').forEach((select, i) => {
       const current = state.rows[i]?.layer ?? null;
-      const names = [...new Set([...state.layerOrder, ...(current && !state.layerOrder.includes(current) ? [current] : [])])];
+      const names = [
+        ...new Set([
+          ...state.layerOrder,
+          ...(current && !state.layerOrder.includes(current) ? [current] : []),
+        ]),
+      ];
       mount(select, [
         h('option', { value: '', selected: current === null }, 'None (unlayered)'),
         ...names.map((n) => h('option', { value: n, selected: n === current }, n)),
@@ -347,7 +373,10 @@ export function start(app: HTMLElement, tabs: TabsController): void {
 
   function renderCascade(options: { announce?: boolean } = {}): void {
     if (!calc || !els.cascadeOutput) return;
-    const model = buildCascade({ property: state.property, layerOrder: state.layerOrder, rows: state.rows }, calc);
+    const model = buildCascade(
+      { property: state.property, layerOrder: state.layerOrder, rows: state.rows },
+      calc,
+    );
     mount(els.cascadeOutput, cascadeResultView(model));
     // Update per-row selector errors in place so focus is never lost.
     model.rows.forEach((r, i) => {
@@ -403,7 +432,15 @@ export function start(app: HTMLElement, tabs: TabsController): void {
   els.addRow?.addEventListener('click', () => {
     if (state.rows.length >= LIMITS.rows.max) return;
     const order = Math.min(LIMITS.order, Math.max(0, ...state.rows.map((r) => r.order)) + 1);
-    state.rows.push({ selector: 'p', value: 'black', important: false, inline: false, layer: null, scope: null, order });
+    state.rows.push({
+      selector: 'p',
+      value: 'black',
+      important: false,
+      inline: false,
+      layer: null,
+      scope: null,
+      order,
+    });
     void loadCalc().then(() => {
       renderRows(state.rows.length - 1);
       renderCascade({ announce: true });
@@ -420,24 +457,24 @@ export function start(app: HTMLElement, tabs: TabsController): void {
 
   /* ---------- Shared state ---------- */
 
-  function applyState(next: ShareState): Promise<void> {
+  async function applyState(next: ShareState): Promise<void> {
     Object.assign(state, fromInputs(next.inputs, next.mode));
     if (els.nesting) els.nesting.value = state.nesting;
     if (els.property) els.property.value = state.property;
     if (els.layerOrder) els.layerOrder.value = state.layerOrder.join(', ');
     tabs.select(state.mode);
-    return loadCalc().then(() => {
-      lastValues = [];
-      renderDuel({ full: true, announce: false });
-      renderNesting();
-      renderRows();
-      renderCascade();
-    });
+    await loadCalc();
+    lastValues = [];
+    renderDuel({ full: true, announce: false });
+    renderNesting();
+    renderRows();
+    renderCascade();
   }
 
   // "Try this" links in the explainer load an example without a full reload.
   document.addEventListener('click', (event) => {
-    const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-try]') : null;
+    const link =
+      event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-try]') : null;
     if (!link || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
     const s = new URL(link.href).searchParams.get('s');
     const decoded = s ? decodeState(s) : null;
@@ -484,9 +521,10 @@ export function start(app: HTMLElement, tabs: TabsController): void {
     const current = JSON.stringify({ ...toShare().inputs });
     void loadCalc().then(() => {
       if (current === JSON.stringify(DEFAULT_INPUTS)) return;
-      renderDuel({ announce: false });
+      renderDuel();
       renderNesting();
       renderCascade();
+      syncUrl();
     });
   }
 }

@@ -47,7 +47,13 @@ export function decidingColumn(x: Specificity, y: Specificity): Column | null {
 /** Compares any number of selectors written in order; later ones win ties. */
 export function compare(contenders: ReadonlyArray<Contender>): Comparison {
   if (contenders.length < 2) {
-    return { winner: 0, effectiveWinner: 0, runnerUp: 0, decidedBy: 'order', reason: 'Add another selector to compare.' };
+    return {
+      winner: 0,
+      effectiveWinner: 0,
+      runnerUp: 0,
+      decidedBy: 'order',
+      reason: 'Add another selector to compare.',
+    };
   }
 
   let best = 0;

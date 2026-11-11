@@ -20,45 +20,52 @@ const flat = rows.flatMap((r) => r.results.map((x) => ({ selector: x.selector, v
 const verdict = flat.length > 1 && rows.every((r) => r.results.length === 1) ? compare(flat).reason : null;
 const verdictHtml = verdict ? rich(verdict).map(renderToString).join('') : '';
 
-const duelSelectors = selectors.length >= 2 ? selectors.slice(0, 8) : [...selectors, DEFAULT_INPUTS.selectors[1] ?? '.a'];
-const encoded = encodeState({ v: 1, mode: 'anatomy', inputs: { ...DEFAULT_INPUTS, selectors: duelSelectors } });
+const duelSelectors =
+  selectors.length >= 2 ? selectors.slice(0, 8) : [...selectors, DEFAULT_INPUTS.selectors[1] ?? '.a'];
+const encoded = encodeState({
+  v: 1,
+  mode: 'anatomy',
+  inputs: { ...DEFAULT_INPUTS, selectors: duelSelectors },
+});
 const tryHref = encoded.ok ? `/specificity/?s=${encoded.value}` : null;
 ---
 
 <figure class="example">
   <div class="example-head">
     <figcaption>{caption}</figcaption>
-    {
-      tryHref && (
-        <a href={tryHref} data-try rel="nofollow">
-          Try this in the duel
-        </a>
-      )
-    }
+    {tryHref && (
+      <a href={tryHref} data-try rel="nofollow">
+        Try this in the duel
+      </a>
+    )}
   </div>
   <div class="table-wrap" tabindex="0" role="region" aria-label={caption}>
     <table class="table">
       <thead>
         <tr>
           <th scope="col">Selector</th>
-          <th scope="col" class="num">IDs</th>
-          <th scope="col" class="num">Classes</th>
-          <th scope="col" class="num">Types</th>
+          <th scope="col" class="num">
+            IDs
+          </th>
+          <th scope="col" class="num">
+            Classes
+          </th>
+          <th scope="col" class="num">
+            Types
+          </th>
         </tr>
       </thead>
       <tbody>
-        {
-          flat.map((r) => (
-            <tr>
-              <th scope="row">
-                <code>{r.selector}</code>
-              </th>
-              <td class="num">{r.value[0]}</td>
-              <td class="num">{r.value[1]}</td>
-              <td class="num">{r.value[2]}</td>
-            </tr>
-          ))
-        }
+        {flat.map((r) => (
+          <tr>
+            <th scope="row">
+              <code>{r.selector}</code>
+            </th>
+            <td class="num">{r.value[0]}</td>
+            <td class="num">{r.value[1]}</td>
+            <td class="num">{r.value[2]}</td>
+          </tr>
+        ))}
       </tbody>
     </table>
   </div>

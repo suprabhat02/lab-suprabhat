@@ -16,15 +16,36 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
 <section class="section" aria-label="Inspect selectors and the cascade">
   <div class="wrap tabs" data-tabs>
     <div class="tablist" role="tablist" aria-label="Inspect" data-tablist hidden>
-      <button class="tab" type="button" role="tab" id="tab-anatomy" aria-controls="panel-anatomy" data-tab="anatomy"
-        >Anatomy</button
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        id="tab-anatomy"
+        aria-controls="panel-anatomy"
+        data-tab="anatomy"
       >
-      <button class="tab" type="button" role="tab" id="tab-nesting" aria-controls="panel-nesting" data-tab="nesting"
-        >Nesting</button
+        Anatomy
+      </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        id="tab-nesting"
+        aria-controls="panel-nesting"
+        data-tab="nesting"
       >
-      <button class="tab" type="button" role="tab" id="tab-cascade" aria-controls="panel-cascade" data-tab="cascade"
-        >Cascade</button
+        Nesting
+      </button>
+      <button
+        class="tab"
+        type="button"
+        role="tab"
+        id="tab-cascade"
+        aria-controls="panel-cascade"
+        data-tab="cascade"
       >
+        Cascade
+      </button>
     </div>
     <Anatomy duel={duel} />
     <NestingPanel css={nestingCss} model={nesting} />

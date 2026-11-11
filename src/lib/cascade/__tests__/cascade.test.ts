@@ -55,7 +55,10 @@ describe('cascade resolver', () => {
   it('normal inline `style` beats `#id#id`', () => {
     const r = resolve({
       layerOrder: [],
-      declarations: [decl('#id#id', { specificity: [2, 0, 0], order: 2 }), decl('inline', { inline: true, order: 1 })],
+      declarations: [
+        decl('#id#id', { specificity: [2, 0, 0], order: 2 }),
+        decl('inline', { inline: true, order: 1 }),
+      ],
     });
     expect(r.winnerId).toBe('inline');
     expect(r.decidedAtStep).toBe(3);
@@ -87,7 +90,12 @@ describe('cascade resolver', () => {
     const r = resolve({
       layerOrder: [],
       declarations: [
-        decl('scoped p', { selector: 'p', scope: { root: '.c', proximity: 1 }, specificity: [0, 0, 1], order: 2 }),
+        decl('scoped p', {
+          selector: 'p',
+          scope: { root: '.c', proximity: 1 },
+          specificity: [0, 0, 1],
+          order: 2,
+        }),
         decl('.x p', { specificity: [0, 1, 1], order: 1 }),
       ],
     });
@@ -110,7 +118,10 @@ describe('cascade resolver', () => {
   it('a scoped rule beats an unscoped one with the same specificity', () => {
     const r = resolve({
       layerOrder: [],
-      declarations: [decl('scoped', { scope: { root: '.c', proximity: 9 }, order: 1 }), decl('plain', { order: 2 })],
+      declarations: [
+        decl('scoped', { scope: { root: '.c', proximity: 9 }, order: 1 }),
+        decl('plain', { order: 2 }),
+      ],
     });
     expect(r.winnerId).toBe('scoped');
     expect(r.steps[5]?.explanation).toMatch(/infinitely far/);
@@ -119,7 +130,10 @@ describe('cascade resolver', () => {
   it('two equal-specificity rules with the same importance: the later one wins', () => {
     const r = resolve({
       layerOrder: [],
-      declarations: [decl('.a', { specificity: [0, 1, 0], order: 1 }), decl('.b', { specificity: [0, 1, 0], order: 2 })],
+      declarations: [
+        decl('.a', { specificity: [0, 1, 0], order: 1 }),
+        decl('.b', { specificity: [0, 1, 0], order: 2 }),
+      ],
     });
     expect(r.winnerId).toBe('.b');
     expect(r.decidedAtStep).toBe(7);
@@ -129,7 +143,10 @@ describe('cascade resolver', () => {
   it('`@layer a, b;`: b beats a for normal declarations', () => {
     const r = resolve({
       layerOrder: ['a', 'b'],
-      declarations: [decl('in-b', { layer: 'b', order: 1 }), decl('in-a', { layer: 'a', specificity: [1, 0, 0], order: 2 })],
+      declarations: [
+        decl('in-b', { layer: 'b', order: 1 }),
+        decl('in-a', { layer: 'a', specificity: [1, 0, 0], order: 2 }),
+      ],
     });
     expect(r.winnerId).toBe('in-b');
     expect(r.decidedAtStep).toBe(4);
@@ -182,7 +199,10 @@ describe('cascade resolver', () => {
   it('models shadow context: outer wins for normal, inner wins for !important', () => {
     const normal = resolve({
       layerOrder: [],
-      declarations: [decl('inner', { context: 'inner', specificity: [1, 0, 0] }), decl('outer', { context: 'outer' })],
+      declarations: [
+        decl('inner', { context: 'inner', specificity: [1, 0, 0] }),
+        decl('outer', { context: 'outer' }),
+      ],
     });
     expect(normal.winnerId).toBe('outer');
     expect(normal.decidedAtStep).toBe(2);

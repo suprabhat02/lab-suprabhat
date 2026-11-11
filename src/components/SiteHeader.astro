@@ -9,14 +9,20 @@ const { path } = Astro.props;
 
 <header class="site-header">
   <div class="wrap site-header-inner">
-    <a class="brand" href="/" aria-current={path === '/' ? 'page' : undefined}
-      >lab<span class="brand-slash" aria-hidden="true">/</span><span class="visually-hidden"> home</span></a
-    >
+    <a class="brand" href="/" aria-current={path === '/' ? 'page' : undefined}>
+      lab
+      <span class="brand-slash" aria-hidden="true">
+        /
+      </span>
+      <span class="visually-hidden"> home</span>
+    </a>
     <nav class="site-nav" aria-label="Main">
-      <a class="nav-link" href="/specificity/" aria-current={path === '/specificity/' ? 'page' : undefined}
-        >Specificity</a
-      >
-      <a class="nav-link" href="/about/" aria-current={path === '/about/' ? 'page' : undefined}>About</a>
+      <a class="nav-link" href="/specificity/" aria-current={path === '/specificity/' ? 'page' : undefined}>
+        Specificity
+      </a>
+      <a class="nav-link" href="/about/" aria-current={path === '/about/' ? 'page' : undefined}>
+        About
+      </a>
       <ThemeToggle />
     </nav>
   </div>
