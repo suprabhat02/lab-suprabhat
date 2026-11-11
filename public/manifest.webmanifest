@@ -1,0 +1,12 @@
+{
+  "name": "Suprabhat's Lab",
+  "short_name": "Lab",
+  "description": "Free, open frontend tools and explainers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070c10",
+  "theme_color": "#070c10",
+  "lang": "en",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

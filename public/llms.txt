@@ -1,0 +1,26 @@
+# Suprabhat's Lab
+
+> Free, open frontend tools and explainers at lab.suprabhat-dev.com. No sign-up, no paywall, no tracking. Built by Suprabhat Kumar (https://suprabhat-dev.com). Slogan: "Web for all, all for web."
+
+Every tool pairs an interactive answer with a long-form explainer. Pages are static HTML and work without JavaScript as read-only examples.
+
+## Tools
+
+- [CSS Specificity Wars](https://lab.suprabhat-dev.com/specificity/): compare up to eight CSS selectors and see which wins and why. Shows (A, B, C) specificity, the deciding column in plain English, a part-by-part anatomy, a nesting expander that shows the `:is()` form, and a cascade resolver that walks all seven cascade steps (origin and importance, context, element-attached styles, layers, specificity, @scope proximity, order of appearance). Includes fix suggestions and shareable links.
+
+## Explainer topics on the specificity page
+
+- [How is CSS specificity calculated?](https://lab.suprabhat-dev.com/specificity/#how-calculated)
+- [How do :is(), :not(), :has() and :where() count?](https://lab.suprabhat-dev.com/specificity/#functional)
+- [:nth-child(of S)](https://lab.suprabhat-dev.com/specificity/#nth-child-of)
+- [Shadow DOM selectors](https://lab.suprabhat-dev.com/specificity/#shadow-dom)
+- [How does nesting affect specificity?](https://lab.suprabhat-dev.com/specificity/#nesting)
+- [The cascade order](https://lab.suprabhat-dev.com/specificity/#cascade-order)
+- [Does @layer beat specificity?](https://lab.suprabhat-dev.com/specificity/#layers)
+- [What is @scope proximity?](https://lab.suprabhat-dev.com/specificity/#scope)
+- [Where do inline styles fit?](https://lab.suprabhat-dev.com/specificity/#inline)
+- [Why is my CSS not applying?](https://lab.suprabhat-dev.com/specificity/#why-not-applying)
+
+## About
+
+- [About and privacy](https://lab.suprabhat-dev.com/about/): manifesto, how the site is built, and the privacy statement (no cookies, no tracking).
