@@ -1,0 +1,41 @@
+---
+import { calculate } from '../lib/cascade/specificity';
+import { encodeState } from '../lib/cascade/share';
+import type { CascadeRow } from '../lib/cascade/share';
+import { buildCascade } from '../lib/app/model';
+import { DEFAULT_INPUTS } from '../lib/app/defaults';
+import { rich, renderToString } from '../lib/view/h';
+
+interface Props {
+  caption: string;
+  code: string;
+  layerOrder?: string[];
+  property?: string;
+  rows: CascadeRow[];
+}
+const { caption, code, layerOrder = [], property = 'color', rows } = Astro.props;
+const model = buildCascade({ property, layerOrder, rows }, calculate);
+if (!model.result) throw new Error(`Cascade example failed: ${caption}: ${model.problem ?? ''}`);
+const summaryHtml = rich(model.result.summary).map(renderToString).join('');
+const encoded = encodeState({
+  v: 1,
+  mode: 'cascade',
+  inputs: { ...DEFAULT_INPUTS, cascade: { property, layerOrder, rows } },
+});
+const tryHref = encoded.ok ? `/specificity/?s=${encoded.value}` : null;
+---
+
+<figure class="example">
+  <div class="example-head">
+    <figcaption>{caption}</figcaption>
+    {
+      tryHref && (
+        <a href={tryHref} data-try rel="nofollow">
+          Try this in the cascade resolver
+        </a>
+      )
+    }
+  </div>
+  <pre class="code mt-s"><code>{code}</code></pre>
+  <p class="mt-s" set:html={summaryHtml} />
+</figure>
