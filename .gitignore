@@ -6,6 +6,15 @@ dist/
 # dependencies
 node_modules/
 
+# copied from @fontsource-variable/geist-mono by scripts/copy-fonts.mjs
+public/fonts/
+
+# test output
+test-results/
+playwright-report/
+coverage/
+.lighthouse/
+
 # logs
 npm-debug.log*
 yarn-debug.log*
