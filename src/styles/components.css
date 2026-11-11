@@ -219,18 +219,6 @@
     }
   }
 
-  .button-primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--on-accent);
-
-    &:hover {
-      background: var(--accent-strong);
-      border-color: var(--accent-strong);
-      color: var(--on-accent);
-    }
-  }
-
   .button-quiet {
     min-block-size: 32px;
     min-inline-size: 44px;
@@ -356,6 +344,8 @@
   .numerals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* The marker row is always reserved, so the winner and loser labels line up across cards. */
+    grid-template-rows: auto auto 1.6rem;
     column-gap: clamp(0.75rem, 5cqi, 2.5rem);
     max-inline-size: 34rem;
     overflow: clip;
@@ -616,6 +606,7 @@
   .anatomy {
     display: grid;
     gap: var(--space-2xl);
+    max-inline-size: 60rem;
   }
 
   .anatomy-selector {
@@ -805,13 +796,12 @@
   /* ---------- Explainer ---------- */
 
   .example {
-    padding: var(--space-s);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg-2);
-
     & .table {
       margin-block-start: var(--space-2xs);
+    }
+
+    & figcaption {
+      font-weight: 600;
     }
   }
 
@@ -849,15 +839,21 @@
     max-inline-size: var(--measure);
   }
 
+  /* Section headings sit one step below the explainer's own title. */
+  .explainer-body > h2 {
+    font-size: var(--step-2);
+  }
+
   .explainer {
     display: grid;
     gap: var(--space-l) var(--space-2xl);
 
     @media (width >= 64rem) {
-      grid-template-columns: minmax(0, 1fr) 15rem;
+      grid-template-columns: minmax(0, 54rem) 15rem;
       grid-template-areas:
         'head nav'
         'body nav';
+      justify-content: start;
       align-items: start;
 
       & > .explainer-head {

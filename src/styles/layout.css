@@ -38,6 +38,11 @@
     border-block-start: 1px solid var(--line);
   }
 
+  /* A hero already ends with space; don't stack a full section gap on top of it. */
+  :is(.tool-hero, .hub-hero) + .section {
+    padding-block-start: var(--space-xl);
+  }
+
   /* Below-the-fold sections: skip style and layout until they're near the viewport. */
   .section-deferred {
     content-visibility: auto;
