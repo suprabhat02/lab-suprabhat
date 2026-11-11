@@ -69,6 +69,12 @@ const result = cascadeResultView(model).map(renderToString).join('');
         Add declaration
       </button>
     </div>
-    <div data-cascade-output role="region" aria-label="Cascade result" set:html={result} />
+    <div
+      class="cascade-output"
+      data-cascade-output
+      role="region"
+      aria-label="Cascade result"
+      set:html={result}
+    />
   </div>
 </section>

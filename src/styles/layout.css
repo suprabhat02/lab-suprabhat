@@ -78,20 +78,27 @@
     z-index: 10;
     background: var(--bg);
     border-block-end: 1px solid var(--line);
+
+    /* At high zoom levels a sticky bar would cover too much of the page. */
+    @media (height < 32rem) {
+      position: static;
+    }
   }
 
   .site-header-inner {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-s);
+    gap: 0 var(--space-s);
     min-block-size: var(--header-height);
   }
 
   .site-nav {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-xs);
+    gap: 0 var(--space-xs);
   }
 
   .site-main {

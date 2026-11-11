@@ -23,3 +23,20 @@ test('home and about', async ({ page }) => {
   await page.goto('/about/');
   await page.screenshot({ path: '.shots/about.png', fullPage: true });
 });
+
+test('400% zoom equivalent (1280x1024 at 400%)', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 256 });
+  await page.goto('/specificity/');
+  await page.screenshot({ path: '.shots/zoom-400.png' });
+});
+
+test('panels', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.goto('/specificity/');
+  for (const name of ['Nesting', 'Cascade']) {
+    await page.getByRole('tab', { name }).click();
+    const panel = page.getByRole('tabpanel', { name });
+    await panel.scrollIntoViewIfNeeded();
+    await panel.screenshot({ path: `.shots/panel-${name.toLowerCase()}.png` });
+  }
+});

@@ -698,6 +698,15 @@
     }
   }
 
+  /* Keep the verdict in view while editing a long list of declarations. */
+  .cascade-output {
+    @media (width >= 64rem) and (height >= 40rem) {
+      position: sticky;
+      inset-block-start: calc(var(--header-height) + var(--space-s));
+      align-self: start;
+    }
+  }
+
   .cascade-winner {
     font-size: var(--step-1);
     font-weight: 600;

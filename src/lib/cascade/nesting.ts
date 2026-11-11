@@ -189,10 +189,11 @@ export function expandNesting(css: string): Result<NestingOutput> {
         const parents = frame.parents;
         const sink = parents
           ? lazySink(() => {
+              // Declarations in a nested @media/@supports act like `& { … }`: one :is() of the parent list.
               const rule: MutableRule = {
                 source: '&',
-                selectors: [...parents],
-                depth: frame.depth,
+                selectors: parents.length > 1 ? [`:is(${parents.join(', ')})`] : [...parents],
+                depth: frame.depth + 1,
                 atRules,
                 declarations: [],
               };
