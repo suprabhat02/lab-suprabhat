@@ -72,6 +72,15 @@
     }
   }
 
+  /* A wider column whose text children still keep the reading measure. */
+  .prose-wide {
+    max-inline-size: none;
+
+    & > * {
+      max-inline-size: var(--measure);
+    }
+  }
+
   .site-header {
     position: sticky;
     inset-block-start: 0;

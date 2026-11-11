@@ -799,10 +799,95 @@
     gap: var(--space-2xs) var(--space-s);
   }
 
+  .explainer {
+    display: grid;
+    gap: var(--space-l) var(--space-2xl);
+
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      grid-template-areas:
+        'head nav'
+        'body nav';
+      align-items: start;
+
+      & > .explainer-head {
+        grid-area: head;
+      }
+
+      & > .explainer-body {
+        grid-area: body;
+      }
+    }
+  }
+
   .toc {
-    columns: 2 18rem;
-    column-gap: var(--space-l);
-    padding-inline-start: 1.4em;
+    font-size: var(--step--1);
+    line-height: 1.45;
+
+    @media (width >= 64rem) {
+      grid-area: nav;
+      position: sticky;
+      inset-block-start: calc(var(--header-height) + var(--space-m));
+      max-block-size: calc(100dvh - var(--header-height) - 2 * var(--space-m));
+      overflow-y: auto;
+    }
+  }
+
+  .toc-summary {
+    display: flex;
+    align-items: center;
+    min-block-size: 44px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .toc-title {
+    display: none;
+    margin-block-end: var(--space-2xs);
+    color: var(--text-2);
+    font-weight: 600;
+  }
+
+  .toc-list {
+    display: grid;
+    gap: var(--space-3xs);
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding-block: 0.35em;
+    color: var(--text-2);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--text);
+      text-decoration: underline;
+    }
+
+    &[aria-current='location'] {
+      color: var(--accent);
+      font-weight: 650;
+    }
+  }
+
+  /* At 1024px and up the list is always shown; below, it's a collapsed <details>. */
+  @media (width >= 64rem) {
+    @supports selector(::details-content) {
+      .toc-details::details-content {
+        display: block;
+        content-visibility: visible;
+      }
+
+      .toc-summary {
+        display: none;
+      }
+
+      .toc-title {
+        display: block;
+      }
+    }
   }
 
   /* ---------- Hub ---------- */

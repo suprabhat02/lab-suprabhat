@@ -261,6 +261,14 @@ test.describe('site', () => {
     expect(problems).toEqual([]);
   });
 
+  test('prose has no stray spaces before punctuation', async ({ page }) => {
+    for (const route of ['/', '/specificity/', '/about/']) {
+      await page.goto(route);
+      const text = await page.locator('main').evaluate((el) => el.textContent ?? '');
+      expect(text.match(/[\w)\]`]\s+[.,;!?](?=\s|$)/g) ?? []).toEqual([]);
+    }
+  });
+
   test('the slogan appears exactly twice across the site', async ({ page }) => {
     let count = 0;
     for (const route of ['/', '/specificity/', '/about/']) {

@@ -40,3 +40,13 @@ test('panels', async ({ page }) => {
     await panel.screenshot({ path: `.shots/panel-${name.toLowerCase()}.png` });
   }
 });
+
+for (const width of [375, 1440]) {
+  test(`explainer ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/specificity/#layers');
+    await page.waitForFunction(() => window.scrollY > 0);
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `.shots/explainer-${width}.png` });
+  });
+}

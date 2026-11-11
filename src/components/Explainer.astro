@@ -13,54 +13,51 @@ const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): 
   order: 1,
   ...extra,
 });
+
+const sections = [
+  ['how-calculated', 'How is CSS specificity calculated?'],
+  ['functional', 'How do :is(), :not(), :has() and :where() count?'],
+  ['nth-child-of', 'What about :nth-child(… of S)?'],
+  ['shadow-dom', 'Shadow DOM selectors'],
+  ['nesting', 'How does nesting affect specificity?'],
+  ['cascade-order', 'The cascade order'],
+  ['layers', 'Does @layer beat specificity?'],
+  ['scope', 'What is @scope proximity?'],
+  ['inline', 'Where do inline styles fit?'],
+  ['why-not-applying', 'Why is my CSS not applying?'],
+] as const;
 ---
 
-<section class="section section-deferred" aria-labelledby="explainer-title">
-  <div class="wrap">
-    <article class="prose">
+<section class="section section-deferred" aria-labelledby="explainer-title" data-explainer>
+  <div class="wrap explainer">
+    <header class="explainer-head prose">
       <h2 id="explainer-title">Specificity and the cascade, explained</h2>
       <p>
         When two rules set the same property on the same element, the browser has to pick one. Most people
         learn that "the more specific selector wins". That's true, but it's only one step of a longer process
         called the cascade. This guide covers both, with examples you can load straight into the tool above.
       </p>
+    </header>
 
-      <nav aria-labelledby="toc-title">
-        <h3 id="toc-title">On this page</h3>
-        <ul class="toc mt-s">
-          <li>
-            <a href="#how-calculated">How is CSS specificity calculated?</a>
-          </li>
-          <li>
-            <a href="#functional">How do :is(), :not(), :has() and :where() count?</a>
-          </li>
-          <li>
-            <a href="#nth-child-of">What about :nth-child(… of S)?</a>
-          </li>
-          <li>
-            <a href="#shadow-dom">Shadow DOM selectors</a>
-          </li>
-          <li>
-            <a href="#nesting">How does nesting affect specificity?</a>
-          </li>
-          <li>
-            <a href="#cascade-order">The cascade order</a>
-          </li>
-          <li>
-            <a href="#layers">Does @layer beat specificity?</a>
-          </li>
-          <li>
-            <a href="#scope">What is @scope proximity?</a>
-          </li>
-          <li>
-            <a href="#inline">Where do inline styles fit?</a>
-          </li>
-          <li>
-            <a href="#why-not-applying">Why is my CSS not applying?</a>
-          </li>
-        </ul>
-      </nav>
+    <nav class="toc" aria-label="On this page" data-toc>
+      <p class="toc-title" aria-hidden="true">
+        On this page
+      </p>
+      <details class="toc-details">
+        <summary class="toc-summary">On this page</summary>
+        <ol class="toc-list" role="list">
+          {sections.map(([id, title]) => (
+            <li>
+              <a class="toc-link" href={`#${id}`}>
+                {title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </details>
+    </nav>
 
+    <article class="explainer-body prose prose-wide">
       <h2 id="how-calculated">How is CSS specificity calculated?</h2>
       <p>
         Specificity is three separate counts, written <code>(A, B, C)</code>. Look at every simple selector in
@@ -72,11 +69,10 @@ const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): 
         </li>
         <li>
           <strong>B, classes:</strong> each <code>.class</code>, attribute selector like{' '}
-          <code>[type="text"]</code>
-          and pseudo-class like <code>:hover</code>.
+          <code>[type="text"]</code> and pseudo-class like <code>:hover</code>.
         </li>
         <li>
-          <strong>C, types:</strong> each element name like <code>p</code> and pseudo-element like
+          <strong>C, types:</strong> each element name like <code>p</code> and pseudo-element like{' '}
           <code>::before</code>.
         </li>
       </ul>
@@ -109,7 +105,7 @@ const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): 
 
       <h2 id="functional">How do :is(), :not(), :has() and :where() count?</h2>
       <p>
-        <code>:is()</code>, <code>:not()</code> and <code>:has()</code> take the specificity of their
+        <code>:is()</code>, <code>:not()</code> and <code>:has()</code> take the specificity of their{' '}
         <strong>most specific argument</strong>. That happens even when the element only matches a weaker
         argument, or, for <code>:not()</code>, matches none of them.
       </p>
@@ -158,8 +154,8 @@ const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): 
 
       <h2 id="nesting">How does nesting affect specificity?</h2>
       <p>
-        In native CSS nesting, <code>&amp;</code> stands for the parent selector wrapped in <code>:is()</code>
-        . When the parent is a list, the nested selector takes the specificity of the <em>strongest</em>{' '}
+        In native CSS nesting, <code>&amp;</code> stands for the parent selector wrapped in <code>:is()</code>. When
+        the parent is a list, the nested selector takes the specificity of the <em>strongest</em>{' '}
         parent, even for elements that only match a weaker one.
       </p>
       <pre class="code"><code>{`.a, #b {
@@ -169,7 +165,8 @@ const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): 
 /* becomes */
 :is(.a, #b) .c { color: red; }  /* (1,1,0), even for .a .c */`}</code></pre>
       <p>
-        A nested rule without <code>&amp;</code> behaves as if it started with <code>&amp; </code>. Use the
+        A nested rule without <code>&amp;</code> behaves as if it started with <code>&amp;</code> and a space.
+        Use the
         <a href="#panel-nesting">nesting expander</a> to paste your own CSS and see the result. Nested
         <code>@media</code> and <code>@supports</code> blocks become separate rules, which can change the
         order of appearance compared with how the code reads.
@@ -252,12 +249,9 @@ h1 { color: crimson; }`}
 
       <h2 id="scope">What is @scope proximity?</h2>
       <p>
-        <code>
-          @scope (.card) {'{'} p {'{'} … {'}'} {'}'}
-        </code>{' '}
-        limits a rule to elements inside <code>.card</code>. When two scoped rules tie on everything before,
-        the one whose scope root is fewer DOM steps away from the element wins. Unscoped rules count as
-        infinitely far away.
+        <code>@scope (.card) &#123; p &#123; … &#125; &#125;</code> limits a rule to elements inside
+        <code>.card</code>. When two scoped rules tie on everything before, the one whose scope root is fewer
+        DOM steps away from the element wins. Unscoped rules count as infinitely far away.
       </p>
       <p>
         Proximity comes <strong>after</strong> specificity, so a more specific selector beats a closer scope:
@@ -307,10 +301,7 @@ h1 { color: crimson; }`}
           Normal declarations can never beat it, however specific.
         </li>
         <li>
-          <strong>
-            An inline <code>style</code> attribute
-          </strong>
-          , often set by a script, beats your stylesheet.
+          <strong>An inline <code>style</code> attribute</strong>, often set by a script, beats your stylesheet.
         </li>
         <li>
           <strong>Your rule is in a layer</strong> and the other one isn't, or is in a later layer.

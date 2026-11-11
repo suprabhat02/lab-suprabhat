@@ -5,3 +5,7 @@ public/fonts/
 package-lock.json
 test-results/
 playwright-report/
+# Long-form prose: the Astro formatter can split text from inline elements and add stray spaces.
+src/components/Explainer.astro
+src/components/LiveExample.astro
+src/pages/about/index.astro

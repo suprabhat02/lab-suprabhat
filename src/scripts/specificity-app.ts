@@ -112,3 +112,18 @@ if (app) {
   });
   if (new URLSearchParams(window.location.search).has('s')) load();
 }
+
+// The "On this page" highlighter only loads once the explainer comes near the viewport.
+const toc = document.querySelector<HTMLElement>('[data-toc]');
+const explainer = document.querySelector('[data-explainer]');
+if (toc && explainer && 'IntersectionObserver' in window) {
+  const near = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      near.disconnect();
+      void import('./toc').then(({ watchToc }) => watchToc(toc));
+    },
+    { rootMargin: '600px 0px' },
+  );
+  near.observe(explainer);
+}
