@@ -79,6 +79,10 @@
     & > * {
       max-inline-size: var(--measure);
     }
+
+    & > .example-live {
+      max-inline-size: none;
+    }
   }
 
   .site-header {

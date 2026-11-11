@@ -48,6 +48,14 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
 
+## Explainer
+
+- **"On this page"** is one `<nav>` holding a `<details>`. Below 1024px it's a collapsed disclosure; at 1024px and up, `::details-content` keeps the list visible and the summary is hidden, so it works without JavaScript. A 0.6 KB script, imported only when the explainer comes within 600px of the viewport, marks the current section with `aria-current="location"`.
+- **The tool panels section is no longer `content-visibility: auto`.** Its placeholder height was wrong, so deep links such as `/specificity/#layers` landed about 540px off. The explainer itself keeps it; links into it land correctly.
+- **Live examples** render inside a declarative shadow root, so their `@layer`, `@scope` and selectors can't touch the page's own cascade, and they work without JavaScript. Each `color` declaration also sets a `--won` custom property with the same importance, and the demo text prints it, so the rendered result names its winner in words, not only colour. The demo `<style>` is allowed by a per-page hash (`Astro.csp.insertStyleHash`). The one demo with a real `style` attribute needs `style-src-attr 'unsafe-hashes'` plus that attribute's exact hash; no other inline style is allowed.
+- **Code blocks wrap** instead of scrolling sideways, so none becomes an unfocusable scroll region (axe `scrollable-region-focusable`).
+- **Prettier skips prose-heavy Astro files** (`.prettierignore`): the Astro formatter split text from inline elements and introduced stray spaces such as `:is() .`. An e2e test now fails if rendered prose has a space before punctuation.
+
 ## Hosting
 
 - `.htaccess` uses `FilesMatch` rather than `<If>` for cache rules because LiteSpeed's support for `<If>` is limited. All JS and CSS are fingerprinted under `/_astro/`, so they get `immutable`.

@@ -1,0 +1,65 @@
+---
+import { createHash } from 'node:crypto';
+
+interface Props {
+  caption: string;
+  /** The CSS shown to readers and applied to the demo. */
+  css: string;
+  /** Demo markup; the element whose colour is in question should be a <p>. */
+  html: string;
+  /** Pre-rendered, escaped HTML from the engine explaining the result. */
+  summaryHtml: string;
+  tryHref: string | null;
+  tryLabel: string;
+}
+const { caption, css, html, summaryHtml, tryHref, tryLabel } = Astro.props;
+
+type Sha = `sha256-${string}`;
+const sha = (text: string): Sha => `sha256-${createHash('sha256').update(text, 'utf8').digest('base64')}`;
+
+// Every `color` declaration also sets --won with the same importance, so the rendered text can name its winner.
+const DECLARATION = /(?<![\w-])color:\s*([a-z]+)(\s*!important)?\s*(;|$)/gi;
+const withWinner = (source: string, quote: string) =>
+  source.replace(DECLARATION, (_m, colour: string, important = '') => {
+    return `color: ${colour}${important}; --won: ${quote}${colour}${quote}${important};`;
+  });
+
+// The demo runs in its own shadow tree, so its layers and selectors can't touch the page.
+const base = `:host { display: block; }
+.canvas { padding: 1rem 1.25rem; border-radius: 6px; background: #ffffff; color: #11171c; font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+.canvas p { margin: 0; }
+.canvas p::after { content: " " var(--won, "unstyled"); }
+@media (forced-colors: active) { .canvas { border: 1px solid CanvasText; } }`;
+const style = `${base}\n${withWinner(css, '"')}`;
+Astro.csp?.insertStyleHash(sha(style));
+
+let demoHtml = html;
+const inlineStyles = [...html.matchAll(/style="([^"]*)"/g)].map((m) => m[1] ?? '');
+for (const value of inlineStyles) {
+  const augmented = withWinner(value, "'").trim();
+  demoHtml = demoHtml.replace(`style="${value}"`, `style="${augmented}"`);
+  Astro.csp?.insertStyleHash({ hash: sha(augmented), kind: 'attribute' });
+}
+if (inlineStyles.length > 0) Astro.csp?.insertStyleResource({ resource: "'unsafe-hashes'", kind: 'attribute' });
+
+const shadow = `<template shadowrootmode="open"><style>${style}</style><div class="canvas">${demoHtml}</div></template>`;
+const code = `${css}\n\n${html}`;
+---
+
+<figure class="example example-live">
+  <div class="example-head">
+    <figcaption>{caption}</figcaption>
+    {tryHref && <a href={tryHref} data-try rel="nofollow">{tryLabel}</a>}
+  </div>
+  <div class="example-body">
+    <div class="example-code">
+      <p class="example-label">CSS and HTML</p>
+      <pre class="code"><code>{code}</code></pre>
+    </div>
+    <div class="example-result">
+      <p class="example-label">Rendered by your browser</p>
+      <div class="demo-host" data-demo set:html={shadow} />
+    </div>
+  </div>
+  <p class="example-summary" set:html={summaryHtml} />
+</figure>

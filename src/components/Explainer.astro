@@ -1,7 +1,14 @@
 ---
 import ExplainerExample from './ExplainerExample.astro';
 import CascadeExample from './CascadeExample.astro';
+import LiveExample from './LiveExample.astro';
+import { calculate } from '../lib/cascade/specificity';
+import { buildNesting } from '../lib/app/model';
+import { encodeState } from '../lib/cascade/share';
 import type { CascadeRow } from '../lib/cascade/share';
+import { DEFAULT_INPUTS } from '../lib/app/defaults';
+import { formatSpecificity } from '../lib/cascade/math';
+import { rich, renderToString } from '../lib/view/h';
 
 const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): CascadeRow => ({
   selector,
@@ -26,6 +33,24 @@ const sections = [
   ['inline', 'Where do inline styles fit?'],
   ['why-not-applying', 'Why is my CSS not applying?'],
 ] as const;
+
+// The nesting demo's verdict comes from the real engine.
+const nestingCss = `.a, #b {
+  & .c { color: crimson; }
+}
+.a .c.c { color: teal; }`;
+const nesting = buildNesting(nestingCss, calculate);
+const nested = nesting.ok ? nesting.rules.find((r) => r.rule.depth === 1) : undefined;
+const nestedValue = nested?.specificities[0];
+const rival = calculate('.a .c.c');
+if (!nested || !nestedValue?.ok || !rival.ok || !rival.value[0]) throw new Error('Nesting example failed');
+const nestingSummary = rich(
+  `\`& .c\` becomes \`${nested.rule.selector}\`, which scores ${formatSpecificity(nestedValue.value)} and beats \`.a .c.c\` ${formatSpecificity(rival.value[0].value)}, even though the element is only inside \`.a\`.`,
+)
+  .map(renderToString)
+  .join('');
+const nestingState = encodeState({ v: 1, mode: 'nesting', inputs: { ...DEFAULT_INPUTS, nesting: nestingCss } });
+const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : null;
 ---
 
 <section class="section section-deferred" aria-labelledby="explainer-title" data-explainer>
@@ -33,26 +58,26 @@ const sections = [
     <header class="explainer-head prose">
       <h2 id="explainer-title">Specificity and the cascade, explained</h2>
       <p>
-        When two rules set the same property on the same element, the browser has to pick one. Most people
-        learn that "the more specific selector wins". That's true, but it's only one step of a longer process
-        called the cascade. This guide covers both, with examples you can load straight into the tool above.
+        When two rules set the same property on the same element, the browser has to pick one. Most people learn
+        that "the more specific selector wins". That's true, but it's only one step of a longer process called the
+        cascade. This guide covers both, with examples you can load straight into the tool above.
       </p>
     </header>
 
     <nav class="toc" aria-label="On this page" data-toc>
-      <p class="toc-title" aria-hidden="true">
-        On this page
-      </p>
+      <p class="toc-title" aria-hidden="true">On this page</p>
       <details class="toc-details">
         <summary class="toc-summary">On this page</summary>
         <ol class="toc-list" role="list">
-          {sections.map(([id, title]) => (
-            <li>
-              <a class="toc-link" href={`#${id}`}>
-                {title}
-              </a>
-            </li>
-          ))}
+          {
+            sections.map(([id, title]) => (
+              <li>
+                <a class="toc-link" href={`#${id}`}>
+                  {title}
+                </a>
+              </li>
+            ))
+          }
         </ol>
       </details>
     </nav>
@@ -60,20 +85,17 @@ const sections = [
     <article class="explainer-body prose prose-wide">
       <h2 id="how-calculated">How is CSS specificity calculated?</h2>
       <p>
-        Specificity is three separate counts, written <code>(A, B, C)</code>. Look at every simple selector in
-        the selector and add it to one column:
+        Specificity is three separate counts, written <code>(A, B, C)</code>. Look at every simple selector in the
+        selector and add it to one column:
       </p>
       <ul>
+        <li><strong>A, IDs:</strong> each <code>#id</code>.</li>
         <li>
-          <strong>A, IDs:</strong> each <code>#id</code>.
+          <strong>B, classes:</strong> each <code>.class</code>, attribute selector like <code>[type="text"]</code> and
+          pseudo-class like <code>:hover</code>.
         </li>
         <li>
-          <strong>B, classes:</strong> each <code>.class</code>, attribute selector like{' '}
-          <code>[type="text"]</code> and pseudo-class like <code>:hover</code>.
-        </li>
-        <li>
-          <strong>C, types:</strong> each element name like <code>p</code> and pseudo-element like{' '}
-          <code>::before</code>.
+          <strong>C, types:</strong> each element name like <code>p</code> and pseudo-element like <code>::before</code>.
         </li>
       </ul>
       <p>
@@ -81,54 +103,46 @@ const sections = [
         <code>~</code>) add nothing. Namespace prefixes such as <code>svg|</code> add nothing either.
       </p>
       <p>
-        To compare two selectors, read the columns from left to right. The first column that differs decides
-        the result and the rest never get a look. Columns never carry over: eleven classes don't add up to an
-        ID.
+        To compare two selectors, read the columns from left to right. The first column that differs decides the
+        result and the rest never get a look. Columns never carry over: eleven classes don't add up to an ID.
       </p>
-      <ExplainerExample
-        selectors={['#nav a', '.menu .link:hover']}
-        caption="One ID beats any number of classes"
-      />
-      <ExplainerExample
-        selectors={['.a.a.a.a.a.a.a.a.a.a.a', '#b']}
-        caption="Eleven classes still lose to one ID"
-      />
+      <ExplainerExample selectors={['#nav a', '.menu .link:hover']} caption="One ID beats any number of classes" />
+      <ExplainerExample selectors={['.a.a.a.a.a.a.a.a.a.a.a', '#b']} caption="Eleven classes still lose to one ID" />
       <p>
-        If every column is equal, specificity can't separate them, and the rule written later wins. That's the
-        last step of the cascade, <a href="#cascade-order">order of appearance</a>.
+        If every column is equal, specificity can't separate them, and the rule written later wins. That's the last
+        step of the cascade, <a href="#cascade-order">order of appearance</a>.
       </p>
       <p>
-        Old single-colon pseudo-elements such as <code>a:before</code> still count as pseudo-elements, in the
-        third column. A selector list like <code>.a, #b</code> isn't scored as a whole: each selector has its
-        own specificity, and the rule uses the one that matched.
+        Old single-colon pseudo-elements such as <code>a:before</code> still count as pseudo-elements, in the third
+        column. A selector list like <code>.a, #b</code> isn't scored as a whole: each selector has its own
+        specificity, and the rule uses the one that matched.
       </p>
 
       <h2 id="functional">How do :is(), :not(), :has() and :where() count?</h2>
       <p>
-        <code>:is()</code>, <code>:not()</code> and <code>:has()</code> take the specificity of their{' '}
-        <strong>most specific argument</strong>. That happens even when the element only matches a weaker
-        argument, or, for <code>:not()</code>, matches none of them.
+        <code>:is()</code>, <code>:not()</code> and <code>:has()</code> take the specificity of their <strong
+          >most specific argument</strong
+        >. That happens even when the element only matches a weaker argument, or, for <code>:not()</code>, matches
+        none of them.
       </p>
       <p>
-        <code>:where()</code> always counts as zero, whatever is inside it. That makes it the best tool for
-        writing defaults that are easy to override.
+        <code>:where()</code> always counts as zero, whatever is inside it. That makes it the best tool for writing
+        defaults that are easy to override.
       </p>
       <ExplainerExample
         selectors={['.foo :is(.bar, #baz)', '.qux:where(em, #foo#bar#baz)', ':not(em, strong#foo)']}
         caption="The most specific argument counts; :where() counts nothing"
       />
       <p>
-        <code>:is()</code> and <code>:where()</code> also take a forgiving list: an argument the browser can't
-        parse is ignored instead of breaking the whole rule. <code>:not()</code> and <code>:has()</code> don't
-        forgive.
+        <code>:is()</code> and <code>:where()</code> also take a forgiving list: an argument the browser can't parse
+        is ignored instead of breaking the whole rule. <code>:not()</code> and <code>:has()</code> don't forgive.
       </p>
 
       <h2 id="nth-child-of">What about :nth-child(… of S)?</h2>
       <p>
         <code>:nth-child()</code> and <code>:nth-last-child()</code> count as one pseudo-class. Add the
-        <code>of S</code> syntax and they also add the most specific selector in <code>S</code>. Other
-        pseudo-classes with arguments, such as <code>:nth-of-type(2)</code> or <code>:lang(en)</code>, count
-        as one pseudo-class.
+        <code>of S</code> syntax and they also add the most specific selector in <code>S</code>. Other pseudo-classes
+        with arguments, such as <code>:nth-of-type(2)</code> or <code>:lang(en)</code>, count as one pseudo-class.
       </p>
       <ExplainerExample
         selectors={[':nth-child(even of li, .item)', ':nth-last-child(odd of #a .b)', ':nth-of-type(2)']}
@@ -137,105 +151,97 @@ const sections = [
 
       <h2 id="shadow-dom">Shadow DOM selectors</h2>
       <p>
-        Inside a component's shadow tree, <code>:host</code> counts as a pseudo-class. <code>:host()</code>{' '}
-        and
-        <code>:host-context()</code> count as a pseudo-class plus their argument. <code>::slotted()</code>{' '}
-        counts as a pseudo-element plus its argument, and <code>::part()</code> counts as one pseudo-element.
+        Inside a component's shadow tree, <code>:host</code> counts as a pseudo-class. <code>:host()</code> and
+        <code>:host-context()</code> count as a pseudo-class plus their argument. <code>::slotted()</code> counts as a
+        pseudo-element plus its argument, and <code>::part()</code> counts as one pseudo-element.
       </p>
       <ExplainerExample
         selectors={[':host', ':host(#x) .y', '::slotted(span.x)', 'x-foo::part(label):hover']}
         caption="Shadow DOM selectors add their arguments"
       />
       <p>
-        Specificity isn't the whole story here. Styles from the page and styles from inside a shadow tree are
-        compared at the <a href="#cascade-order">context step</a> of the cascade first: for normal
-        declarations the page wins, and for <code>!important</code> the shadow tree wins.
+        Specificity isn't the whole story here. Styles from the page and styles from inside a shadow tree are compared
+        at the <a href="#cascade-order">context step</a> of the cascade first: for normal declarations the page wins,
+        and for <code>!important</code> the shadow tree wins.
       </p>
 
       <h2 id="nesting">How does nesting affect specificity?</h2>
       <p>
         In native CSS nesting, <code>&amp;</code> stands for the parent selector wrapped in <code>:is()</code>. When
-        the parent is a list, the nested selector takes the specificity of the <em>strongest</em>{' '}
-        parent, even for elements that only match a weaker one.
+        the parent is a list, the nested selector takes the specificity of the <em>strongest</em> parent, even for
+        elements that only match a weaker one.
       </p>
-      <pre class="code"><code>{`.a, #b {
-  & .c { color: red; }
-}
-
-/* becomes */
-:is(.a, #b) .c { color: red; }  /* (1,1,0), even for .a .c */`}</code></pre>
+      <LiveExample
+        caption="A nested rule takes its strongest parent's specificity"
+        css={nestingCss}
+        html={`<div class="a"><p class="c">This text is</p></div>`}
+        summaryHtml={nestingSummary}
+        tryHref={nestingHref}
+        tryLabel="Try this in the nesting expander"
+      />
       <p>
-        A nested rule without <code>&amp;</code> behaves as if it started with <code>&amp;</code> and a space.
-        Use the
+        A nested rule without <code>&amp;</code> behaves as if it started with <code>&amp;</code> and a space. Use the
         <a href="#panel-nesting">nesting expander</a> to paste your own CSS and see the result. Nested
-        <code>@media</code> and <code>@supports</code> blocks become separate rules, which can change the
-        order of appearance compared with how the code reads.
+        <code>@media</code> and <code>@supports</code> blocks become separate rules, which can change the order of
+        appearance compared with how the code reads.
       </p>
 
       <h2 id="cascade-order">The cascade order</h2>
       <p>
-        Specificity is step five of seven. The browser walks these steps in order and stops at the first one
-        that separates the declarations:
+        Specificity is step five of seven. The browser walks these steps in order and stops at the first one that
+        separates the declarations:
       </p>
       <ol>
         <li>
-          <strong>Origin and importance.</strong> Transitions, then <code>!important</code> browser, user and
-          author styles, then animations, then normal author, user and browser styles.
+          <strong>Origin and importance.</strong> Transitions, then <code>!important</code> browser, user and author
+          styles, then animations, then normal author, user and browser styles.
         </li>
+        <li><strong>Context.</strong> The page versus a shadow tree.</li>
         <li>
-          <strong>Context.</strong> The page versus a shadow tree.
+          <strong>Element-attached styles.</strong> The <code>style</code> attribute beats rules from stylesheets.
         </li>
-        <li>
-          <strong>Element-attached styles.</strong> The <code>style</code> attribute beats rules from
-          stylesheets.
-        </li>
-        <li>
-          <strong>Layers.</strong> The order of <code>@layer</code> blocks, and unlayered styles.
-        </li>
-        <li>
-          <strong>Specificity.</strong> The <code>(A, B, C)</code> comparison.
-        </li>
-        <li>
-          <strong>Scope proximity.</strong> How close the <code>@scope</code> root is.
-        </li>
-        <li>
-          <strong>Order of appearance.</strong> The last one written wins.
-        </li>
+        <li><strong>Layers.</strong> The order of <code>@layer</code> blocks, and unlayered styles.</li>
+        <li><strong>Specificity.</strong> The <code>(A, B, C)</code> comparison.</li>
+        <li><strong>Scope proximity.</strong> How close the <code>@scope</code> root is.</li>
+        <li><strong>Order of appearance.</strong> The last one written wins.</li>
       </ol>
       <p>
-        The <a href="#panel-cascade">cascade resolver</a> above walks these steps for your own declarations
-        and marks the step where the winner was decided.
+        The <a href="#panel-cascade">cascade resolver</a> above walks these steps for your own declarations and marks
+        the step where the winner was decided.
       </p>
 
       <h2 id="layers">Does @layer beat specificity?</h2>
       <p>
-        Yes. Layers are compared at step four, before specificity gets a vote. For normal declarations, later
-        layers beat earlier ones, and styles outside any layer beat all layered styles.
+        Yes. Layers are compared at step four, before specificity gets a vote. For normal declarations, later layers
+        beat earlier ones, and styles outside any layer beat all layered styles.
       </p>
       <CascadeExample
         caption="Unlayered beats layered, whatever the specificity"
         layerOrder={['components']}
-        code={`@layer components {
+        css={`@layer components {
   #hero .title { color: navy; }
 }
-h1 { color: crimson; }`}
-        rows={[
-          row('#hero .title', 'navy', { layer: 'components', order: 1 }),
-          row('h1', 'crimson', { order: 2 }),
-        ]}
+p { color: crimson; }`}
+        html={`<div id="hero"><p class="title">This text is</p></div>`}
+        rows={[row('#hero .title', 'navy', { layer: 'components', order: 1 }), row('p', 'crimson', { order: 2 })]}
       />
       <p>
         For <code>!important</code> the order <strong>reverses</strong>: the earliest layer wins, and layered
-        <code>!important</code> beats unlayered <code>!important</code>. This lets a low-level reset protect a
-        few declarations without fighting everything above it.
+        <code>!important</code> beats unlayered <code>!important</code>. This lets a low-level reset protect a few
+        declarations without fighting everything above it.
       </p>
       <CascadeExample
         caption="!important reverses the layer order"
         layerOrder={['reset', 'components']}
-        code={`@layer reset, components;
-@layer reset { p { color: red !important; } }
-@layer components { .note p { color: blue !important; } }
+        css={`@layer reset, components;
+@layer reset {
+  p { color: red !important; }
+}
+@layer components {
+  .note p { color: blue !important; }
+}
 #intro { color: green !important; }`}
+        html={`<div class="note"><p id="intro">This text is</p></div>`}
         rows={[
           row('p', 'red', { layer: 'reset', important: true, order: 1 }),
           row('.note p', 'blue', { layer: 'components', important: true, order: 2 }),
@@ -243,98 +249,80 @@ h1 { color: crimson; }`}
         ]}
       />
       <p>
-        Calling <code>!important</code> a "cascade layer" is a common mistake. It's part of the first step,
-        origin and importance, and it interacts with layers by flipping their order.
+        Calling <code>!important</code> a "cascade layer" is a common mistake. It's part of the first step, origin and
+        importance, and it interacts with layers by flipping their order.
       </p>
 
       <h2 id="scope">What is @scope proximity?</h2>
       <p>
         <code>@scope (.card) &#123; p &#123; … &#125; &#125;</code> limits a rule to elements inside
-        <code>.card</code>. When two scoped rules tie on everything before, the one whose scope root is fewer
-        DOM steps away from the element wins. Unscoped rules count as infinitely far away.
+        <code>.card</code>. When two scoped rules tie on everything before, the one whose scope root is fewer DOM steps
+        away from the element wins. Unscoped rules count as infinitely far away.
       </p>
-      <p>
-        Proximity comes <strong>after</strong> specificity, so a more specific selector beats a closer scope:
-      </p>
+      <p>Proximity comes <strong>after</strong> specificity, so a more specific selector beats a closer scope:</p>
       <CascadeExample
         caption="Specificity is checked before proximity"
-        code={`@scope (.card) {
-  p { color: teal; }   /* 1 step from .card */
+        css={`@scope (.card) {
+  p { color: teal; }
 }
 .x p { color: purple; }`}
-        rows={[
-          row('p', 'teal', { scope: { root: '.card', proximity: 1 }, order: 1 }),
-          row('.x p', 'purple', { order: 2 }),
-        ]}
+        html={`<div class="x"><div class="card"><p>This text is</p></div></div>`}
+        rows={[row('p', 'teal', { scope: { root: '.card', proximity: 1 }, order: 1 }), row('.x p', 'purple', { order: 2 })]}
       />
 
       <h2 id="inline">Where do inline styles fit?</h2>
       <p>
-        A <code>style</code> attribute isn't a fourth column of specificity. It's a separate step,
-        element-attached styles, which runs before layers and specificity. A normal inline style beats every
-        normal rule in a stylesheet, even <code>#id#id#id</code>. An inline <code>!important</code> beats any
-        author
+        A <code>style</code> attribute isn't a fourth column of specificity. It's a separate step, element-attached
+        styles, which runs before layers and specificity. A normal inline style beats every normal rule in a
+        stylesheet, even <code>#id#id#id</code>. An inline <code>!important</code> beats any author
         <code>!important</code> from a stylesheet.
       </p>
       <CascadeExample
         caption="A normal inline style beats any selector"
-        code={`#card#card { color: navy; }
-<div id="card" style="color: crimson">`}
+        css={`#card#card { color: navy; }`}
+        html={`<p id="card" style="color: crimson">This text is</p>`}
         rows={[row('#card#card', 'navy', { order: 1 }), row('', 'crimson', { inline: true, order: 2 })]}
       />
-      <p>
-        Only an author <code>!important</code> beats a normal inline style, and that's decided at step one.
-      </p>
+      <p>Only an author <code>!important</code> beats a normal inline style, and that's decided at step one.</p>
 
       <h2 id="why-not-applying">Why is my CSS not applying?</h2>
       <p>When a rule seems to be ignored, check these, roughly in the order the cascade does:</p>
       <ul>
         <li>
-          <strong>The rule is invalid.</strong> A typo, an unknown pseudo-class or a pseudo-element that isn't
-          last makes the browser drop the whole rule. The <a href="#panel-anatomy">anatomy</a> view flags
-          these.
+          <strong>The rule is invalid.</strong> A typo, an unknown pseudo-class or a pseudo-element that isn't last
+          makes the browser drop the whole rule. The <a href="#panel-anatomy">anatomy</a> view flags these.
         </li>
         <li>
-          <strong>
-            Something is <code>!important</code>.
-          </strong>{' '}
-          Normal declarations can never beat it, however specific.
+          <strong>Something is <code>!important</code>.</strong> Normal declarations can never beat it, however
+          specific.
         </li>
         <li>
           <strong>An inline <code>style</code> attribute</strong>, often set by a script, beats your stylesheet.
         </li>
         <li>
-          <strong>Your rule is in a layer</strong> and the other one isn't, or is in a later layer.
-          Specificity never gets a vote.
+          <strong>Your rule is in a layer</strong> and the other one isn't, or is in a later layer. Specificity never
+          gets a vote.
         </li>
         <li>
-          <strong>An ID is hiding in the other selector.</strong> One ID beats any number of classes. Wrap it
-          in
+          <strong>An ID is hiding in the other selector.</strong> One ID beats any number of classes. Wrap it in
           <code>:where()</code> to neutralise it.
         </li>
         <li>
-          <strong>
-            A list inside <code>:is()</code> or nesting
-          </strong>{' '}
-          gave the other rule the specificity of its strongest argument.
+          <strong>A list inside <code>:is()</code> or nesting</strong> gave the other rule the specificity of its
+          strongest argument.
         </li>
+        <li><strong>The other rule comes later</strong>, in the same file or a stylesheet loaded after yours.</li>
         <li>
-          <strong>The other rule comes later</strong>, in the same file or a stylesheet loaded after yours.
-        </li>
-        <li>
-          <strong>It isn't a cascade problem.</strong> The property may not apply to that element, or it's
-          inherited from a parent instead of set directly.
+          <strong>It isn't a cascade problem.</strong> The property may not apply to that element, or it's inherited
+          from a parent instead of set directly.
         </li>
       </ul>
       <p>
-        The fixes, gentlest first: lower the winner with <code>:where()</code>, move rules into ordered
-        layers, raise the loser by repeating a class (<code>.btn.btn</code>) rather than adding an ID, and
-        only then reach for
+        The fixes, gentlest first: lower the winner with <code>:where()</code>, move rules into ordered layers, raise
+        the loser by repeating a class (<code>.btn.btn</code>) rather than adding an ID, and only then reach for
         <code>!important</code>. The duel suggests all four for your selectors.
       </p>
-      <p>
-        More from the same author on <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.
-      </p>
+      <p>More from the same author on <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.</p>
     </article>
   </div>
 </section>
