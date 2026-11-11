@@ -88,7 +88,7 @@
     letter-spacing: -0.01em;
   }
 
-  :where(p, li, dd) {
+  :where(.prose p) {
     text-wrap: pretty;
   }
 

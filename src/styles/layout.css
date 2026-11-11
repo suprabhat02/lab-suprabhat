@@ -38,6 +38,12 @@
     border-block-start: 1px solid var(--line);
   }
 
+  /* Below-the-fold sections: skip style and layout until they're near the viewport. */
+  .section-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1600px;
+  }
+
   .stack > * + * {
     margin-block-start: var(--stack-space, var(--space-s));
   }
