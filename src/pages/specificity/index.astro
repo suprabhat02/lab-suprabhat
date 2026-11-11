@@ -1,0 +1,60 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Duel from '../../components/Duel.astro';
+import ToolPanels from '../../components/ToolPanels.astro';
+import Explainer from '../../components/Explainer.astro';
+import { calculate } from '../../lib/cascade/specificity';
+import { DEFAULT_INPUTS } from '../../lib/app/defaults';
+import { buildCascade, buildDuel, buildNesting } from '../../lib/app/model';
+
+const tool = await getEntry('tools', 'specificity');
+if (!tool) throw new Error('Missing tools/specificity.md');
+
+// Run the real engine at build time so crawlers and no-JS visitors get a correct answer.
+const duel = buildDuel(DEFAULT_INPUTS.selectors, calculate);
+const nesting = buildNesting(DEFAULT_INPUTS.nesting, calculate);
+const cascade = buildCascade(DEFAULT_INPUTS.cascade, calculate);
+
+const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'CSS Specificity Wars',
+    url: new URL('/specificity/', site).href,
+    description: tool.data.summary,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern web browser. Works without JavaScript as a read-only example.',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
+    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
+    keywords: tool.data.keywords.join(', '),
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+    author: { '@type': 'Person', name: 'Suprabhat Kumar', url: 'https://suprabhat-dev.com' },
+  },
+];
+---
+
+<BaseLayout
+  title="CSS Specificity Calculator & Cascade Explainer: Specificity Wars | Suprabhat's Lab"
+  description="Compare CSS selectors and see which one wins and why. Specificity scores, a part-by-part breakdown, a nesting expander and a step-by-step cascade resolver for @layer, @scope and !important."
+  path="/specificity/"
+  og="specificity"
+  ogAlt="CSS Specificity Wars: which CSS selector wins?"
+  breadcrumbs={[
+    { name: 'Lab', path: '/' },
+    { name: 'CSS Specificity Wars', path: '/specificity/' },
+  ]}
+  jsonLd={jsonLd}
+>
+  <Duel duel={duel} />
+  <ToolPanels duel={duel} nestingCss={DEFAULT_INPUTS.nesting} nesting={nesting} cascade={cascade} />
+  <Explainer />
+</BaseLayout>
+
+<script>
+  import '../../scripts/specificity-app';
+</script>

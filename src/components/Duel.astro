@@ -1,0 +1,55 @@
+---
+import { renderToString } from '../lib/view/h';
+import type { VNode } from '../lib/view/h';
+import { contenderView, suggestionsView, verdictView } from '../lib/app/views';
+import type { DuelModel } from '../lib/app/model';
+
+interface Props {
+  duel: DuelModel;
+}
+const { duel } = Astro.props;
+const html = (nodes: VNode[]) => nodes.map(renderToString).join('');
+const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.contenders.length, c, duel)));
+---
+
+<section class="tool-hero" aria-labelledby="tool-title" data-app>
+  <div class="wrap">
+    <h1 id="tool-title">Which CSS selector wins?</h1>
+    <p class="tool-lead">Type two selectors. See the score, and exactly why.</p>
+    <noscript>
+      <p class="notice mt-m">
+        JavaScript is off, so this shows a worked example that won't update. The explainer below covers everything the
+        tool does.
+      </p>
+    </noscript>
+    <p class="notice mt-m" data-share-notice role="status" hidden></p>
+
+    <form class="duel" data-duel aria-label="Compare selectors" novalidate>
+      <div class="contenders" data-contenders set:html={contenders} />
+      <p class="verdict" data-verdict set:html={html(verdictView(duel))} />
+      <div class="duel-actions">
+        <button class="button button-primary js-only" type="submit">Compare selectors</button>
+        <button class="button js-only" type="button" data-add>Add selector</button>
+        <button class="button js-only" type="button" data-copy>Copy link</button>
+        <p class="status" data-copy-status role="status"></p>
+        <div class="share-fallback field" data-share-wrap hidden>
+          <label class="label" for="share-link">Link to this comparison</label>
+          <input class="input" id="share-link" type="text" readonly data-share-fallback />
+        </div>
+      </div>
+    </form>
+    <p class="visually-hidden" aria-live="polite" data-live></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="fix-title">
+  <div class="wrap">
+    <h2 id="fix-title">Want a different winner?</h2>
+    <p class="panel-intro mt-s">
+      Ways to change the result, from the gentlest to the most heavy-handed. Read more in <a href="#why-not-applying"
+        >why is my CSS not applying?</a
+      >
+    </p>
+    <div class="mt-l" data-suggestions set:html={html(suggestionsView(duel))} />
+  </div>
+</section>
