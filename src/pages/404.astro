@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found | Suprabhat's Lab"
+  description="This page doesn't exist. Head back to the lab's tools."
+  path="/404.html"
+  og="home"
+  ogAlt="Suprabhat's Lab"
+  noindex
+>
+  <section class="hub-hero" aria-labelledby="nf-title">
+    <div class="wrap prose">
+      <h1 id="nf-title">This page doesn't exist</h1>
+      <p>The link may be old, or the address may have a typo.</p>
+      <p><a href="/">Go to the lab's home page</a> or <a href="/specificity/">open CSS Specificity Wars</a>.</p>
+    </div>
+  </section>
+</BaseLayout>

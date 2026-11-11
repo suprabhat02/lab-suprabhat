@@ -1,16 +1,71 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const tools = (await getCollection('tools')).sort((a, b) => b.data.updatedAt.getTime() - a.data.updatedAt.getTime());
+const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: "Suprabhat's Lab",
+    url: site,
+    description: 'Free, open frontend tools and explainers. No sign-up, no paywall, no tracking.',
+    inLanguage: 'en',
+    author: { '@type': 'Person', name: 'Suprabhat Kumar', url: 'https://suprabhat-dev.com' },
+  },
+];
+const dateFormat = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Suprabhat's Lab: free frontend tools and explainers"
+  description="Free, open frontend tools and explainers that make CSS and UI easier. No sign-up, no paywall, no tracking, and built for every device and assistive technology."
+  path="/"
+  og="home"
+  ogAlt="Suprabhat's Lab: free frontend tools and explainers"
+  breadcrumbs={[{ name: 'Lab', path: '/' }]}
+  jsonLd={jsonLd}
+>
+  <section class="hub-hero" aria-labelledby="hub-title">
+    <div class="wrap">
+      <h1 id="hub-title">Frontend tools that explain themselves</h1>
+      <p class="tool-lead">
+        Free tools and explainers for CSS and UI. No sign-up, no paywall, no tracking. They work on any device and with
+        any assistive technology.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="tools-title">
+    <div class="wrap">
+      <h2 id="tools-title">Tools</h2>
+      <ul class="tool-list mt-l" role="list">
+        {
+          tools.map((tool) => (
+            <li class="tool-item">
+              <h3 class="tool-title">
+                <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
+              </h3>
+              {tool.data.status === 'in-progress' && <p class="tool-status">In progress</p>}
+              <p class="prose">{tool.data.summary}</p>
+              <p class="muted">
+                <small>
+                  {tool.data.category}, updated{' '}
+                  <time datetime={tool.data.updatedAt.toISOString().slice(0, 10)}>
+                    {dateFormat.format(tool.data.updatedAt)}
+                  </time>
+                </small>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-l prose">
+        More tools are on the way. Each one gets the same treatment: a tool that answers the question, and an explainer
+        that teaches the idea behind it. Read <a href="/about/">why this lab exists</a>, or see more work on
+        <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
