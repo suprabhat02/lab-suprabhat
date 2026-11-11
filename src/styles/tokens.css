@@ -1,0 +1,120 @@
+@layer reset, tokens, base, layout, components, utilities;
+
+/* Self-hosted Geist Mono: only the subsets a page actually uses are downloaded. */
+@font-face {
+  font-family: 'Geist Mono Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist Mono Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-mono-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Metric-matched fallbacks (Geist Mono: 600/1000 advance, 1005/-295 ascent/descent) to avoid layout shift. */
+@font-face {
+  font-family: 'Geist Mono Fallback Windows';
+  src: local('Consolas');
+  size-adjust: 109.13%;
+  ascent-override: 92.09%;
+  descent-override: 27.03%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Geist Mono Fallback';
+  src: local('Menlo'), local('SF Mono'), local('DejaVu Sans Mono'), local('Liberation Mono'), local('Courier New');
+  size-adjust: 99.65%;
+  ascent-override: 100.85%;
+  descent-override: 29.6%;
+  line-gap-override: 0%;
+}
+
+@layer tokens {
+  :root {
+    color-scheme: dark;
+
+    --bg: light-dark(#f9fafb, #070c10);
+    --bg-2: light-dark(#f1f4f7, #0d1218);
+    --bg-3: light-dark(#e6eaee, #171e24);
+    --surface: light-dark(#ffffff, #0d1217);
+    --text: light-dark(#11171c, #f3f5f8);
+    --text-2: light-dark(#3c434b, #bec5cc);
+    --text-3: light-dark(#575e66, #9ba2aa);
+    --accent: light-dark(#b42300, #ff4d2a);
+    --accent-strong: light-dark(#981c00, #ffb6a5);
+    --accent-dim: light-dark(#f03200, #772c1e);
+    --on-accent: light-dark(#ffffff, #06090d);
+    --success: light-dark(#106c3e, #4ed589);
+    --danger: light-dark(#b4144a, #f86685);
+    --line: light-dark(#d5dbe1, #232b33);
+    /* Form control borders need 3:1 against the page (WCAG 1.4.11). */
+    --control-border: light-dark(#7b828a, #6b737b);
+
+    --radius-control: 6px;
+    --radius-card: 10px;
+    --radius-shell: 12px;
+
+    --font: 'Geist Mono Variable', 'Geist Mono', 'Geist Mono Fallback Windows', 'Geist Mono Fallback', ui-monospace,
+      monospace;
+
+    /* Modular scale, ratio 1.25, fluid between 320px and 1440px. */
+    --step--1: clamp(0.85rem, 0.82rem + 0.12vw, 0.9rem);
+    --step-0: clamp(1.0625rem, 1.03rem + 0.12vw, 1.125rem);
+    --step-1: clamp(1.33rem, 1.26rem + 0.3vw, 1.41rem);
+    --step-2: clamp(1.66rem, 1.52rem + 0.6vw, 1.95rem);
+    --step-3: clamp(2.07rem, 1.8rem + 1.2vw, 2.75rem);
+    --step-4: clamp(2.6rem, 2.05rem + 2.6vw, 4.3rem);
+
+    --space-3xs: clamp(0.25rem, 0.23rem + 0.1vw, 0.3rem);
+    --space-2xs: clamp(0.5rem, 0.47rem + 0.12vw, 0.6rem);
+    --space-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
+    --space-s: clamp(1rem, 0.95rem + 0.25vw, 1.2rem);
+    --space-m: clamp(1.5rem, 1.4rem + 0.45vw, 1.8rem);
+    --space-l: clamp(2rem, 1.85rem + 0.7vw, 2.6rem);
+    --space-xl: clamp(3rem, 2.75rem + 1.2vw, 4rem);
+    --space-2xl: clamp(4rem, 3.5rem + 2.4vw, 6rem);
+    --space-section: clamp(6rem, 14vh, 12rem);
+
+    --measure: 68ch;
+    --gutter: clamp(1rem, 0.5rem + 3vw, 4rem);
+    --max-width: 90rem;
+    --header-height: 4rem;
+    --focus-ring: 3px solid var(--accent);
+    --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      color-scheme: light;
+    }
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --text-2: var(--text);
+      --text-3: var(--text);
+      --line: light-dark(#5c636b, #8d959d);
+    }
+  }
+}
