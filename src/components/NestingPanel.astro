@@ -1,0 +1,38 @@
+---
+import { renderToString } from '../lib/view/h';
+import { nestingView } from '../lib/app/views';
+import { MAX_NESTING_LENGTH } from '../lib/cascade/nesting';
+import type { NestingModel } from '../lib/app/model';
+
+interface Props {
+  css: string;
+  model: NestingModel;
+}
+const { css, model } = Astro.props;
+const html = nestingView(model).map(renderToString).join('');
+---
+
+<section class="panel" id="panel-nesting" aria-labelledby="h-nesting" data-panel="nesting">
+  <h2 id="h-nesting" data-panel-heading>Nesting</h2>
+  <p class="panel-intro mt-s">
+    Paste nested CSS to see the selectors it really produces, and their specificity. Read <a href="#nesting"
+      >how nesting affects specificity</a
+    >.
+  </p>
+  <div class="panel-grid">
+    <div class="field">
+      <label class="label" for="nesting-input">Nested CSS</label>
+      <textarea
+        class="input textarea"
+        id="nesting-input"
+        data-nesting
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="off"
+        maxlength={MAX_NESTING_LENGTH}
+        rows="14">{css}</textarea
+      >
+    </div>
+    <div class="stack" data-nesting-output aria-label="Expanded selectors" role="region" set:html={html} />
+  </div>
+</section>

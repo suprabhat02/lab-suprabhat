@@ -1,0 +1,60 @@
+---
+import { renderToString } from '../lib/view/h';
+import { cascadeResultView, cascadeRowView } from '../lib/app/views';
+import { LIMITS } from '../lib/cascade/share';
+import type { CascadeModel } from '../lib/app/model';
+
+interface Props {
+  model: CascadeModel;
+}
+const { model } = Astro.props;
+const rows = model.rows
+  .map((r, i) => renderToString(cascadeRowView(i, model.rows.length, r.row, model.layerOrder, r.error?.message ?? null)))
+  .join('');
+const result = cascadeResultView(model).map(renderToString).join('');
+---
+
+<section class="panel" id="panel-cascade" aria-labelledby="h-cascade" data-panel="cascade">
+  <h2 id="h-cascade" data-panel-heading>Cascade</h2>
+  <p class="panel-intro mt-s">
+    Specificity is only step five. Describe two to four competing declarations for the same element and watch all seven
+    steps of the cascade decide. Read <a href="#cascade-order">the cascade order</a>.
+  </p>
+  <div class="panel-grid" data-cascade>
+    <div>
+      <div class="field layer-order">
+        <label class="label" for="layer-order">Layer order, earliest first</label>
+        <input
+          class="input"
+          id="layer-order"
+          type="text"
+          value={model.layerOrder.join(', ')}
+          data-layer-order
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          aria-describedby="layer-order-hint"
+        />
+        <p class="muted" id="layer-order-hint"><small>Like <code>@layer base, components;</code></small></p>
+        <div data-layer-error></div>
+      </div>
+      <div class="field mt-s">
+        <label class="label" for="cascade-property">Property</label>
+        <input
+          class="input"
+          id="cascade-property"
+          type="text"
+          value={model.property}
+          maxlength={LIMITS.property}
+          data-property
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+        />
+      </div>
+      <div class="decls" data-decls set:html={rows} />
+      <button class="button mt-m js-only" type="button" data-add-row>Add declaration</button>
+    </div>
+    <div data-cascade-output role="region" aria-label="Cascade result" set:html={result} />
+  </div>
+</section>
