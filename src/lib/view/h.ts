@@ -12,8 +12,8 @@ export interface VElement {
   readonly children: ReadonlyArray<VNode>;
 }
 
-export type VNode = VElement | string | number | null | undefined | false;
-type Child = VNode | ReadonlyArray<Child>;
+export type VNode = VElement | string | number | null | undefined | false | ReadonlyArray<VNode>;
+type Child = VNode;
 
 const VOID = new Set(['area', 'br', 'col', 'hr', 'img', 'input', 'meta', 'link', 'source', 'wbr']);
 const SVG_TAGS = new Set(['svg', 'path', 'circle', 'rect', 'g', 'line', 'polyline']);
@@ -23,11 +23,13 @@ const ATTR = /^[a-z][a-z0-9-:]*$/i;
 
 function flatten(children: ReadonlyArray<Child>, out: VNode[] = []): VNode[] {
   for (const child of children) {
-    if (Array.isArray(child)) flatten(child, out);
-    else if (child !== null && child !== undefined && child !== false && child !== '') out.push(child as VNode);
+    if (isFragment(child)) flatten(child, out);
+    else if (child !== null && child !== undefined && child !== false && child !== '') out.push(child);
   }
   return out;
 }
+
+const isFragment = (node: VNode): node is ReadonlyArray<VNode> => Array.isArray(node);
 
 export function h(tag: string, attrs: Attrs = {}, ...children: Child[]): VElement {
   if (!TAG.test(tag)) throw new Error(`Invalid tag: ${tag}`);
@@ -44,6 +46,7 @@ const escapeAttr = (s: string) => escapeText(s).replace(/"/g, '&quot;');
 
 export function renderToString(node: VNode): string {
   if (node === null || node === undefined || node === false) return '';
+  if (isFragment(node)) return node.map(renderToString).join('');
   if (typeof node === 'string' || typeof node === 'number') return escapeText(String(node));
   let attrs = '';
   for (const [name, value] of Object.entries(node.attrs)) {
@@ -57,6 +60,11 @@ export function renderToString(node: VNode): string {
 
 export function renderToDom(node: VNode, doc: Document = document, svg = false): Node {
   if (node === null || node === undefined || node === false) return doc.createTextNode('');
+  if (isFragment(node)) {
+    const fragment = doc.createDocumentFragment();
+    for (const child of node) fragment.appendChild(renderToDom(child, doc, svg));
+    return fragment;
+  }
   if (typeof node === 'string' || typeof node === 'number') return doc.createTextNode(String(node));
   const inSvg = svg || node.tag === 'svg';
   const el = inSvg && SVG_TAGS.has(node.tag) ? doc.createElementNS(SVG_NS, node.tag) : doc.createElement(node.tag);
@@ -70,9 +78,6 @@ export function renderToDom(node: VNode, doc: Document = document, svg = false):
 }
 
 /** Replaces the children of `target` with the rendered nodes. */
-export function mount(target: Element, nodes: VNode | ReadonlyArray<VNode>): void {
-  const doc = target.ownerDocument;
-  const fragment = doc.createDocumentFragment();
-  for (const node of Array.isArray(nodes) ? nodes : [nodes]) fragment.appendChild(renderToDom(node, doc));
-  target.replaceChildren(fragment);
+export function mount(target: Element, nodes: VNode): void {
+  target.replaceChildren(renderToDom(nodes, target.ownerDocument));
 }

@@ -74,6 +74,27 @@
     display: none;
   }
 
+  /* On very narrow screens keep the accessible name but show only the icon. */
+  @media (width < 30rem) {
+    .theme-toggle {
+      min-inline-size: 44px;
+      justify-content: center;
+    }
+
+    .theme-toggle-text {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .nav-link {
+      padding-inline: var(--space-3xs);
+    }
+  }
+
   .footer-slogan {
     max-inline-size: 16ch;
     font-size: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
@@ -332,8 +353,9 @@
 
   .numerals {
     display: grid;
-    grid-template-columns: repeat(3, max-content);
-    column-gap: clamp(1rem, 7cqi, 3rem);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(0.75rem, 5cqi, 2.5rem);
+    max-inline-size: 34rem;
     overflow: clip;
     overflow-clip-margin: 0.2em;
   }

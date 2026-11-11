@@ -11,6 +11,10 @@
     border: 0;
   }
 
+  :root:not([data-js]) .js-only {
+    display: none;
+  }
+
   .mt-s {
     margin-block-start: var(--space-s);
   }

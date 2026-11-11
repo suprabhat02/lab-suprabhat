@@ -36,6 +36,8 @@ export default defineConfig({
     inlineStylesheets: 'never',
   },
   devToolbar: { enabled: false },
+  // Shiki emits inline styles, which the CSP blocks; code samples here are plain.
+  markdown: { syntaxHighlight: false },
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/404'),
