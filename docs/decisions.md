@@ -13,27 +13,27 @@ The parser loads on first interaction: about 19 KB gzipped, plus 14 KB for the t
 
 ## Version notes (checked 2026-11-11 with `npm view`)
 
-| Package                         | Used                                                                     | Note                                                                                                                                            |
-| ------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| astro                           | 7.4.10                                                                   |                                                                                                                                                 |
-| @bramus/specificity             | 2.4.3                                                                    |                                                                                                                                                 |
-| @astrojs/sitemap                | 3.7.4                                                                    |                                                                                                                                                 |
-| astro-og-canvas                 | 0.13.3                                                                   | Loads the Geist Mono `woff2` directly; no TTF needed.                                                                                           |
-| @fontsource-variable/geist-mono | 5.3.0                                                                    |                                                                                                                                                 |
-| vitest                          | 5.1.0                                                                    |                                                                                                                                                 |
-| @playwright/test                | 1.65.0                                                                   |                                                                                                                                                 |
-| @axe-core/playwright            | 4.14.0                                                                   |                                                                                                                                                 |
-| typescript                      | 6.0.3                                                                    | **Not** the latest (7.0.2): `@astrojs/check` 0.9.12 allows `^5 \|\| ^6` and `typescript-eslint` 8.72.2 allows `<6.1.0`. Move to 7 when they do. |
-| eslint / typescript-eslint      | 10.14.0 / 8.72.2                                                         | `npm audit` reports a moderate `minimatch` advisory in this dev-only chain; the only fix is downgrading ESLint. Nothing ships to users.         |
-| Node                            | 24 in CI                                                                 | Local was 24.x; `engines` allows `>=22.23.4` (Astro's minimum).                                                                                 |
-| GitHub Actions                  | checkout v7, setup-node v7, upload-artifact v7, FTP-Deploy-Action v4.4.0 | Latest majors at the time.                                                                                                                      |
+| Package                         | Used                                                                                      | Note                                                                                                                                            |
+| ------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| astro                           | 7.4.10                                                                                    |                                                                                                                                                 |
+| @bramus/specificity             | 2.4.3                                                                                     |                                                                                                                                                 |
+| @astrojs/sitemap                | 3.7.4                                                                                     |                                                                                                                                                 |
+| astro-og-canvas                 | 0.13.3                                                                                    | Loads the Geist Mono `woff2` directly; no TTF needed.                                                                                           |
+| @fontsource-variable/geist-mono | 5.3.0                                                                                     |                                                                                                                                                 |
+| vitest                          | 5.1.0                                                                                     |                                                                                                                                                 |
+| @playwright/test                | 1.65.0                                                                                    |                                                                                                                                                 |
+| @axe-core/playwright            | 4.14.0                                                                                    |                                                                                                                                                 |
+| typescript                      | 6.0.3                                                                                     | **Not** the latest (7.0.2): `@astrojs/check` 0.9.12 allows `^5 \|\| ^6` and `typescript-eslint` 8.72.2 allows `<6.1.0`. Move to 7 when they do. |
+| eslint / typescript-eslint      | 10.14.0 / 8.72.2                                                                          | `npm audit` reports a moderate `minimatch` advisory in this dev-only chain; the only fix is downgrading ESLint. Nothing ships to users.         |
+| Node                            | 24 in CI                                                                                  | Local was 24.x; `engines` allows `>=22.23.4` (Astro's minimum).                                                                                 |
+| GitHub Actions                  | checkout v7, setup-node v7, upload-artifact v7, upload-pages-artifact v4, deploy-pages v4 | Latest majors at the time.                                                                                                                      |
 
 ## Astro settings
 
 - **`compressHTML: true`** instead of the v7 default `'jsx'`. JSX whitespace rules can join words across lines in prose; the lossless mode can't.
 - **Markdown syntax highlighting off.** Shiki emits inline styles, which the CSP blocks. Code samples are plain `<pre><code>`.
 - **No `<ClientRouter />`.** Cross-document view transitions come from CSS (`@view-transition { navigation: auto; }`), turned off under reduced motion, so pages stay JS-free.
-- **CSP** is Astro's built-in `security.csp` (a hashed `<meta>` tag). The pre-paint theme script's hash is also computed in `astro.config.mjs` from the same file the layout inlines. `frame-ancestors` can't be set from `<meta>`, so `.htaccess` sends it as a header.
+- **CSP** is Astro's built-in `security.csp` (a hashed `<meta>` tag). The pre-paint theme script's hash is also computed in `astro.config.mjs` from the same file the layout inlines. `frame-ancestors` can't be set from `<meta>`, and GitHub Pages can't send headers, so the site can be framed. It has no forms, sign-in or state worth clickjacking, so this is accepted.
 
 ## Island split
 
@@ -58,8 +58,10 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 
 ## Hosting
 
-- `.htaccess` uses `FilesMatch` rather than `<If>` for cache rules because LiteSpeed's support for `<If>` is limited. All JS and CSS are fingerprinted under `/_astro/`, so they get `immutable`.
-- `Permissions-Policy` turns everything off except `clipboard-write=(self)`, which "Copy link" needs.
+- **GitHub Pages, not Hostinger FTP.** `lab.suprabhat-dev.com` already resolved to `suprabhat02.github.io`, like the main site, and the domain is verified for GitHub Pages on the account. Pages through Actions needs no stored secrets (OIDC), no DNS changes, and gives free HTTPS and a CDN.
+- **What that gives up:** custom response headers. There is no `Strict-Transport-Security`, `Permissions-Policy`, `X-Content-Type-Options` or `frame-ancestors` from us, and caching is GitHub's fixed `max-age=600`, so fingerprinted `/_astro/` files aren't `immutable`. CSP and referrer policy still apply through `<meta>` tags. If headers become necessary, put a CDN that can set them in front, or move to a host that supports them.
+- **No `CNAME` file in `public/`.** With an Actions-based Pages deploy the custom domain comes from the repository settings, and a `CNAME` file in the artifact is ignored.
+- **Clean URLs and 404** work without rewrites: `build.format: 'directory'` emits `/<route>/index.html`, and Pages serves `dist/404.html` for missing paths.
 
 ## Lighthouse
 

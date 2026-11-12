@@ -33,7 +33,7 @@ src/
   content/tools/        One Markdown file per tool (the `tools` collection)
   content.config.ts
   pages/                index, specificity/, about/, 404, og/[slug].png.ts
-public/                 .htaccess, robots.txt, llms.txt, favicon.svg, manifest.webmanifest
+public/                 robots.txt, llms.txt, favicon.svg, manifest.webmanifest
 scripts/                copy-fonts.mjs, report-sizes.mjs (budgets), lighthouse.mjs
 tests/e2e/              Playwright + axe
 docs/

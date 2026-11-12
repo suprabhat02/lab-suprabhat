@@ -1,5 +1,10 @@
 name: Deploy
 
+# Builds the static site and publishes it to GitHub Pages.
+# lab.suprabhat-dev.com is a CNAME to suprabhat02.github.io, and the custom
+# domain is set in Settings → Pages. No secrets are needed: deploy-pages
+# authenticates with the workflow's OIDC token.
+
 on:
   push:
     branches: [main]
@@ -9,12 +14,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-production
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Build and deploy to Hostinger
+  build:
+    name: Check, test and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -30,6 +35,9 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Type check
         run: npm run check
 
@@ -39,12 +47,23 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy over FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          protocol: ftps
-          local-dir: ./dist/
+          path: dist
+
+  deploy:
+    name: Publish to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
