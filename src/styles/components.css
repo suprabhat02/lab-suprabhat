@@ -546,6 +546,16 @@
     margin-block-start: 0;
   }
 
+  /* With tabs, the tab list already separates the panel from what's above it. */
+  :root[data-js] .panel {
+    padding-block-start: var(--space-l);
+  }
+
+  /* Panels end at their content; only a short gap separates them from the explainer, whichever tab is open. */
+  .section-tools {
+    padding-block-end: var(--space-xl);
+  }
+
   .panel-intro {
     max-inline-size: var(--measure);
     color: var(--text-2);

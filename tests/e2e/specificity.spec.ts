@@ -250,6 +250,32 @@ test.describe('tabs', () => {
     await expect(table.locator('th[scope="col"]')).toHaveCount(6);
     await expect(table.locator('tbody th[scope="row"]').first()).toHaveText('#nav');
   });
+
+  test('panels end at their content and switching keeps the tab list in place', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/specificity/');
+    const tablist = page.getByRole('tablist', { name: 'Inspect' });
+    const measure = (name: string) =>
+      page.getByRole('tabpanel', { name }).evaluate((panel) => {
+        const section = panel.closest('section.section-tools') ?? panel;
+        return {
+          // Space between the panel's last content and the end of its section.
+          below: section.getBoundingClientRect().bottom - panel.getBoundingClientRect().bottom,
+          tablistTop: document.querySelector('[data-tablist]')?.getBoundingClientRect().top ?? 0,
+        };
+      });
+
+    await page.getByRole('tab', { name: 'Cascade' }).click();
+    await tablist.evaluate((el) => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    const tall = await measure('Cascade');
+    await page.getByRole('tab', { name: 'Nesting' }).click();
+    const short = await measure('Nesting');
+
+    // Two pixels of slack for subpixel rounding (WebKit).
+    expect(Math.abs(short.tablistTop - tall.tablistTop)).toBeLessThanOrEqual(2);
+    expect(Math.abs(short.below - tall.below)).toBeLessThanOrEqual(2);
+    expect(short.below).toBeLessThanOrEqual(80);
+  });
 });
 
 test.describe('nesting and cascade', () => {
