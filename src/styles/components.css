@@ -396,6 +396,16 @@
 
   /* Small enough that both scoreboards fit on one phone screen below the first input. */
   @media (width <= 30rem) {
+    /* The lead wraps to two or three lines depending on the platform's font rasteriser,
+       so the hero spacing leaves room for the third line instead of depending on it. */
+    .tool-hero {
+      padding-block-start: var(--space-m);
+    }
+
+    .duel {
+      margin-block-start: var(--space-l);
+    }
+
     .numeral {
       font-size: clamp(3rem, 18vw, 5rem);
     }
