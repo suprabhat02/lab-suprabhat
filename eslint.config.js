@@ -16,6 +16,8 @@ export default defineConfig(
         console: 'readonly',
         process: 'readonly',
         URL: 'readonly',
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
         document: 'readonly',
         localStorage: 'readonly',
         matchMedia: 'readonly',

@@ -67,3 +67,32 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
+
+  indexnow:
+    name: Ping IndexNow
+    needs: deploy
+    if: github.event_name == 'push' && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Reuse the exact files that were deployed instead of rebuilding.
+      - name: Download the Pages artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/pages
+
+      - name: Unpack into dist
+        run: mkdir -p dist && tar -xf "$RUNNER_TEMP/pages/artifact.tar" -C dist
+
+      - name: Submit the sitemap URLs
+        continue-on-error: true
+        run: node scripts/submit-indexnow.mjs

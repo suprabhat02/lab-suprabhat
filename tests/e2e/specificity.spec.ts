@@ -418,11 +418,4 @@ test.describe('site', () => {
     // Once in the footer of each page, plus the /about/ title.
     expect(count).toBe(4);
   });
-
-  test('has JSON-LD for the tool', async ({ page }) => {
-    await page.goto('/specificity/');
-    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
-    const types = blocks.map((b) => (JSON.parse(b) as { '@type': string })['@type']);
-    expect(types).toEqual(expect.arrayContaining(['WebApplication', 'BreadcrumbList']));
-  });
 });

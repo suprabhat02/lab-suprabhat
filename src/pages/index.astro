@@ -5,18 +5,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 const tools = (await getCollection('tools')).sort(
   (a, b) => b.data.updatedAt.getTime() - a.data.updatedAt.getTime(),
 );
-const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
-const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: "Suprabhat's Lab",
-    url: site,
-    description: 'Free, open frontend tools and explainers. No sign-up, no paywall, no tracking.',
-    inLanguage: 'en',
-    author: { '@type': 'Person', name: 'Suprabhat Kumar', url: 'https://suprabhat-dev.com' },
-  },
-];
 const dateFormat = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   month: 'long',
@@ -27,12 +15,11 @@ const dateFormat = new Intl.DateTimeFormat('en', {
 
 <BaseLayout
   title="Suprabhat's Lab: free frontend tools and explainers"
-  description="Free, open frontend tools and explainers that make CSS and UI easier. No sign-up, no paywall, no tracking, and built for every device and assistive technology."
+  description="Free, open frontend tools and explainers that make CSS and UI easier. No sign-up, no paywall, no tracking. Built for every device and assistive technology."
   path="/"
   og="home"
   ogAlt="Suprabhat's Lab: free frontend tools and explainers"
   breadcrumbs={[{ name: 'Lab', path: '/' }]}
-  jsonLd={jsonLd}
 >
   <section class="hub-hero" aria-labelledby="hub-title">
     <div class="wrap">

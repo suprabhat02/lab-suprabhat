@@ -61,6 +61,7 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 - **GitHub Pages, not Hostinger FTP.** `lab.suprabhat-dev.com` already resolved to `suprabhat02.github.io`, like the main site, and the domain is verified for GitHub Pages on the account. Pages through Actions needs no stored secrets (OIDC), no DNS changes, and gives free HTTPS and a CDN.
 - **What that gives up:** custom response headers. There is no `Strict-Transport-Security`, `Permissions-Policy`, `X-Content-Type-Options` or `frame-ancestors` from us, and caching is GitHub's fixed `max-age=600`, so fingerprinted `/_astro/` files aren't `immutable`. CSP and referrer policy still apply through `<meta>` tags. If headers become necessary, put a CDN that can set them in front, or move to a host that supports them.
 - **No `CNAME` file in `public/`.** With an Actions-based Pages deploy the custom domain comes from the repository settings, and a `CNAME` file in the artifact is ignored.
+- **IndexNow after each deploy.** The `indexnow` job in `deploy.yml` unpacks the deployed Pages artifact and posts every sitemap URL to `api.indexnow.org`. The key lives at `public/<key>.txt` (the standard location, so no `keyLocation`). It runs only for real pushes, not Dependabot, and a failed ping never fails the deploy.
 - **Clean URLs and 404** work without rewrites: `build.format: 'directory'` emits `/<route>/index.html`, and Pages serves `dist/404.html` for missing paths.
 
 ## Lighthouse
