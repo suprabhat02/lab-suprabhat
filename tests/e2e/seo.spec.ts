@@ -1,3 +1,4 @@
+import { readdirSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
@@ -68,4 +69,15 @@ test('/specificity/ declares the tool under its canonical @id', async ({ page })
   expect(app?.['author']).toEqual({ '@id': PERSON_ID });
   expect(app?.['offers']).toMatchObject({ price: 0, priceCurrency: 'USD' });
   expect(nodes.some((n) => n['@type'] === 'BreadcrumbList')).toBe(true);
+});
+
+test('serves the IndexNow key file at the site root', async ({ request }) => {
+  const keyFiles = readdirSync(new URL('../../public/', import.meta.url)).filter((f) =>
+    /^[0-9a-f]{32}\.txt$/.test(f),
+  );
+  expect(keyFiles).toHaveLength(1);
+  const file = keyFiles[0] ?? '';
+  const response = await request.get(`/${file}`);
+  expect(response.status()).toBe(200);
+  expect(await response.text()).toBe(file.replace('.txt', ''));
 });

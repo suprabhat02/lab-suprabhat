@@ -22,6 +22,7 @@ src/
       views.ts          View functions shared by build-time rendering and the island
     view/h.ts           Tiny view layer: renderToString (build) and renderToDom (browser)
     seo/entities.ts     schema.org Person and WebSite shared by every page's JSON-LD @graph
+    seo/sitemap.ts      Reads page URLs from a built sitemap (used by the IndexNow script)
   components/           .astro components: Duel, Anatomy, NestingPanel, CascadeLadder, ToolPanels,
                         Explainer, ExplainerExample, CascadeExample, SiteHeader, SiteFooter,
                         ThemeToggle, SkipLink
@@ -34,8 +35,8 @@ src/
   content/tools/        One Markdown file per tool (the `tools` collection)
   content.config.ts
   pages/                index, specificity/, about/, 404, og/[slug].png.ts
-public/                 robots.txt, llms.txt, favicon.svg, manifest.webmanifest
-scripts/                copy-fonts.mjs, report-sizes.mjs (budgets), lighthouse.mjs
+public/                 robots.txt, llms.txt, favicon.svg, manifest.webmanifest, <IndexNow key>.txt
+scripts/                copy-fonts.mjs, report-sizes.mjs (budgets), lighthouse.mjs, submit-indexnow.mjs
 tests/e2e/              Playwright + axe
 docs/
 ```
