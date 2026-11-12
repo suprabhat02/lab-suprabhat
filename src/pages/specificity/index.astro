@@ -7,6 +7,7 @@ import Explainer from '../../components/Explainer.astro';
 import { calculate } from '../../lib/cascade/specificity';
 import { DEFAULT_INPUTS } from '../../lib/app/defaults';
 import { buildCascade, buildDuel, buildNesting } from '../../lib/app/model';
+import { PERSON_ID, ref } from '../../lib/seo/entities';
 
 const tool = await getEntry('tools', 'specificity');
 if (!tool) throw new Error('Missing tools/specificity.md');
@@ -17,12 +18,13 @@ const nesting = buildNesting(DEFAULT_INPUTS.nesting, calculate);
 const cascade = buildCascade(DEFAULT_INPUTS.cascade, calculate);
 
 const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
+const url = new URL('/specificity/', site).href;
 const jsonLd = [
   {
-    '@context': 'https://schema.org',
     '@type': 'WebApplication',
+    '@id': `${url}#app`,
     name: 'CSS Specificity Wars',
-    url: new URL('/specificity/', site).href,
+    url,
     description: tool.data.summary,
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Any',
@@ -33,7 +35,7 @@ const jsonLd = [
     dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
     keywords: tool.data.keywords.join(', '),
     offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-    author: { '@type': 'Person', name: 'Suprabhat Kumar', url: 'https://suprabhat-dev.com' },
+    author: ref(PERSON_ID),
   },
 ];
 ---

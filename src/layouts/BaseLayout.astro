@@ -9,6 +9,7 @@ import themeScript from '../scripts/theme-inline.js?raw';
 import SkipLink from '../components/SkipLink.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import { graph } from '../lib/seo/entities';
 
 export interface Crumb {
   name: string;
@@ -24,6 +25,7 @@ interface Props {
   og: string;
   ogAlt: string;
   breadcrumbs?: Crumb[];
+  /** This page's own schema.org nodes; the Person and the WebSite are added for every page. */
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
 }
@@ -33,10 +35,9 @@ const site = Astro.site ?? new URL('https://lab.suprabhat-dev.com');
 const canonical = new URL(path, site).href;
 const ogImage = new URL(`/og/${og}.png`, site).href;
 
-const graph: Record<string, unknown>[] = [...jsonLd];
+const nodes: Record<string, unknown>[] = [...jsonLd];
 if (breadcrumbs.length > 0) {
-  graph.push({
-    '@context': 'https://schema.org',
+  nodes.push({
     '@type': 'BreadcrumbList',
     itemListElement: breadcrumbs.map((c, i) => ({
       '@type': 'ListItem',
@@ -47,7 +48,7 @@ if (breadcrumbs.length > 0) {
   });
 }
 // Escape `<` so the JSON can never close the script element.
-const ldJson = graph.map((g) => JSON.stringify(g).replace(/</g, '\\u003c'));
+const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -94,9 +95,7 @@ const ldJson = graph.map((g) => JSON.stringify(g).replace(/</g, '\\u003c'));
     />
 
     <script is:inline set:html={themeScript} />
-    {ldJson.map((json) => (
-      <script type="application/ld+json" set:html={json} />
-    ))}
+    <script type="application/ld+json" set:html={ldJson} />
     {/*
         Analytics hook, off in v1. To add a cookieless counter later (GoatCounter or self-hosted Umami):
         1. add its script here, for example

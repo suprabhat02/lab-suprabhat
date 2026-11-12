@@ -21,6 +21,7 @@ src/
       model.ts          Builds view models from inputs (the parser is injected)
       views.ts          View functions shared by build-time rendering and the island
     view/h.ts           Tiny view layer: renderToString (build) and renderToDom (browser)
+    seo/entities.ts     schema.org Person and WebSite shared by every page's JSON-LD @graph
   components/           .astro components: Duel, Anatomy, NestingPanel, CascadeLadder, ToolPanels,
                         Explainer, ExplainerExample, CascadeExample, SiteHeader, SiteFooter,
                         ThemeToggle, SkipLink
