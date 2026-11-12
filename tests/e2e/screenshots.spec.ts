@@ -14,7 +14,7 @@ const routes = [
 ] as const;
 
 for (const [name, path] of routes) {
-  for (const width of [375, 1440]) {
+  for (const width of [390, 1440]) {
     for (const theme of ['dark', 'light'] as const) {
       test(`${name} ${width}px ${theme}`, async ({ page }) => {
         await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
