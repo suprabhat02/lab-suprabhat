@@ -358,8 +358,6 @@
   .numerals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    /* The marker row is always reserved, so the winner and loser labels line up across cards. */
-    grid-template-rows: auto auto 1.6rem;
     column-gap: clamp(0.75rem, 5cqi, 2.5rem);
     max-inline-size: 34rem;
     overflow: clip;
@@ -401,27 +399,15 @@
     margin-block-start: var(--space-2xs);
     color: var(--text-2);
     font-size: var(--step--1);
-  }
 
-  .decided-marker {
-    grid-row: 3;
-    grid-column: 1;
-    inline-size: max-content;
-    color: var(--accent);
-    font-size: var(--step--1);
-    font-weight: 600;
-
-    &[data-col='b'] {
-      grid-column: 2;
-    }
-
-    &[data-col='c'] {
-      grid-column: 3;
+    &[data-decided] {
+      color: var(--accent);
+      font-weight: 600;
     }
   }
 
   .outcome {
-    margin-block-start: var(--space-xs);
+    margin-block-start: var(--space-3xs);
     color: var(--text-2);
     font-size: var(--step--1);
   }

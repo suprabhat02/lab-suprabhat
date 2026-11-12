@@ -34,6 +34,22 @@ test.describe('duel', () => {
     await page.goto('/specificity/');
     await expect(verdict(page)).toHaveText('#nav a wins in the first column: 1 ID beats 0.');
     await expect(page.locator('[data-score="0"] .numeral[data-decided]')).toHaveText('1');
+    await expect(page.locator('[data-score="0"] .numeral-caption[data-decided]')).toHaveText('▲ IDs');
+  });
+
+  test('the outcome sits right under the column labels, level across cards', async ({ page }) => {
+    await page.goto('/specificity/');
+    const gaps: number[] = [];
+    const tops: number[] = [];
+    for (const i of [0, 1]) {
+      const caption = await page.locator(`[data-score="${i}"] .numeral-caption`).first().boundingBox();
+      const outcome = await page.locator(`[data-score="${i}"] .outcome`).boundingBox();
+      if (!caption || !outcome) throw new Error('Missing scoreboard boxes');
+      gaps.push(outcome.y - (caption.y + caption.height));
+      tops.push(outcome.y);
+    }
+    for (const gap of gaps) expect(gap).toBeLessThan(12);
+    expect(Math.abs((tops[0] ?? 0) - (tops[1] ?? 0))).toBeLessThan(1);
   });
 
   test('keyboard-only flow: compare, add, remove and copy', async ({ page, context, browserName }) => {

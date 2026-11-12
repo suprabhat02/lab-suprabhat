@@ -107,15 +107,14 @@ export function scoreView(
         value === null ? '–' : String(value),
       );
     }),
-    COLUMN_LABELS.map((label) => h('span', { class: 'numeral-caption' }, label)),
-    decided
-      ? h(
-          'span',
-          { class: 'decided-marker', 'data-col': decided },
-          h('span', { class: 'marker-arrow' }, '▲'),
-          ' decided here',
-        )
-      : null,
+    COLUMN_KEYS.map((key, i) =>
+      h(
+        'span',
+        { class: 'numeral-caption', 'data-decided': decided === key },
+        decided === key ? h('span', { class: 'marker-arrow' }, '▲ ') : null,
+        COLUMN_LABELS[i] ?? '',
+      ),
+    ),
   );
 
   const text = best
