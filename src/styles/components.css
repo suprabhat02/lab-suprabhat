@@ -68,6 +68,20 @@
       color: var(--text);
       border-color: var(--text-2);
     }
+
+    & .theme-toggle-icon {
+      fill: none;
+    }
+
+    &[aria-pressed='true'] {
+      border-color: var(--accent);
+      color: var(--text);
+
+      & .theme-toggle-icon {
+        fill: var(--accent);
+        color: var(--accent);
+      }
+    }
   }
 
   :root:not([data-js]) .theme-toggle {

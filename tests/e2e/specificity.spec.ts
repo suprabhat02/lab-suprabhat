@@ -282,12 +282,24 @@ test.describe('site', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/');
     const toggle = page.getByRole('button', { name: 'Dark theme' });
+    const icon = toggle.locator('svg path');
+    const outlineIsAccent = () =>
+      toggle.evaluate((el) => {
+        const accent = getComputedStyle(document.querySelector('.brand-slash') ?? el).color;
+        return getComputedStyle(el).borderTopColor === accent;
+      });
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(icon).not.toHaveCSS('fill', 'none');
+    expect(await outlineIsAccent()).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await page.mouse.move(0, 0);
+    await expect(icon).toHaveCSS('fill', 'none');
+    expect(await outlineIsAccent()).toBe(false);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByRole('button', { name: 'Dark theme' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('home and about ship no JavaScript besides the theme script', async ({ page }) => {

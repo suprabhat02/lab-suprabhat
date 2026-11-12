@@ -28,4 +28,6 @@
     sync();
   });
   document.addEventListener('DOMContentLoaded', sync);
+  // Runs before the first paint, so the pressed look never flashes for light-theme visitors.
+  requestAnimationFrame(sync);
 })();
