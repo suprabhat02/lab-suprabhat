@@ -85,7 +85,7 @@
       max-inline-size: var(--measure);
     }
 
-    & > .example-live {
+    & > .example {
       max-inline-size: none;
     }
   }

@@ -34,6 +34,39 @@ test.describe('duel', () => {
     await page.goto('/specificity/');
     await expect(verdict(page)).toHaveText('#nav a wins in the first column: 1 ID beats 0.');
     await expect(page.locator('[data-score="0"] .numeral[data-decided]')).toHaveText('1');
+    await expect(page.locator('[data-score="0"] .numeral-caption[data-decided]')).toHaveText('▲ IDs');
+  });
+
+  test('the outcome sits right under the column labels, level across cards', async ({ page }) => {
+    await page.goto('/specificity/');
+    const gaps: number[] = [];
+    const tops: number[] = [];
+    for (const i of [0, 1]) {
+      const caption = await page.locator(`[data-score="${i}"] .numeral-caption`).first().boundingBox();
+      const outcome = await page.locator(`[data-score="${i}"] .outcome`).boundingBox();
+      if (!caption || !outcome) throw new Error('Missing scoreboard boxes');
+      gaps.push(outcome.y - (caption.y + caption.height));
+      tops.push(outcome.y);
+    }
+    for (const gap of gaps) expect(gap).toBeLessThan(12);
+    expect(Math.abs((tops[0] ?? 0) - (tops[1] ?? 0))).toBeLessThan(1);
+  });
+
+  test('on a 390x844 phone both scoreboards fit on one screen from the first input', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/specificity/');
+    const input = await page.getByLabel('Selector 1', { exact: true }).boundingBox();
+    const last = await page.locator('[data-score="1"] .outcome').boundingBox();
+    const header = await page.locator('.site-header').boundingBox();
+    if (!input || !last || !header) throw new Error('Missing boxes');
+    expect(last.y + last.height - input.y).toBeLessThanOrEqual(844 - (header.y + header.height));
+    // And on first load, without scrolling.
+    expect(last.y + last.height).toBeLessThanOrEqual(844);
+    // The decided column keeps its highlight at the smaller size.
+    const decided = await page
+      .locator('[data-score="0"] .numeral[data-decided]')
+      .evaluate((el) => getComputedStyle(el).color !== getComputedStyle(el.nextElementSibling ?? el).color);
+    expect(decided).toBe(true);
   });
 
   test('keyboard-only flow: compare, add, remove and copy', async ({ page, context, browserName }) => {
@@ -217,6 +250,32 @@ test.describe('tabs', () => {
     await expect(table.locator('th[scope="col"]')).toHaveCount(6);
     await expect(table.locator('tbody th[scope="row"]').first()).toHaveText('#nav');
   });
+
+  test('panels end at their content and switching keeps the tab list in place', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/specificity/');
+    const tablist = page.getByRole('tablist', { name: 'Inspect' });
+    const measure = (name: string) =>
+      page.getByRole('tabpanel', { name }).evaluate((panel) => {
+        const section = panel.closest('section.section-tools') ?? panel;
+        return {
+          // Space between the panel's last content and the end of its section.
+          below: section.getBoundingClientRect().bottom - panel.getBoundingClientRect().bottom,
+          tablistTop: document.querySelector('[data-tablist]')?.getBoundingClientRect().top ?? 0,
+        };
+      });
+
+    await page.getByRole('tab', { name: 'Cascade' }).click();
+    await tablist.evaluate((el) => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    const tall = await measure('Cascade');
+    await page.getByRole('tab', { name: 'Nesting' }).click();
+    const short = await measure('Nesting');
+
+    // Two pixels of slack for subpixel rounding (WebKit).
+    expect(Math.abs(short.tablistTop - tall.tablistTop)).toBeLessThanOrEqual(2);
+    expect(Math.abs(short.below - tall.below)).toBeLessThanOrEqual(2);
+    expect(short.below).toBeLessThanOrEqual(80);
+  });
 });
 
 test.describe('nesting and cascade', () => {
@@ -282,12 +341,24 @@ test.describe('site', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/');
     const toggle = page.getByRole('button', { name: 'Dark theme' });
+    const icon = toggle.locator('svg path');
+    const outlineIsAccent = () =>
+      toggle.evaluate((el) => {
+        const accent = getComputedStyle(document.querySelector('.brand-slash') ?? el).color;
+        return getComputedStyle(el).borderTopColor === accent;
+      });
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(icon).not.toHaveCSS('fill', 'none');
+    expect(await outlineIsAccent()).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await page.mouse.move(0, 0);
+    await expect(icon).toHaveCSS('fill', 'none');
+    expect(await outlineIsAccent()).toBe(false);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.getByRole('button', { name: 'Dark theme' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('home and about ship no JavaScript besides the theme script', async ({ page }) => {

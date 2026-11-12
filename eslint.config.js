@@ -19,6 +19,7 @@ export default defineConfig(
         document: 'readonly',
         localStorage: 'readonly',
         matchMedia: 'readonly',
+        requestAnimationFrame: 'readonly',
         Element: 'readonly',
       },
     },

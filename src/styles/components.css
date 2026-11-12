@@ -68,6 +68,20 @@
       color: var(--text);
       border-color: var(--text-2);
     }
+
+    & .theme-toggle-icon {
+      fill: none;
+    }
+
+    &[aria-pressed='true'] {
+      border-color: var(--accent);
+      color: var(--text);
+
+      & .theme-toggle-icon {
+        fill: var(--accent);
+        color: var(--accent);
+      }
+    }
   }
 
   :root:not([data-js]) .theme-toggle {
@@ -344,8 +358,6 @@
   .numerals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    /* The marker row is always reserved, so the winner and loser labels line up across cards. */
-    grid-template-rows: auto auto 1.6rem;
     column-gap: clamp(0.75rem, 5cqi, 2.5rem);
     max-inline-size: 34rem;
     overflow: clip;
@@ -382,32 +394,41 @@
     }
   }
 
+  /* Small enough that both scoreboards fit on one phone screen below the first input. */
+  @media (width <= 30rem) {
+    /* The lead wraps to two or three lines depending on the platform's font rasteriser,
+       so the hero spacing leaves room for the third line instead of depending on it. */
+    .tool-hero {
+      padding-block-start: var(--space-m);
+    }
+
+    .duel {
+      margin-block-start: var(--space-l);
+    }
+
+    .numeral {
+      font-size: clamp(3rem, 18vw, 5rem);
+    }
+
+    .contenders {
+      row-gap: var(--space-l);
+    }
+  }
+
   .numeral-caption {
     grid-row: 2;
     margin-block-start: var(--space-2xs);
     color: var(--text-2);
     font-size: var(--step--1);
-  }
 
-  .decided-marker {
-    grid-row: 3;
-    grid-column: 1;
-    inline-size: max-content;
-    color: var(--accent);
-    font-size: var(--step--1);
-    font-weight: 600;
-
-    &[data-col='b'] {
-      grid-column: 2;
-    }
-
-    &[data-col='c'] {
-      grid-column: 3;
+    &[data-decided] {
+      color: var(--accent);
+      font-weight: 600;
     }
   }
 
   .outcome {
-    margin-block-start: var(--space-xs);
+    margin-block-start: var(--space-3xs);
     color: var(--text-2);
     font-size: var(--step--1);
   }
@@ -533,6 +554,16 @@
 
   :root[data-js] .panel + .panel {
     margin-block-start: 0;
+  }
+
+  /* With tabs, the tab list already separates the panel from what's above it. */
+  :root[data-js] .panel {
+    padding-block-start: var(--space-l);
+  }
+
+  /* Panels end at their content; only a short gap separates them from the explainer, whichever tab is open. */
+  .section-tools {
+    padding-block-end: var(--space-xl);
   }
 
   .panel-intro {
@@ -803,14 +834,27 @@
     & figcaption {
       font-weight: 600;
     }
+
+    /* Every example spans the column so its link lines up; tables still keep the reading measure. */
+    & > .table-wrap,
+    & > p {
+      max-inline-size: var(--measure);
+    }
   }
 
   .example-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2xs) var(--space-s);
+    display: grid;
+    gap: var(--space-3xs) var(--space-s);
+    justify-items: start;
+
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+
+      & > a {
+        white-space: nowrap;
+      }
+    }
   }
 
   .example-body {

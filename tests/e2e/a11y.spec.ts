@@ -52,7 +52,7 @@ test('forced colors mode keeps the page usable', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto('/specificity/');
   expect(await seriousViolations(page)).toEqual([]);
-  await expect(page.locator('.decided-marker')).toContainText('decided here');
+  await expect(page.locator('.numeral-caption[data-decided]')).toContainText('▲');
 });
 
 test('pages have one h1 and a skip link to #main', async ({ page }) => {
