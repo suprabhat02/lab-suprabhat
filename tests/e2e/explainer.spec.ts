@@ -94,6 +94,42 @@ test.describe('explainer navigation without JavaScript', () => {
 });
 
 test.describe('live examples', () => {
+  const tryLinks = (page: Page) =>
+    page.locator('.explainer-body figure.example').evaluateAll((figures) =>
+      figures.map((figure) => {
+        const caption = figure.querySelector('figcaption')?.getBoundingClientRect();
+        const link = figure.querySelector('a[data-try]')?.getBoundingClientRect();
+        if (!caption || !link) return null;
+        return {
+          captionTop: caption.top,
+          captionBottom: caption.bottom,
+          linkTop: link.top,
+          linkRight: link.right,
+        };
+      }),
+    );
+
+  test('every "Try this" link sits beside its heading at 1024px and up', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/specificity/');
+    const boxes = await tryLinks(page);
+    expect(boxes.length).toBeGreaterThan(5);
+    const right = boxes[0]?.linkRight ?? 0;
+    for (const box of boxes) {
+      expect(box).not.toBeNull();
+      expect(Math.abs((box?.linkTop ?? 0) - (box?.captionTop ?? 0))).toBeLessThan(4);
+      expect(Math.abs((box?.linkRight ?? 0) - right)).toBeLessThan(1);
+    }
+  });
+
+  test('every "Try this" link sits below its heading on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/specificity/');
+    for (const box of await tryLinks(page)) {
+      expect(box).not.toBeNull();
+      expect(box?.linkTop ?? 0).toBeGreaterThanOrEqual((box?.captionBottom ?? 0) - 1);
+    }
+  });
   const expected = [
     ['A nested rule takes its strongest parent', 'crimson', 'rgb(220, 20, 60)'],
     ['Unlayered beats layered', 'crimson', 'rgb(220, 20, 60)'],

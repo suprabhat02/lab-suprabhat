@@ -803,14 +803,27 @@
     & figcaption {
       font-weight: 600;
     }
+
+    /* Every example spans the column so its link lines up; tables still keep the reading measure. */
+    & > .table-wrap,
+    & > p {
+      max-inline-size: var(--measure);
+    }
   }
 
   .example-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2xs) var(--space-s);
+    display: grid;
+    gap: var(--space-3xs) var(--space-s);
+    justify-items: start;
+
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+
+      & > a {
+        white-space: nowrap;
+      }
+    }
   }
 
   .example-body {
