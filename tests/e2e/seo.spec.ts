@@ -46,6 +46,17 @@ for (const route of ROUTES) {
       expect(credits.length).toBeGreaterThan(0);
       for (const { node } of credits) expect(node).toEqual({ '@id': PERSON_ID });
     });
+
+    test('has a title of at most 60 characters and a description of 120 to 155', async ({ page }) => {
+      await page.goto(route);
+      const title = await page.title();
+      const description = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+      expect(title.length).toBeLessThanOrEqual(60);
+      expect(description.length).toBeGreaterThanOrEqual(120);
+      expect(description.length).toBeLessThanOrEqual(155);
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+      await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
+    });
   });
 }
 
