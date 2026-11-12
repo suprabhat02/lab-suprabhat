@@ -20,7 +20,7 @@ npm run build      # fails if a size budget is exceeded
 npm run test:e2e   # Playwright + axe against the build
 ```
 
-CI runs the same steps on every pull request.
+CI runs the same steps on every pull request, with the end-to-end tests split into one job per browser (Chromium, Firefox, WebKit), two workers and one retry. A failing job uploads its Playwright HTML report as an artifact.
 
 ## Ground rules
 

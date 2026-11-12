@@ -66,7 +66,7 @@ Every tool is an entry in the `tools` content collection. The home page and site
 
 ## Deploy
 
-Pushes to `main` run `.github/workflows/deploy.yml`: `npm ci`, `npm run check`, `npm test`, `npm run build`, then upload `dist/` to Hostinger over FTPS with `SamKirkland/FTP-Deploy-Action@v4.4.0`. Pull requests run `.github/workflows/ci.yml` (lint, check, unit tests, build, Playwright + axe).
+Pushes to `main` run `.github/workflows/deploy.yml`: `npm ci`, `npm run check`, `npm test`, `npm run build`, then upload `dist/` to Hostinger over FTPS with `SamKirkland/FTP-Deploy-Action@v4.4.0`. Pull requests run `.github/workflows/ci.yml` (lint, check, unit tests, build, then Playwright + axe as separate Chromium, Firefox and WebKit jobs).
 
 Add these repository secrets (**Settings → Secrets and variables → Actions**):
 
