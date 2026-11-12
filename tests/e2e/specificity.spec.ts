@@ -52,6 +52,23 @@ test.describe('duel', () => {
     expect(Math.abs((tops[0] ?? 0) - (tops[1] ?? 0))).toBeLessThan(1);
   });
 
+  test('on a 390x844 phone both scoreboards fit on one screen from the first input', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/specificity/');
+    const input = await page.getByLabel('Selector 1', { exact: true }).boundingBox();
+    const last = await page.locator('[data-score="1"] .outcome').boundingBox();
+    const header = await page.locator('.site-header').boundingBox();
+    if (!input || !last || !header) throw new Error('Missing boxes');
+    expect(last.y + last.height - input.y).toBeLessThanOrEqual(844 - (header.y + header.height));
+    // And on first load, without scrolling.
+    expect(last.y + last.height).toBeLessThanOrEqual(844);
+    // The decided column keeps its highlight at the smaller size.
+    const decided = await page
+      .locator('[data-score="0"] .numeral[data-decided]')
+      .evaluate((el) => getComputedStyle(el).color !== getComputedStyle(el.nextElementSibling ?? el).color);
+    expect(decided).toBe(true);
+  });
+
   test('keyboard-only flow: compare, add, remove and copy', async ({ page, context, browserName }) => {
     // Only Chromium lets tests grant clipboard access; the others exercise whichever path the browser allows.
     if (browserName === 'chromium') await context.grantPermissions(['clipboard-read', 'clipboard-write']);
