@@ -65,6 +65,8 @@ const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
     <meta name="theme-color" content="#f9fafb" media="(prefers-color-scheme: light)" />
     <meta name="author" content="Suprabhat Kumar" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    {/* Bing Webmaster Tools ownership check; Bing needs it on the home page and keeps checking it. */}
+    {path === '/' && <meta name="msvalidate.01" content="4E5ECF05B712B40C5A4F9B6442206F3C" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Suprabhat's Lab" />
