@@ -1,0 +1,212 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTools } from '../../lib/seo/tools';
+import { lockedVersions } from '../../lib/seo/versions';
+import { REPORT_URL } from '../../lib/seo/links';
+import { rich, renderToString } from '../../lib/view/h';
+
+const html = (text: string) => rich(text).map(renderToString).join('');
+
+// Every statement here must be provable from the repo's code, tests or explainers.
+const methods: Record<string, { checked: string[]; limits: string[] }> = {
+  specificity: {
+    checked: [
+      "Scores come from `@bramus/specificity`. The lab's own walk of the css-tree syntax tree produces the per-part breakdown, and the tests require the parts to add up to the library's score.",
+      'The reference vectors in `specificity.test.ts` cover IDs, classes, types, `:is()`, `:not()`, `:has()`, `:where()`, `:nth-child(… of S)`, shadow DOM selectors, namespaces and legacy pseudo-elements. Each must match its expected triple and the library.',
+      'Nesting expansion, the duel verdict, fix suggestions and the seven-step cascade resolver have their own suites (`nesting.test.ts`, `compare-suggest.test.ts`, `cascade.test.ts`) with hand-written expected results. They have no external oracle.',
+    ],
+    limits: [
+      'Selectors over 1,000 characters are rejected, and nesting expansion is capped at 2,000 characters.',
+      'Unknown pseudo-classes are counted like classes but flagged. Invalid arguments in the forgiving `:is()` and `:where()` lists are dropped with a warning.',
+      "The cascade resolver decides between the two to four declarations you describe. It doesn't read your page or your stylesheet.",
+    ],
+  },
+  playground: {
+    checked: [
+      'Uses the same `calculate()` engine and unit tests as CSS Specificity Wars.',
+      'Browser tests in `playground.spec.ts` check the highlighted parts, per-part contributions, functional pseudo-class rules, warnings, each score in a selector list, and recovery from invalid input.',
+    ],
+    limits: [
+      'Selectors over 1,000 characters are rejected.',
+      "It scores selectors; it doesn't decide which rule wins the cascade. Use CSS Specificity Wars for that.",
+    ],
+  },
+  'stylesheet-audit': {
+    checked: [
+      '`audit.test.ts` covers parsing (multiline selector lists, nesting, conditional chains, layers, imports and size caps), metrics (real triple ordering and the lower median) and findings, with hand-written expected results.',
+      'Scores come from the same `calculate()` and nesting from the same `expandNesting()` as CSS Specificity Wars; there is no second scoring implementation. CSS is parsed with css-tree.',
+    ],
+    limits: [
+      'It does not evaluate media conditions, match selectors against a document, expand imports or compare property values.',
+      'Keyframes, font descriptors and unsupported at-rule groups are not selector rules and are reported as excluded.',
+      'Input is capped at 100 KB, and only the first 5,000 selectors are scored. The report is a starting point for review, not a replacement for browser inspection.',
+    ],
+  },
+  'accessible-name': {
+    checked: [
+      'The engine follows the AccName 1.2 computation steps and HTML-AAM.',
+      'Each fixture in `compute.test.ts` is computed through both adapters, the build-time parse5 adapter and the browser DOM adapter, which must agree. The result is then compared with `dom-accessibility-api` running on jsdom.',
+      'Where that library and the specification disagree, the test records the difference next to a link to the governing specification text. Another test parses hostile markup and checks that nothing is requested or executed.',
+    ],
+    limits: [
+      'It reads attributes and text, not the rendered page. It recognizes `hidden`, `aria-hidden="true"` and inline hiding styles.',
+      "It can't know class-based styling, generated text, layout-dependent whitespace, shadow-tree changes or values changed by scripts.",
+      'Markup is capped at 4 KB. Browser-generated button labels are shown in English. Always verify the final page with your browser and assistive technology.',
+    ],
+  },
+};
+
+const tools = (await getTools()).filter((tool) => tool.data.status === 'live');
+for (const tool of tools) {
+  if (!methods[tool.id]) throw new Error(`Add a methodology entry for the live tool "${tool.id}".`);
+}
+const versions = lockedVersions([
+  '@bramus/specificity',
+  'css-tree',
+  'parse5',
+  'dom-accessibility-api',
+  'jsdom',
+  'axe-core',
+  '@playwright/test',
+]);
+const roles: Record<string, string> = {
+  '@bramus/specificity': 'Specificity scores, in the tools',
+  'css-tree': 'CSS and selector parsing, in the tools',
+  parse5: 'HTML parsing for the pre-rendered accessible-name example',
+  'dom-accessibility-api': 'Accessible-name oracle, in unit tests',
+  jsdom: 'The DOM the oracle runs on, in unit tests',
+  'axe-core': 'Accessibility scans, in browser tests',
+  '@playwright/test': 'Browser tests in Chromium, Firefox and WebKit',
+};
+---
+
+<BaseLayout
+  title="How the tools are checked | Suprabhat's Lab"
+  description="How each tool in the lab is tested: the reference data and oracle libraries it is compared with, what it can't tell you, and how to report a wrong result."
+  path="/methodology/"
+  og="methodology"
+  ogAlt="How the tools are checked"
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Methodology', path: '/methodology/' },
+  ]}
+>
+  <section class="hub-hero" aria-labelledby="methodology-title">
+    <div class="wrap flow">
+      <h1 id="methodology-title">How the tools are checked</h1>
+      <p class="tool-lead">
+        What each tool is tested against, what it can't know, and how to report a mistake.
+      </p>
+      <p class="muted">
+        By <a href="/about/">Suprabhat Kumar</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="principles">
+    <div class="wrap">
+      <div class="prose flow">
+        <h2 id="principles">Principles</h2>
+        <ul>
+          <li>
+            <strong>Client-side only.</strong> Every tool runs in your browser. Pasted CSS, HTML and selectors
+            are analysed on your device and never sent to a server.
+          </li>
+          <li>
+            <strong>Nothing stored.</strong> No cookies, no analytics and no account. The only thing kept is
+            your theme choice, in your browser's local storage.
+          </li>
+          <li>
+            <strong>Links only carry what you share.</strong> Stylesheet Audit and Accessible Name Wars put
+            your input in a link only when you press Copy link, and Selector Playground never does. CSS
+            Specificity Wars keeps its selectors in the address bar as you edit, so the page can be
+            bookmarked; that address stays in your browser unless you send it.
+          </li>
+          <li>
+            <strong>Same answer without JavaScript.</strong> Each tool page includes a pre-calculated example
+            from the same engine the live tool uses.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {tools.map((tool) => {
+    const method = methods[tool.id];
+    return (
+      <section class="section" aria-labelledby={tool.data.slug}>
+        <div class="wrap">
+          <div class="prose flow">
+            <h2 id={tool.data.slug}>
+              <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
+            </h2>
+            <h3>How it is checked</h3>
+            <ul>
+              {method?.checked.map((item) => (
+                <li set:html={html(item)} />
+              ))}
+            </ul>
+            <h3>Known limits</h3>
+            <ul>
+              {method?.limits.map((item) => (
+                <li set:html={html(item)} />
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <section class="section" aria-labelledby="site-checks">
+    <div class="wrap">
+      <div class="prose flow">
+        <h2 id="site-checks">How the site is checked</h2>
+        <p>
+          Every pull request runs the unit tests and the browser tests in Chromium, Firefox and WebKit. Every
+          page is scanned with axe-core in the light and dark themes, and the colour tokens are checked
+          against WCAG contrast ratios offline.
+        </p>
+        <h2 id="versions">Tested versions</h2>
+        <p>Read from the lockfile when the site is built.</p>
+      </div>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Tested package versions">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Package</th>
+              <th scope="col">Version</th>
+              <th scope="col">Used for</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(versions).map(([name, version]) => (
+              <tr>
+                <th scope="row">
+                  <code>{name}</code>
+                </th>
+                <td>
+                  <code>{version}</code>
+                </td>
+                <td>{roles[name]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="report">
+    <div class="wrap">
+      <div class="prose flow">
+        <h2 id="report">Report a wrong result</h2>
+        <p>
+          If a tool gives an answer you think is wrong, <a href={REPORT_URL}>open a wrong-result report</a> on
+          GitHub with the input, what you expected and what the tool said. Reports are public, so don't paste
+          private code.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

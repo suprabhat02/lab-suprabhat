@@ -1,0 +1,34 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  tool: CollectionEntry<'tools'>;
+  /** The tools index groups by category, so it shows status instead of a category label. */
+  variant?: 'home' | 'index';
+}
+const { tool, variant = 'home' } = Astro.props;
+const dateFormat = new Intl.DateTimeFormat('en', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const status = tool.data.status === 'live' ? 'Live' : 'In progress';
+---
+
+<li class="tool-item">
+  {variant === 'home' && <p class="tool-category">{tool.data.category}</p>}
+  <h3 class="tool-title">
+    <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
+  </h3>
+  {(variant === 'index' || tool.data.status === 'in-progress') && <p class="tool-status">{status}</p>}
+  <p class="prose">{tool.data.summary}</p>
+  <p class="muted">
+    <small>
+      Updated{' '}
+      <time datetime={tool.data.updatedAt.toISOString().slice(0, 10)}>
+        {dateFormat.format(tool.data.updatedAt)}
+      </time>
+    </small>
+  </p>
+</li>

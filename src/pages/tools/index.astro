@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import { getTools } from '../../lib/seo/tools';
+import { WEBSITE_ID, ref } from '../../lib/seo/entities';
+
+const tools = await getTools();
+// Groups appear in the order of their first tool, so `order` controls both levels.
+const categories = [...new Set(tools.map((tool) => tool.data.category))].map((name) => ({
+  name,
+  id: `category-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+  tools: tools.filter((tool) => tool.data.category === name),
+}));
+const site = Astro.site ?? new URL('https://lab.suprabhat-dev.com');
+const url = new URL('/tools/', site).href;
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${url}#page`,
+    name: 'All tools',
+    url,
+    inLanguage: 'en',
+    isPartOf: ref(WEBSITE_ID),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: tools.map((tool, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: tool.data.title,
+        url: new URL(`/${tool.data.slug}/`, site).href,
+      })),
+    },
+  },
+];
+---
+
+<BaseLayout
+  title="All tools: CSS and accessibility checkers | Suprabhat's Lab"
+  description="Every free tool in the lab, grouped by topic, with its status and last update. Each one runs in your browser, and your input is never sent anywhere."
+  path="/tools/"
+  og="tools"
+  ogAlt="All tools in Suprabhat's Lab"
+  breadcrumbs={[
+    { name: 'Home', path: '/' },
+    { name: 'Tools', path: '/tools/' },
+  ]}
+  jsonLd={jsonLd}
+>
+  <section class="hub-hero" aria-labelledby="tools-page-title">
+    <div class="wrap flow">
+      <h1 id="tools-page-title">All tools</h1>
+      <p class="tool-lead">
+        Each tool answers one question and explains the answer. Read{' '}
+        <a href="/methodology/">how they are checked</a>
+        and what they can't tell you.
+      </p>
+    </div>
+  </section>
+
+  {categories.map((category) => (
+    <section class="section" aria-labelledby={category.id}>
+      <div class="wrap flow">
+        <h2 id={category.id}>{category.name}</h2>
+        <ul class="tool-list" role="list">
+          {category.tools.map((tool) => (
+            <ToolCard tool={tool} variant="index" />
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+</BaseLayout>

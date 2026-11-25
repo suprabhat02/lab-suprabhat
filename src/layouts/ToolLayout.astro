@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import { getTools } from '../lib/seo/tools';
 import { PERSON_ID, ref } from '../lib/seo/entities';
+import { REPORT_URL } from '../lib/seo/links';
 
 interface Props {
   tool: CollectionEntry<'tools'>;
@@ -16,7 +17,7 @@ const path = `/${tool.data.slug}/`;
 const url = new URL(path, Astro.site).href;
 const breadcrumbs = [
   { name: 'Home', path: '/' },
-  { name: 'Tools', path: '/#tools-title' },
+  { name: 'Tools', path: '/tools/' },
   { name: tool.data.title, path },
 ];
 const relatedIds = new Set(tool.data.related.map((entry) => entry.id));
@@ -79,6 +80,13 @@ const jsonLd = [
       </noscript>
     </header>
     <slot />
+    <p class="wrap cluster tool-trust">
+      <span>
+        By <a href="/about/">Suprabhat Kumar</a>
+      </span>
+      <a href={`/methodology/#${tool.data.slug}`}>How this tool is checked</a>
+      <a href={REPORT_URL}>Report a wrong result</a>
+    </p>
   </section>
   <slot name="after-tool" />
   <slot name="explainer" />

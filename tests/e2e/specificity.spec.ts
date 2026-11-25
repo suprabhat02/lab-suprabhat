@@ -420,8 +420,8 @@ test.describe('site', () => {
     await expect(toggle).toHaveAttribute('data-state', 'dark');
   });
 
-  test('home and about ship no JavaScript besides the theme script', async ({ page }) => {
-    for (const route of ['/', '/about/']) {
+  test('static pages ship no JavaScript besides the theme script', async ({ page }) => {
+    for (const route of ['/', '/about/', '/tools/', '/methodology/']) {
       await page.goto(route);
       await expect(page.locator('script[src]')).toHaveCount(0);
     }

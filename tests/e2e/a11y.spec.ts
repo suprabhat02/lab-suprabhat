@@ -9,6 +9,8 @@ const ROUTES = [
   '/accessible-name/',
   '/stylesheet-audit/',
   '/about/',
+  '/tools/',
+  '/methodology/',
   '/404.html',
 ];
 const THEMES = ['dark', 'light'] as const;

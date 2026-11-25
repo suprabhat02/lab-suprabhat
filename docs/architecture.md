@@ -9,6 +9,17 @@ require a group label. Their limits/privacy copy belongs directly below the
 input, not in a separate heading. The static llms tool list is checked against
 the collection by the SEO browser tests.
 
+`/tools/` renders every collection entry through `ToolCard.astro` (shared with
+the home grid), grouped by `category` in order of each group's first tool and
+sorted by `order`. The tool breadcrumb links there. `/methodology/` lists, for
+each live tool, how it is checked and its known limits; it throws at build time
+if a live tool has no entry. `src/lib/seo/versions.ts` reads the oracle and
+parser versions from `package-lock.json` during the build, so the published
+numbers match what the tests ran. `ToolLayout` adds a byline linking to
+`/about/`, a link to the tool's methodology section and a "Report a wrong
+result" link to the issue form (`src/lib/seo/links.ts`). None of these pages
+add client JavaScript.
+
 A static Astro site. Every page is HTML at build time; the specificity tool adds one plain TypeScript island on top.
 
 ## Folder map
@@ -43,9 +54,11 @@ src/
   styles/               tokens.css, base.css, layout.css, components.css, utilities.css
   content/tools/        One Markdown file per tool (the `tools` collection)
   content.config.ts
-  pages/                index, specificity/, about/, 404, og/[slug].png.ts
+  pages/                index, tools/, methodology/, specificity/, playground/, accessible-name/,
+                        stylesheet-audit/, about/, 404, og/[slug].png.ts
 public/                 robots.txt, llms.txt, favicon.svg, manifest.webmanifest, <IndexNow key>.txt
-scripts/                copy-fonts.mjs, report-sizes.mjs (budgets), lighthouse.mjs, submit-indexnow.mjs
+scripts/                copy-fonts.mjs, font-fallbacks.mjs, contrast.mjs, check-attribution.mjs,
+                        report-sizes.mjs (budgets), lighthouse.mjs, submit-indexnow.mjs
 tests/e2e/              Playwright + axe
 docs/
 ```

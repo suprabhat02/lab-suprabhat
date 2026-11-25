@@ -1,4 +1,6 @@
 ---
+import { REPORT_URL } from '../lib/seo/links';
+
 interface Props {
   home?: boolean;
 }
@@ -11,6 +13,15 @@ const year = new Date().getFullYear();
     <p class="footer-slogan">Web for all, all for web.</p>
     <div class="site-footer-meta">
       <p>Free, no sign-up, no tracking.</p>
+      <p>
+        <a href="/tools/">All tools</a>
+      </p>
+      <p>
+        <a href="/methodology/">How the tools are checked</a>
+      </p>
+      <p>
+        <a href={REPORT_URL}>Report a wrong result</a>
+      </p>
       <p>
         <a href="/about/">About this lab</a>
       </p>

@@ -1,4 +1,4 @@
-import { h } from '../view/h';
+import { h, rich } from '../view/h';
 import { codeBlock } from '../view/code';
 import type { VElement, VNode } from '../view/h';
 import { elementLabel } from './model';
@@ -34,14 +34,14 @@ export function traceView(trace: ReadonlyArray<TraceStep>): VElement {
         h(
           'p',
           { class: 'ladder-head' },
-          h('span', { class: 'ladder-name' }, `${step.id}: ${step.source}`),
+          h('span', { class: 'ladder-name' }, `${step.id}: `, ...rich(step.source)),
           h(
             'span',
             { class: 'ladder-outcome' },
             step.outcome === 'used' ? h('strong', {}, OUTCOMES[step.outcome]) : OUTCOMES[step.outcome],
           ),
         ),
-        h('p', { class: 'ladder-text' }, step.explanation),
+        h('p', { class: 'ladder-text' }, ...rich(step.explanation)),
         step.children.length
           ? h(
               'details',

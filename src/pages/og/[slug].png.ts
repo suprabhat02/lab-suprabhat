@@ -25,12 +25,20 @@ const pages: Record<string, { title: string; description: string }> = {
     title: 'Web for all, all for web.',
     description: "Why this lab exists, how it's built, and what it collects: nothing.",
   },
+  tools: {
+    title: 'All tools',
+    description: 'Free CSS and accessibility tools, grouped by topic. Your input never leaves your browser.',
+  },
+  methodology: {
+    title: 'How the tools are checked',
+    description: 'The reference data and oracle libraries behind each tool, and what each one cannot know.',
+  },
 };
 for (const tool of tools) {
   pages[tool.data.slug] = { title: tool.data.ogTitle ?? tool.data.title, description: tool.data.summary };
 }
 
-const FONT = './node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2';
+const FONT = './node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2';
 
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,

@@ -106,7 +106,7 @@
     font-family: var(--font-sans);
     max-inline-size: var(--measure-slogan);
     font-size: var(--step-4);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
     line-height: var(--line-display);
     letter-spacing: var(--tracking-display);
   }
@@ -449,7 +449,7 @@
 
     &[data-decided] {
       color: var(--text);
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-heading);
     }
   }
 
@@ -460,7 +460,7 @@
 
   .outcome-win {
     color: var(--text);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
   }
 
   .list-note {
@@ -560,7 +560,7 @@
 
     &[aria-selected='true'] {
       color: var(--text);
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-heading);
       border-block-end-color: var(--text);
     }
   }
@@ -618,7 +618,7 @@
 
     & tfoot :is(th, td) {
       border-block-end: 0;
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-heading);
     }
 
     & .num {
@@ -786,7 +786,7 @@
 
   .cascade-winner {
     font-size: var(--step-1);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
     line-height: var(--line-ui);
   }
 
@@ -807,7 +807,7 @@
     color: var(--text-muted);
 
     &::marker {
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-heading);
     }
 
     &[data-outcome='decided'] {
@@ -827,7 +827,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0 var(--space-s);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
   }
 
   .ladder-outcome {
@@ -987,7 +987,7 @@
 
     &[aria-current='location'] {
       color: var(--accent);
-      font-weight: var(--weight-semibold);
+      font-weight: var(--weight-heading);
     }
   }
 
@@ -1080,6 +1080,12 @@
   }
 
   .tool-category {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+
+  .tool-trust {
+    --cluster-space: var(--space-2xs) var(--space-m);
     color: var(--text-muted);
     font-size: var(--step--1);
   }

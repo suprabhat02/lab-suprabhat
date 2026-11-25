@@ -1,4 +1,4 @@
-import { h } from '../view/h';
+import { h, rich } from '../view/h';
 import { codeBlock } from '../view/code';
 import type { VNode } from '../view/h';
 import { compareEntries, displayValue } from './metrics';
@@ -189,8 +189,8 @@ export function detailsView(model: Audit): VNode[] {
               h(
                 'li',
                 { class: 'fix' },
-                h('p', {}, `Line ${finding.line}: ${finding.message}`),
-                h('p', {}, finding.fix),
+                h('p', {}, `Line ${finding.line}: `, ...rich(finding.message)),
+                h('p', {}, ...rich(finding.fix)),
                 codeBlock(finding.snippet, `Line ${finding.line}: ${finding.message}`),
               ),
             ),

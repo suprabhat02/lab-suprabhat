@@ -73,9 +73,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
           {
             sections.map(([id, title]) => (
               <li>
-                <a class="toc-link" href={`#${id}`}>
-                  {title}
-                </a>
+                <a class="toc-link" href={`#${id}`} set:html={rich(title).map(renderToString).join('')} />
               </li>
             ))
           }
@@ -119,7 +117,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
         specificity, and the rule uses the one that matched.
       </p>
 
-      <h2 id="functional">How do :is(), :not(), :has() and :where() count?</h2>
+      <h2 id="functional">How do <code>:is()</code>, <code>:not()</code>, <code>:has()</code> and <code>:where()</code> count?</h2>
       <p>
         <code>:is()</code>, <code>:not()</code> and <code>:has()</code> take the specificity of their <strong
           >most specific argument</strong
@@ -139,7 +137,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
         is ignored instead of breaking the whole rule. <code>:not()</code> and <code>:has()</code> don't forgive.
       </p>
 
-      <h2 id="nth-child-of">What about :nth-child(… of S)?</h2>
+      <h2 id="nth-child-of">What about <code>:nth-child(… of S)</code>?</h2>
       <p>
         <code>:nth-child()</code> and <code>:nth-last-child()</code> count as one pseudo-class. Add the
         <code>of S</code> syntax and they also add the most specific selector in <code>S</code>. Other pseudo-classes
@@ -211,7 +209,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
         the step where the winner was decided.
       </p>
 
-      <h2 id="layers">Does @layer beat specificity?</h2>
+      <h2 id="layers">Does <code>@layer</code> beat specificity?</h2>
       <p>
         Yes. Layers are compared at step four, before specificity gets a vote. For normal declarations, later layers
         beat earlier ones, and styles outside any layer beat all layered styles.
@@ -254,7 +252,7 @@ p { color: crimson; }`}
         importance, and it interacts with layers by flipping their order.
       </p>
 
-      <h2 id="scope">What is @scope proximity?</h2>
+      <h2 id="scope">What is <code>@scope</code> proximity?</h2>
       <p>
         <code>@scope (.card) &#123; p &#123; … &#125; &#125;</code> limits a rule to elements inside
         <code>.card</code>. When two scoped rules tie on everything before, the one whose scope root is fewer DOM steps

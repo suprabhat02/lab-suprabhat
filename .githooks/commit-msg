@@ -1,0 +1,10 @@
+#!/bin/sh
+# Rejects attribution trailers, tool footers and identities other than the project owner's.
+# Enabled by `npm install` (core.hooksPath). Never bypass it with --no-verify: fix the message.
+node scripts/check-attribution.mjs \
+  --message-file "$1" \
+  --author "$(git var GIT_AUTHOR_IDENT)" \
+  --committer "$(git var GIT_COMMITTER_IDENT)" || {
+  echo "Commit rejected. Fix the message or identity listed above, then commit again." >&2
+  exit 1
+}

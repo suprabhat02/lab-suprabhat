@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 const PERSON_ID = 'https://suprabhat-dev.com/#person';
+const REPORT_URL = 'https://github.com/suprabhat02/lab-suprabhat/issues/new?template=wrong-result.yml';
 const ROUTES = [
   '/',
   '/specificity/',
@@ -10,6 +11,8 @@ const ROUTES = [
   '/accessible-name/',
   '/stylesheet-audit/',
   '/about/',
+  '/tools/',
+  '/methodology/',
 ] as const;
 const toolsDirectory = new URL('../../src/content/tools/', import.meta.url);
 const tools = readdirSync(toolsDirectory)
@@ -29,6 +32,9 @@ const tools = readdirSync(toolsDirectory)
       title: field('title'),
       summary: field('summary'),
       navLabel: field('navLabel'),
+      category: field('category'),
+      status: field('status'),
+      updatedAt: field('updatedAt').replace(/['"]/g, ''),
       order: Number(field('order')),
       related: references
         .trim()
@@ -157,6 +163,15 @@ for (const tool of tools) {
       { name: 'Tools', position: 2 },
       { name: tool.title, position: 3 },
     ]);
+    await expect(page.locator('.tool-trust a[href="/about/"]')).toHaveText('Suprabhat Kumar');
+    await expect(page.locator('.tool-trust a', { hasText: 'How this tool is checked' })).toHaveAttribute(
+      'href',
+      `/methodology/#${tool.slug}`,
+    );
+    await expect(page.locator('.tool-trust a', { hasText: 'Report a wrong result' })).toHaveAttribute(
+      'href',
+      REPORT_URL,
+    );
     for (const nav of await page.locator('nav').all()) {
       await expect(nav).toHaveAttribute('aria-label', /.+/);
     }
@@ -172,4 +187,79 @@ test('serves the IndexNow key file at the site root', async ({ request }) => {
   const response = await request.get(`/${file}`);
   expect(response.status()).toBe(200);
   expect(await response.text()).toBe(file.replace('.txt', ''));
+});
+
+test('every tool appears on /tools/, in the sitemap and in llms.txt', async ({ page, request }) => {
+  await page.goto('/tools/');
+  await expect(page.locator('h1')).toHaveText('All tools');
+  const categories = [...new Set(tools.map((tool) => tool.category))];
+  await expect(page.locator('main h2')).toHaveText(categories);
+  for (const category of categories) {
+    const section = page.locator('main section', {
+      has: page.getByRole('heading', { level: 2, name: category, exact: true }),
+    });
+    const inCategory = tools.filter((tool) => tool.category === category);
+    await expect(section.locator('.tool-title a')).toHaveText(inCategory.map((tool) => tool.title));
+    for (const [index, tool] of inCategory.entries()) {
+      const card = section.locator('.tool-item').nth(index);
+      await expect(card.locator('.tool-title a')).toHaveAttribute('href', `/${tool.slug}/`);
+      await expect(card).toContainText(tool.summary);
+      await expect(card.locator('.tool-status')).toHaveText(tool.status === 'live' ? 'Live' : 'In progress');
+      await expect(card.locator('time')).toHaveAttribute('datetime', tool.updatedAt);
+    }
+  }
+
+  const index = await (await request.get('/sitemap-index.xml')).text();
+  const sitemaps = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    (match) => new URL(match[1] ?? '').pathname,
+  );
+  expect(sitemaps.length).toBeGreaterThan(0);
+  const locations = (
+    await Promise.all(sitemaps.map(async (path) => (await request.get(path)).text()))
+  ).flatMap((xml) => [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]));
+  const llms = await (await request.get('/llms.txt')).text();
+  for (const path of [...tools.map((tool) => `/${tool.slug}/`), '/tools/', '/methodology/']) {
+    expect(locations, path).toContain(`https://lab.suprabhat-dev.com${path}`);
+    expect(llms, path).toContain(`](https://lab.suprabhat-dev.com${path})`);
+  }
+});
+
+test('methodology covers every live tool with versions from the lockfile', async ({ page }) => {
+  await page.goto('/methodology/');
+  for (const tool of tools.filter((entry) => entry.status === 'live')) {
+    const section = page.locator(`section:has(> .wrap h2#${tool.slug})`);
+    await expect(section.getByRole('heading', { level: 3 })).toHaveText([
+      'How it is checked',
+      'Known limits',
+    ]);
+    await expect(section.locator('li')).not.toHaveCount(0);
+  }
+  await expect(page.locator('a[href="/about/"]', { hasText: 'Suprabhat Kumar' })).toBeVisible();
+  await expect(page.locator(`#report ~ p a[href="${REPORT_URL}"]`)).toBeVisible();
+  const lock = JSON.parse(readFileSync(new URL('../../package-lock.json', import.meta.url), 'utf8')) as {
+    packages: Record<string, { version: string }>;
+  };
+  const rows = page.getByRole('region', { name: 'Tested package versions' }).locator('tbody tr');
+  await expect(rows).not.toHaveCount(0);
+  for (const row of await rows.all()) {
+    const name = (await row.locator('th').textContent())?.trim() ?? '';
+    await expect(row.locator('td').first()).toHaveText(
+      lock.packages[`node_modules/${name}`]?.version ?? 'missing',
+    );
+  }
+});
+
+test('the wrong-result issue form lists every tool in order', () => {
+  const form = readFileSync(
+    new URL('../../.github/ISSUE_TEMPLATE/wrong-result.yml', import.meta.url),
+    'utf8',
+  );
+  const options = /options:\r?\n((?:[ \t]+- .+\r?\n)+)/.exec(form)?.[1];
+  if (!options) throw new Error('Missing tool options in wrong-result.yml');
+  expect(
+    options
+      .trim()
+      .split(/\r?\n/)
+      .map((line) => line.trim().slice(2)),
+  ).toEqual(tools.map((tool) => tool.title));
 });

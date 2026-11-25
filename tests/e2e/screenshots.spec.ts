@@ -13,6 +13,8 @@ const routes = [
   ['accessible-name', '/accessible-name/'],
   ['stylesheet-audit', '/stylesheet-audit/'],
   ['about', '/about/'],
+  ['tools', '/tools/'],
+  ['methodology', '/methodology/'],
   ['404', '/404.html'],
 ] as const;
 

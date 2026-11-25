@@ -36,9 +36,21 @@ export function h(tag: string, attrs: Attrs = {}, ...children: Child[]): VElemen
   return { tag, attrs, children: flatten(children) };
 }
 
-/** Splits text on backticks and renders the odd segments as `<code>`. */
+// Specificity triples, ARIA attributes, attribute selectors, functional pseudo-classes, at-rules and ID or
+// class selectors. The sans face can't tell I from l, so these render in the mono face.
+const IDENTIFIER =
+  /(\(\d+, ?\d+, ?\d+\)|(?<![\w-])aria-[a-z]+|(?<![\w-])[a-z]*\[[a-z][\w-]*(?:[~|^$*]?="[^"]*")?\]|(?<![\w)])::?[a-z][a-z-]*\([^()]*\)|(?<=^|[\s(])[#.@][a-z][\w-]*)/;
+
+/** Wraps identifiers in plain text as `<code>`. */
+export function identifiers(text: string): VNode[] {
+  return text.split(new RegExp(IDENTIFIER.source, 'g')).map((s, i) => (i % 2 === 1 ? h('code', {}, s) : s));
+}
+
+/** Splits text on backticks and renders the odd segments, and identifiers elsewhere, as `<code>`. */
 export function rich(text: string): VNode[] {
-  return text.split('`').map((segment, i) => (i % 2 === 1 ? h('code', {}, segment) : segment));
+  return text
+    .split('`')
+    .flatMap((segment, i) => (i % 2 === 1 ? [h('code', {}, segment)] : identifiers(segment)));
 }
 
 const escapeText = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

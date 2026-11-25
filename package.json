@@ -12,6 +12,7 @@
   },
   "scripts": {
     "fonts": "node scripts/copy-fonts.mjs && node scripts/font-fallbacks.mjs",
+    "prepare": "git config core.hooksPath .githooks || exit 0",
     "predev": "npm run fonts",
     "dev": "astro dev",
     "prebuild": "npm run fonts && npm run contrast",
@@ -31,7 +32,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
     "@bramus/specificity": "^2.4.3",
-    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "astro": "^7.4.10",
     "astro-og-canvas": "^0.13.3",
@@ -46,8 +47,8 @@
     "@capsizecss/unpack": "^4.0.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
-    "@types/node": "^26.6.6",
     "@types/jsdom": "^30.0.0",
+    "@types/node": "^26.6.6",
     "dom-accessibility-api": "^0.7.1",
     "eslint": "^10.14.0",
     "eslint-plugin-astro": "^3.2.1",
