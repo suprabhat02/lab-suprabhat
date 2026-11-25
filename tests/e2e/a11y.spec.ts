@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-const ROUTES = ['/', '/specificity/', '/playground/', '/about/', '/404.html'];
+const ROUTES = ['/', '/specificity/', '/playground/', '/accessible-name/', '/about/', '/404.html'];
 const THEMES = ['dark', 'light'] as const;
 
 // The specificity page is long; axe needs more than the default 30s when the suite runs in parallel.

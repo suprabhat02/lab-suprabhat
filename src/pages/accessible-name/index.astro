@@ -1,0 +1,166 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { parseHtml } from '../../lib/accname/adapters/parse5';
+import { analyze, DEFAULT_HTML } from '../../lib/accname/model';
+import { analysisView, optionsView } from '../../lib/accname/views';
+import { renderToString } from '../../lib/view/h';
+import { PERSON_ID, ref } from '../../lib/seo/entities';
+import '../../styles/accessible-name.css';
+
+const tool = await getEntry('tools', 'accessible-name');
+if (!tool) throw new Error('Missing tools/accessible-name.md');
+const result = analyze(DEFAULT_HTML, 0, parseHtml);
+if (!result.ok) throw new Error(result.error.message);
+const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
+const url = new URL('/accessible-name/', site).href;
+const jsonLd = [
+  {
+    '@type': 'WebApplication',
+    '@id': `${url}#app`,
+    name: tool.data.title,
+    url,
+    description: tool.data.summary,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern browser. Works without JavaScript as a read-only example.',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
+    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
+    keywords: tool.data.keywords.join(', '),
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+    author: ref(PERSON_ID),
+  },
+];
+---
+
+<BaseLayout
+  title="Accessible Name Calculator: what screen readers announce"
+  description={tool.data.summary}
+  path="/accessible-name/"
+  og="accessible-name"
+  ogAlt={tool.data.ogTitle ?? tool.data.title}
+  breadcrumbs={[
+    { name: 'Lab', path: '/' },
+    { name: tool.data.title, path: '/accessible-name/' },
+  ]}
+  jsonLd={jsonLd}
+>
+  <section class="tool-hero" aria-labelledby="tool-title" data-name-app>
+    <div class="wrap name-tool">
+      <h1 id="tool-title">Which accessible name wins?</h1>
+      <p class="tool-lead">Accessible Name Wars: paste HTML and follow the label the browser chooses.</p>
+      <noscript>
+        <p class="notice mt-m">JavaScript is off. This complete worked example will not update.</p>
+      </noscript>
+      <p class="notice mt-m" data-name-notice role="status" hidden></p>
+      <div class="field mt-l">
+        <label class="label" for="name-html">
+          Your HTML
+        </label>
+        <textarea
+          class="input name-html"
+          id="name-html"
+          rows="5"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          aria-describedby="name-help"
+          data-name-html
+        >{DEFAULT_HTML}</textarea>
+        <p class="muted mt-s" id="name-help">
+          Up to 4 KB. Your markup is parsed, never rendered. Scripts and resources in it do not run or load.
+        </p>
+      </div>
+      <div class="field mt-m js-only" data-name-select hidden={result.value.elements.length < 2}>
+        <label class="label" for="name-element">
+          Element to check
+        </label>
+        <select
+          class="input select"
+          id="name-element"
+          data-name-element
+          set:html={optionsView(result.value).map(renderToString).join('')}
+        />
+      </div>
+      <div class="duel-actions mt-m js-only">
+        <button class="button" type="button" data-name-copy>
+          Copy link
+        </button>
+        <p class="status" data-name-copy-status role="status"></p>
+      </div>
+      <div class="field mt-s" data-name-link-wrap hidden>
+        <label class="label" for="name-link">
+          Link to this calculation
+        </label>
+        <input class="input" id="name-link" type="text" readonly data-name-link />
+      </div>
+      <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-name-live></p>
+      <div
+        class="mt-xl"
+        data-name-output
+        set:html={analysisView(result.value).map(renderToString).join('')}
+      />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="name-explainer">
+    <div class="wrap name-tool stack">
+      <h2 id="name-explainer">A label, not everything on screen</h2>
+      <p class="prose">
+        An accessible name identifies an element; a description adds context. A screen reader can combine the
+        name with its role and state. The wording depends on the reader and platform, not just the HTML. See{' '}
+        <a href="https://w3c.github.io/accname/#intro">the accessible name specification</a>.
+      </p>
+      <h3>Follow the order, then the exceptions</h3>
+      <p class="prose">
+        For an element that permits naming, <code>aria-labelledby</code> is checked before
+        <code>aria-label</code>, followed by native labels such as <code>label</code>, <code>alt</code>,
+        <code>legend</code>, and <code>caption</code>. Roles such as button and link can then use their
+        content. A <code>title</code> can be a fallback; supported text fields can finally use a placeholder.
+        An empty naming source can fall through, except where the element-specific rules say otherwise. Read{' '}
+        <a href="https://w3c.github.io/accname/#computation-steps">the computation steps</a> and
+        <a href="https://w3c.github.io/html-aam/#accname-computation">HTML's element-specific rules</a>.
+      </p>
+      <p class="prose">
+        A hidden element is normally excluded, but a directly referenced hidden label can contribute its
+        hidden subtree. A control embedded in another label contributes its value. A generic container cannot
+        simply be given a name with ARIA. These are algorithm rules, not a universal attribute ranking. See{' '}
+        <a href="https://w3c.github.io/accname/#comp_hidden_not_referenced">hidden labels</a>,
+        <a href="https://w3c.github.io/accname/#comp_embedded_control">embedded controls</a>, and
+        <a href="https://www.w3.org/TR/wai-aria-1.2/#namefromprohibited">roles that prohibit naming</a>.
+      </p>
+      <h3>Keep what people see in what they hear</h3>
+      <p class="prose">
+        A competing ARIA label can replace a perfectly useful visible label. Voice-control users need the
+        visible wording in the accessible name. Case and ordinary punctuation do not have to match. Symbolic
+        characters and surrounding visual context need human review. See{' '}
+        <a href="https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html">WCAG 2.5.3: Label in Name</a>
+        .
+      </p>
+      <h3>Names and descriptions have different rules</h3>
+      <p class="prose">
+        Descriptions check <code>aria-describedby</code>, then <code>aria-description</code>, unused native
+        description sources, and finally an unused <code>title</code>. The first applicable description source
+        wins even if it is empty. A <code>figcaption</code> does not automatically name its
+        <code>figure</code>; reference it explicitly when appropriate. See{' '}
+        <a href="https://w3c.github.io/accname/#mapping_additional_nd_description">description precedence</a>
+        and <a href="https://w3c.github.io/html-aam/#figure-element-accessible-name-computation">figure naming</a>.
+      </p>
+      <h3>What pasted HTML cannot tell us</h3>
+      <p class="prose">
+        This tool reads attributes and text, not the rendered page. It recognizes <code>hidden</code>,
+        <code>aria-hidden="true"</code>, and inline hiding styles. It cannot know class-based styling,
+        generated text, layout-dependent whitespace, shadow-tree changes, or values changed by scripts.
+        Browser-generated button labels are shown in English and can be localized by a real browser. Always
+        verify the final page with your browser and assistive technology. See{' '}
+        <a href="https://w3c.github.io/accname/#comp_name_from_content">rendered and generated content</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../../scripts/accessible-name';
+</script>
