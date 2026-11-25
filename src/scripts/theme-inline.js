@@ -17,9 +17,14 @@
     var button = document.querySelector('[data-theme-toggle]');
     if (!button) return;
     var dark = current() === 'dark';
-    button.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    // The label names the current theme and the hidden text names the action, so the
+    // accessible name reads e.g. "Dark theme (switch to light)". aria-pressed is not used:
+    // a label that changes with the state plus a pressed state would contradict each other.
+    button.setAttribute('data-state', dark ? 'dark' : 'light');
     var label = button.querySelector('[data-theme-label]');
     if (label) label.textContent = dark ? 'Dark theme' : 'Light theme';
+    var action = button.querySelector('[data-theme-action]');
+    if (action) action.textContent = dark ? '(switch to light)' : '(switch to dark)';
     var icon = button.querySelector('[data-theme-icon]');
     if (icon) {
       icon.setAttribute(
@@ -48,6 +53,10 @@
     sync();
   });
   document.addEventListener('DOMContentLoaded', sync);
-  // Runs before the first paint, so the pressed look never flashes for light-theme visitors.
+  // Follow the system theme while the visitor hasn't chosen one.
+  try {
+    matchMedia('(prefers-color-scheme: light)').addEventListener('change', sync);
+  } catch (e) {}
+  // Runs before the first paint, so the dark-state look never flashes for light-theme visitors.
   requestAnimationFrame(sync);
 })();

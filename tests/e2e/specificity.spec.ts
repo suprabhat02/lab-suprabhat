@@ -350,15 +350,17 @@ test.describe('site', () => {
         const accent = getComputedStyle(document.querySelector('.brand-slash') ?? el).color;
         return getComputedStyle(el).borderTopColor === accent;
       });
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await expect(toggle).toHaveAccessibleName('Dark theme');
+    await expect(toggle).not.toHaveAttribute('aria-pressed');
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
+    await expect(toggle).toHaveAccessibleName('Dark theme (switch to light)');
     await expect(icon).toHaveAttribute('d', moon);
     await expect(icon).not.toHaveCSS('fill', 'none');
     expect(await outlineIsAccent()).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('data-state', 'light');
     await expect(toggle.locator('[data-theme-label]')).toHaveText('Light theme');
+    await expect(toggle).toHaveAccessibleName('Light theme (switch to dark)');
     await expect(icon).toHaveAttribute('d', sun);
     await expect(icon).toHaveAttribute('fill', 'none');
     await expect(icon).toHaveAttribute('stroke-linecap', 'round');
@@ -370,27 +372,48 @@ test.describe('site', () => {
     expect(await outlineIsAccent()).toBe(false);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await expect(toggle).toHaveAccessibleName('Light theme');
+    await expect(toggle).toHaveAttribute('data-state', 'light');
+    await expect(toggle).toHaveAccessibleName('Light theme (switch to dark)');
     await expect(icon).toHaveAttribute('d', sun);
     await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
     await expect(toggle.locator('[data-theme-label]')).toHaveText('Dark theme');
     await expect(icon).toHaveAttribute('d', moon);
     await expect(icon).not.toHaveCSS('fill', 'none');
     await page.reload();
-    await expect(toggle).toHaveAccessibleName('Dark theme');
+    await expect(toggle).toHaveAccessibleName('Dark theme (switch to light)');
     await expect(icon).toHaveAttribute('d', moon);
   });
 
   test('theme toggle initializes from the light system preference', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/');
-    const toggle = page.getByRole('button', { name: 'Light theme' });
-    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    const toggle = page.getByRole('button', { name: 'Light theme (switch to dark)' });
+    await expect(toggle).toHaveAttribute('data-state', 'light');
     await expect(toggle.locator('[data-theme-icon]')).toHaveAttribute('fill', 'none');
     await toggle.click();
-    await expect(page.getByRole('button', { name: 'Dark theme' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Dark theme (switch to light)' })).toHaveAttribute(
+      'data-state',
+      'dark',
+    );
+  });
+
+  test('theme toggle follows a system theme change until the visitor chooses one', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/');
+    const toggle = page.locator('[data-theme-toggle]');
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(toggle).toHaveAttribute('data-state', 'light');
+    await expect(toggle).toHaveAccessibleName('Light theme (switch to dark)');
+    // Choosing a theme pins it: a later system change no longer moves the toggle.
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
   });
 
   test('home and about ship no JavaScript besides the theme script', async ({ page }) => {

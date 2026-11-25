@@ -99,7 +99,7 @@ test.describe('without JavaScript', () => {
     expect(await page.locator('noscript').evaluate((node) => node.innerHTML)).toContain('JavaScript is off');
     const toggle = page.locator('[data-theme-toggle]');
     await expect(toggle.locator('[data-theme-label]')).toHaveText('Dark theme');
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('data-state', 'dark');
     await expect(toggle.locator('[data-theme-icon]')).toHaveAttribute(
       'd',
       'M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z',
