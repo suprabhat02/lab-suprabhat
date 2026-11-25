@@ -91,6 +91,24 @@ The one gap is mobile performance on `/specificity/` (individual runs 96 to 100;
   - In Firefox, a Playwright role-and-name query on a tab panel followed immediately by an axe scan crashes the content process. The panel scan locates the panel by id instead. It doesn't happen in normal browsing.
   - Firefox ignores `@view-transition`; navigation works the same without the animation.
 
+## Stylesheet Audit
+
+- **Privacy:** pasted CSS may be proprietary. Parsing and analysis are local, with no input persistence, analytics or resource fetching. Only an explicit Copy link action encodes CSS in the URL; incoming links restore it. Base64url is not encryption, and opening a shared URL may expose its contents to browser history or server logs.
+- **Display scale:** graph height is `min(A, 9) * 100 + min(B, 9) * 10 + min(C, 9)`. Capping makes a compact visualization, not a substitute for column-by-column ordering. The caption states this; sorting, maxima, medians and spike findings use full triples. Squares mark important entries, circles normal entries, and dashed lines mark layer changes. A labelled SVG and the full data table provide alternatives to color and position.
+- **Parser compatibility:** css-tree 3.2.1's installed source and the repository's minimal type declarations were inspected. Its block parser recognizes nested selectors starting with `&`, but recovers implicit nesting as raw declarations. An offset-preserving prelude mask lets it parse the structure; original selectors still go through `expandNesting` and `calculate`. No replacement specificity engine or new runtime dependency is needed.
+- **Bounds and responsiveness:** validate 100 KB before parsing, score at most 5,000 entries, retain at most 200 findings, and allow at most 8 KB of CSS in share links. A debounced worker keeps parsing off the main thread and shows a polite working state; superseded work is terminated and ten-second jobs fail explicitly. Existing selector/nesting limits are not raised.
+- **Interpretation:** the agreed spike definition compares against every available following entry in a ten-entry window, not any one entry. Duplicates are scoped to the exact selector, layer and conditional chain. No claim is made that the selectors actually match the same element or declare the same property. Layer order statements distinguish normal from important declarations and acknowledge reversed important precedence.
+
+### Audit validation on 2026-11-25
+
+Lint, type checks, all 382 unit tests (69 audit cases), and the production build passed. The complete Chromium, Firefox and WebKit suite passed 295 tests, with 50 existing skips. This includes real 5,000-entry graph/table checks, keyboard sorting and cross-highlighting, both-theme axe scans, share restoration, no automatic URL state, and no requests for pasted imports or resource URLs.
+
+Initial audit JavaScript is 2.44 KB gzip and total site CSS is 6.24 KB, within the unchanged budgets. The parser runs in a lazy 28.30 KB worker; the audit controller is 4.43 KB. There are no dependency changes.
+
+Lighthouse 13.6.0 measured 100 in Performance, Accessibility, Best Practices and SEO in three mobile and three desktop audit runs. A further mobile/desktop pair confirmed all four 100s on the final build (LCP 916/258 ms, CLS 0, TBT 0). One mobile and one desktop run on each existing public route (`/`, `/specificity/`, `/playground/`, `/accessible-name/`, `/about/`) also scored all four 100s. These are local measurements, not a promise that every future environment will reproduce them.
+
+A screenshot with a trial navigation link at 320 px showed that it wrapped onto another row. The trial was browser-only and removed; the header remains unchanged. The tool is discoverable through the generated home-page listing.
+
 ## Accessible name adapters and oracle
 
 Sharing pasted HTML is opt-in: rendering and editing never encode it into the URL. Only pressing "Copy link" updates the URL and offers the share link; incoming `?s=` links still restore their saved state. Pasted markup may contain sensitive content, and URL-encoded data can persist in browser history or reach server logs when a link is opened. Base64url is not encryption.
