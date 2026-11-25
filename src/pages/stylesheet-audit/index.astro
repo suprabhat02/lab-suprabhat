@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
+import ExplainerBand from '../../components/ExplainerBand.astro';
 import { analyze, DEFAULT_CSS } from '../../lib/audit/model';
 import { auditView } from '../../lib/audit/views';
 import { renderToString } from '../../lib/view/h';
@@ -61,8 +62,8 @@ const output = auditView(result.value).map(renderToString).join('');
     </Fragment>
     <div slot="output" class="flow" data-audit-output set:html={output} />
   </ToolWorkbench>
-  <section slot="explainer" class="section section-explainer" aria-labelledby="audit-explainer">
-    <div class="wrap prose flow">
+  <ExplainerBand slot="explainer" labelledby="audit-explainer">
+    <div class="prose flow">
       <h2 id="audit-explainer">A map, not a verdict</h2>
       <p class="prose">
         A specificity graph shows selector weight in source order. Peaks identify places to review, not
@@ -111,7 +112,7 @@ const output = auditView(result.value).map(renderToString).join('');
         for review, not a replacement for browser inspection.
       </p>
     </div>
-  </section>
+  </ExplainerBand>
 </ToolLayout>
 <script>
   import '../../scripts/stylesheet-audit';

@@ -111,6 +111,15 @@
     --radius-control: 6px;
     --radius-card: 10px;
     --radius-shell: 12px;
+    --radius-inline: 4px;
+    --radius-focus: 2px;
+    --stroke-hairline: 1px;
+    --stroke-emphasis: 2px;
+    --stroke-focus: 3px;
+    --underline-offset: 0.2em;
+    --root-font-size: 100%;
+    --inline-code-size: 0.95em;
+    --inline-icon-offset: 0.15em;
 
     --font-sans:
       'Geist Variable', 'Geist Variable Fallback: Arial', 'Geist Variable Fallback: Segoe UI',
@@ -166,7 +175,43 @@
     --gutter: var(--space-s-m);
     --max-width: 90rem;
     --header-height: 4rem;
-    --focus-outline: 3px solid var(--focus-ring);
+    --control-size: 2.75rem;
+    --input-size: 3rem;
+    --selector-size: 3.5rem;
+    --control-compact: 2rem;
+    --check-size: 1.25rem;
+    --target-min: 1.5rem;
+    --textarea-min: 16rem;
+    --pane-min: 22rem;
+    --contender-min: 24rem;
+    --menu-width: 24rem;
+    --table-min: 40rem;
+    --audit-table-min: 42rem;
+    --column-number: 4rem;
+    --graph-min: 12rem;
+    --anatomy-max: 60rem;
+    --layer-order-max: 36rem;
+    --explainer-max: 54rem;
+    --aside-width: 15rem;
+    --deferred-block: 100rem;
+    --measure-slogan: 16ch;
+    --measure-callout: 60ch;
+    --measure-verdict: 48ch;
+    --depth-indent: 1.5ch;
+    /* Data displays keep their container-relative scale, not the heading scale. */
+    --score-size: clamp(4rem, 30cqi, 11rem);
+    --score-size-compact: clamp(3rem, 18vi, 5rem);
+    --score-gap: clamp(var(--space-xs), 5cqi, var(--space-l));
+    --score-max: 34rem;
+    --line-score: 0.95;
+    --score-tick-offset: -0.3em;
+    /* Fixed-pixel OG canvas typography is generated at build time, not browser UI. */
+    --og-title-size: 80;
+    --og-description-size: 32;
+    --og-padding: 80;
+    --og-border-width: 12;
+    --font-og-family: Geist;
+    --focus-outline: var(--stroke-focus) solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 

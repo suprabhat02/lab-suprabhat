@@ -1,4 +1,5 @@
 import { h } from '../view/h';
+import { codeBlock } from '../view/code';
 import type { VElement, VNode } from '../view/h';
 import { elementLabel } from './model';
 import type { Analysis } from './model';
@@ -125,7 +126,7 @@ export function analysisView(model: Analysis): VNode[] {
       'details',
       { class: 'as-css flow' },
       h('summary', {}, 'Show selected element as source'),
-      h('pre', { class: 'code' }, h('code', {}, source(model.node))),
+      codeBlock(source(model.node), 'Selected element HTML'),
     ),
     h('h2', { id: 'name-trace' }, 'Which source wins?'),
     traceView(model.name.trace),
@@ -161,7 +162,7 @@ export function analysisView(model: Analysis): VNode[] {
                   )
                 : null,
               h('p', {}, check.fix),
-              h('pre', { class: 'code' }, h('code', {}, check.snippet)),
+              codeBlock(check.snippet, check.message),
             ),
           ),
         )

@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
+import ExplainerBand from '../../components/ExplainerBand.astro';
 import { parseHtml } from '../../lib/accname/adapters/parse5';
 import { analyze, DEFAULT_HTML } from '../../lib/accname/model';
 import { analysisView, optionsView, verdictView } from '../../lib/accname/views';
@@ -76,8 +77,8 @@ if (!result.ok) throw new Error(result.error.message);
       set:html={analysisView(result.value).map(renderToString).join('')}
     />
   </ToolWorkbench>
-  <section slot="explainer" class="section section-explainer" aria-labelledby="name-explainer">
-    <div class="wrap prose flow">
+  <ExplainerBand slot="explainer" labelledby="name-explainer">
+    <div class="prose flow">
       <h2 id="name-explainer">A label, not everything on screen</h2>
       <p class="prose">
         An accessible name identifies an element; a description adds context. A screen reader can combine the
@@ -131,7 +132,7 @@ if (!result.ok) throw new Error(result.error.message);
         <a href="https://w3c.github.io/accname/#comp_name_from_content">rendered and generated content</a>.
       </p>
     </div>
-  </section>
+  </ExplainerBand>
 </ToolLayout>
 
 <script>

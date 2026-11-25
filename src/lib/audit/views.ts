@@ -1,4 +1,5 @@
 import { h } from '../view/h';
+import { codeBlock } from '../view/code';
 import type { VNode } from '../view/h';
 import { compareEntries, displayValue } from './metrics';
 import { ISSUE_NAMES } from './issues';
@@ -153,8 +154,8 @@ export function tableView(model: Audit, sort: Sort = 'none'): VNode {
             h(
               'td',
               {},
-              entry.layer ?? 'Unlayered',
-              entry.context.length ? h('p', {}, entry.context.join(' → ')) : null,
+              entry.layer ? h('code', {}, entry.layer) : 'Unlayered',
+              entry.context.length ? h('p', {}, h('code', {}, entry.context.join(' → '))) : null,
             ),
             h('td', {}, entry.important ? 'Yes' : 'No'),
           ),
@@ -190,7 +191,7 @@ export function detailsView(model: Audit): VNode[] {
                 { class: 'fix' },
                 h('p', {}, `Line ${finding.line}: ${finding.message}`),
                 h('p', {}, finding.fix),
-                h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
+                codeBlock(finding.snippet, `Line ${finding.line}: ${finding.message}`),
               ),
             ),
         ),

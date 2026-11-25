@@ -37,9 +37,9 @@
     display: block;
     inline-size: 100%;
     block-size: auto;
-    min-block-size: 12rem;
+    min-block-size: var(--graph-min);
     background: var(--surface-inset);
-    border-block-end: 1px solid var(--border-control-on-fill);
+    border-block-end: var(--stroke-hairline) solid var(--border-control-on-fill);
   }
 
   .audit-line,
@@ -75,7 +75,7 @@
 
   .audit-table {
     inline-size: 100%;
-    min-inline-size: 42rem;
+    min-inline-size: var(--audit-table-min);
     table-layout: fixed;
     border-collapse: collapse;
     font-size: var(--step--1);
@@ -92,12 +92,12 @@
     text-align: start;
     vertical-align: top;
     padding: var(--space-xs);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: var(--stroke-hairline) solid var(--border-subtle);
     overflow-wrap: anywhere;
   }
 
   .audit-table th:first-child {
-    inline-size: 4rem;
+    inline-size: var(--column-number);
   }
 
   .audit-table thead {
@@ -108,7 +108,7 @@
   .audit-table tr:focus {
     background: var(--fill-active);
     outline: var(--focus-outline);
-    outline-offset: -3px;
+    outline-offset: calc(-1 * var(--stroke-focus));
   }
 
   .audit-layers {

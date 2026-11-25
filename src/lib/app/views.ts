@@ -1,4 +1,5 @@
 import { h, rich } from '../view/h';
+import { codeBlock } from '../view/code';
 import type { VElement, VNode } from '../view/h';
 import { LIMITS } from '../cascade/share';
 import { formatSpecificity } from '../cascade/math';
@@ -247,7 +248,7 @@ export function suggestionsView(duel: DuelModel): VNode[] {
           { class: 'fix', 'data-kind': s.kind },
           h('h3', { class: 'fix-title' }, s.title),
           h('p', {}, ...rich(s.detail)),
-          s.code ? h('pre', { class: 'code' }, h('code', {}, s.code)) : null,
+          s.code ? codeBlock(s.code, s.title) : null,
           s.warning ? warningMessage(s.warning) : null,
         ),
       ),
@@ -623,7 +624,7 @@ export function cascadeResultView(model: CascadeModel): VNode[] {
     'details',
     { class: 'as-css flow' },
     h('summary', {}, 'Show as CSS'),
-    h('pre', { class: 'code' }, h('code', {}, cascadeAsCss(model))),
+    codeBlock(cascadeAsCss(model), 'Competing CSS declarations'),
   );
   if (!model.result)
     return [errorMessage(model.problem ?? 'Fill in the declarations to resolve the cascade.'), css];

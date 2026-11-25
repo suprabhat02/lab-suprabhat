@@ -17,7 +17,7 @@
 
     @media (width >= 64rem) {
       &:not(.workbench-stacked) {
-        grid-template-columns: minmax(22rem, 2fr) minmax(0, 3fr);
+        grid-template-columns: minmax(var(--pane-min), 2fr) minmax(0, 3fr);
       }
 
       & > .workbench-input {
@@ -35,17 +35,21 @@
     container-type: inline-size;
     min-inline-size: 0;
     padding: var(--space-s);
-    border: 1px solid var(--border-subtle);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-shell);
     background: var(--surface);
     overflow-wrap: anywhere;
+
+    & h2 {
+      font-size: var(--step-2);
+    }
+
+    & h3 {
+      font-size: var(--step-1);
+    }
   }
 
   .workbench-output {
-    & h2 {
-      font-size: var(--step-1);
-    }
-
     & :is(h2, h3, section) {
       scroll-margin-block-start: calc(var(--header-height) + var(--space-s));
     }
@@ -56,19 +60,19 @@
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-s);
     padding-block-end: var(--space-s);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: var(--stroke-hairline) solid var(--border-subtle);
     font-size: var(--step--1);
 
     & a {
       display: inline-flex;
       align-items: center;
-      min-block-size: 24px;
+      min-block-size: var(--target-min);
     }
   }
 
   .section-explainer {
     background: var(--surface);
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   .span-all {
@@ -96,13 +100,13 @@
   }
 
   .section + .section {
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   /* Below-the-fold sections: skip style and layout until they're near the viewport. */
   .section-deferred {
     content-visibility: auto;
-    contain-intrinsic-size: auto 1600px;
+    contain-intrinsic-size: auto var(--deferred-block);
   }
 
   .prose {
@@ -136,7 +140,7 @@
     inset-block-start: 0;
     z-index: 10;
     background: var(--bg);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: var(--stroke-hairline) solid var(--border-subtle);
 
     /* At high zoom levels a sticky bar would cover too much of the page. */
     @media (height < 32rem) {
@@ -165,10 +169,10 @@
   }
 
   .menu-summary {
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     align-content: center;
     padding-inline: var(--space-xs);
-    border: 1px solid var(--border-control-on-fill);
+    border: var(--stroke-hairline) solid var(--border-control-on-fill);
     border-radius: var(--radius-control);
     background: var(--fill);
     cursor: pointer;
@@ -179,14 +183,14 @@
       position: absolute;
       inset-block-start: calc(100% + var(--space-xs));
       inset-inline-end: 0;
-      inline-size: min(24rem, 100vw - 2 * var(--gutter) - 3 * var(--space-l));
+      inline-size: min(var(--menu-width), 100vi - 2 * var(--gutter) - 3 * var(--space-l));
       max-block-size: calc(100dvh - var(--header-height) - var(--space-m));
       overflow: auto;
       display: flex;
       flex-direction: column;
       align-items: stretch;
       padding: var(--space-xs);
-      border: 1px solid var(--border-subtle);
+      border: var(--stroke-hairline) solid var(--border-subtle);
       border-radius: var(--radius-control);
       background: var(--surface-overlay);
     }
@@ -212,7 +216,7 @@
   .site-footer {
     padding-block: var(--space-l);
     background: var(--surface);
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   .site-footer-meta {

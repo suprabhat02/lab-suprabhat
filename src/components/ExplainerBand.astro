@@ -1,0 +1,17 @@
+---
+interface Props {
+  labelledby: string;
+  deferred?: boolean;
+}
+const { labelledby, deferred = false } = Astro.props;
+---
+
+<section
+  class:list={['section', 'section-explainer', { 'section-deferred': deferred }]}
+  aria-labelledby={labelledby}
+  data-explainer={deferred || undefined}
+>
+  <div class="wrap">
+    <slot />
+  </div>
+</section>

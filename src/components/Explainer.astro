@@ -1,4 +1,5 @@
 ---
+import ExplainerBand from './ExplainerBand.astro';
 import ExplainerExample from './ExplainerExample.astro';
 import CascadeExample from './CascadeExample.astro';
 import LiveExample from './LiveExample.astro';
@@ -53,8 +54,8 @@ const nestingState = encodeState({ v: 1, mode: 'nesting', inputs: { ...DEFAULT_I
 const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : null;
 ---
 
-<section class="section section-deferred section-explainer" aria-labelledby="explainer-title" data-explainer>
-  <div class="wrap explainer">
+<ExplainerBand labelledby="explainer-title" deferred>
+  <div class="explainer">
     <header class="explainer-head prose flow">
       <h2 id="explainer-title">Specificity and the cascade, explained</h2>
       <p>
@@ -325,4 +326,4 @@ p { color: crimson; }`}
       <p>More from the same author on <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.</p>
     </article>
   </div>
-</section>
+</ExplainerBand>

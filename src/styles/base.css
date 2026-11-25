@@ -36,7 +36,7 @@
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: 100%;
+    font-size: var(--root-font-size);
     font-optical-sizing: auto;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
@@ -96,30 +96,31 @@
 
   :where(a) {
     color: var(--accent);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
+    text-decoration-thickness: var(--stroke-hairline);
+    text-underline-offset: var(--underline-offset);
   }
 
   :where(a:hover) {
     color: var(--accent-hover);
-    text-decoration-thickness: 2px;
+    text-decoration-thickness: var(--stroke-emphasis);
   }
 
   :where(:focus-visible) {
     outline: var(--focus-outline);
-    outline-offset: 3px;
-    border-radius: 2px;
+    outline-offset: var(--stroke-focus);
+    border-radius: var(--radius-focus);
   }
 
   :where(code, kbd, samp, pre) {
     font-family: var(--font-mono);
     font-variant-ligatures: none;
-    font-size: 0.95em;
+    font-size: inherit;
   }
 
   :where(:not(pre) > code) {
-    padding: 0.05em 0.3em;
-    border-radius: 4px;
+    padding-inline: var(--space-3xs);
+    border-radius: var(--radius-inline);
+    font-size: var(--inline-code-size);
     background: var(--surface-inset);
     color: var(--text);
     overflow-wrap: anywhere;
@@ -128,6 +129,8 @@
   :where(pre) {
     overflow-x: auto;
     tab-size: 2;
+    font-size: var(--step--1);
+    line-height: var(--line-code);
   }
 
   :where(strong, b) {
@@ -137,6 +140,7 @@
   :where(
     .brand,
     .input-selector,
+    .input[spellcheck='false'],
     .textarea,
     .name-html,
     .audit-css,
@@ -145,13 +149,21 @@
     .selector-scores dd,
     .audit-metrics dd,
     .table .num,
-    .audit-table td:not(:nth-child(2))
+    .audit-table td:nth-child(1),
+    .audit-table td:nth-child(3)
   ) {
     font-family: var(--font-mono);
     font-variant-ligatures: none;
   }
 
-  :where(.numeral, .selector-scores dd, .audit-metrics dd, .table .num, .audit-table td:not(:nth-child(2))) {
+  :where(
+    .numeral,
+    .selector-scores dd,
+    .audit-metrics dd,
+    .table .num,
+    .audit-table td:nth-child(1),
+    .audit-table td:nth-child(3)
+  ) {
     font-variant-numeric: tabular-nums;
   }
 
@@ -162,7 +174,7 @@
 
   :where(hr) {
     border: 0;
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   :where(::selection) {

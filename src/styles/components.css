@@ -4,7 +4,7 @@
   .skip-link {
     position: absolute;
     inset-inline-start: var(--space-s);
-    inset-block-start: -10rem;
+    inset-block-start: calc(-1 * var(--space-3xl));
     z-index: 100;
     padding: var(--space-2xs) var(--space-s);
     background: var(--accent);
@@ -20,7 +20,7 @@
   .brand {
     display: inline-flex;
     align-items: center;
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     color: var(--text);
     font-weight: var(--weight-semibold);
     font-size: var(--step-1);
@@ -38,7 +38,7 @@
   .nav-link {
     display: inline-flex;
     align-items: center;
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     padding-inline: var(--space-2xs);
     color: var(--text-muted);
     text-decoration: underline;
@@ -47,7 +47,7 @@
     &[aria-current='page'] {
       color: var(--accent);
       text-decoration: underline;
-      text-decoration-thickness: 2px;
+      text-decoration-thickness: var(--stroke-emphasis);
     }
   }
 
@@ -55,9 +55,9 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     padding-inline: var(--space-xs);
-    border: 2px solid var(--border-strong);
+    border: var(--stroke-emphasis) solid var(--border-strong);
     border-radius: var(--radius-control);
     background: transparent;
     color: var(--text-muted);
@@ -84,14 +84,14 @@
   /* On very narrow screens keep the accessible name but show only the icon. */
   @media (width < 30rem) {
     .theme-toggle {
-      min-inline-size: 44px;
+      min-inline-size: var(--control-size);
       justify-content: center;
     }
 
     .theme-toggle-text {
       position: absolute;
-      inline-size: 1px;
-      block-size: 1px;
+      inline-size: var(--stroke-hairline);
+      block-size: var(--stroke-hairline);
       overflow: hidden;
       clip-path: inset(50%);
       white-space: nowrap;
@@ -104,7 +104,7 @@
 
   .footer-slogan {
     font-family: var(--font-sans);
-    max-inline-size: 16ch;
+    max-inline-size: var(--measure-slogan);
     font-size: var(--step-4);
     font-weight: var(--weight-semibold);
     line-height: var(--line-display);
@@ -128,9 +128,9 @@
   .input {
     display: block;
     inline-size: 100%;
-    min-block-size: 48px;
+    min-block-size: var(--input-size);
     padding: var(--space-2xs) var(--space-xs);
-    border: 1px solid var(--border-control-on-fill);
+    border: var(--stroke-hairline) solid var(--border-control-on-fill);
     border-radius: var(--radius-control);
     background: var(--surface-inset);
     color: var(--text);
@@ -143,12 +143,12 @@
 
     &:focus-visible {
       outline: var(--focus-outline);
-      outline-offset: 2px;
+      outline-offset: var(--stroke-emphasis);
     }
 
     &[aria-invalid='true'] {
       border-color: var(--danger);
-      border-width: 2px;
+      border-width: var(--stroke-emphasis);
     }
 
     &:disabled {
@@ -158,7 +158,7 @@
   }
 
   .textarea {
-    min-block-size: 16rem;
+    min-block-size: var(--textarea-min);
     resize: vertical;
     font-size: var(--step--1);
     line-height: var(--line-code);
@@ -198,12 +198,12 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     cursor: pointer;
 
     & input {
-      inline-size: 1.25rem;
-      block-size: 1.25rem;
+      inline-size: var(--check-size);
+      block-size: var(--check-size);
       accent-color: var(--text);
     }
   }
@@ -213,9 +213,9 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-2xs);
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     padding-inline: var(--space-s);
-    border: 1px solid var(--border-control-on-fill);
+    border: var(--stroke-hairline) solid var(--border-control-on-fill);
     border-radius: var(--radius-control);
     background: var(--fill);
     color: var(--text);
@@ -238,15 +238,15 @@
   }
 
   .button-quiet {
-    min-block-size: 32px;
-    min-inline-size: 44px;
+    min-block-size: var(--control-compact);
+    min-inline-size: var(--control-size);
     padding-inline: var(--space-2xs);
     border: 0;
     background: transparent;
     color: var(--text-muted);
     font-size: var(--step--1);
     text-decoration: underline;
-    text-underline-offset: 0.2em;
+    text-underline-offset: var(--underline-offset);
     cursor: pointer;
 
     &:hover {
@@ -265,7 +265,7 @@
 
     & .icon {
       flex: none;
-      translate: 0 0.15em;
+      translate: 0 var(--inline-icon-offset);
     }
   }
 
@@ -283,7 +283,7 @@
 
   .notice {
     padding: var(--space-xs) var(--space-s);
-    border: 1px solid var(--border-subtle);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-control);
     background: var(--surface);
     color: var(--text-muted);
@@ -294,16 +294,17 @@
     padding: var(--space-xs) var(--space-s);
     border-radius: var(--radius-control);
     background: var(--surface-inset);
-    border: 1px solid var(--border-subtle);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     font-size: var(--step--1);
     line-height: var(--line-code);
-    /* Wrap rather than scroll, so no code block becomes a keyboard trap or an unreachable scroller. */
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    white-space: pre;
+    overflow-x: auto;
   }
 
   .callout {
-    max-inline-size: 60ch;
+    max-inline-size: var(--measure-callout);
     font-size: var(--step-1);
     line-height: var(--line-body);
   }
@@ -351,7 +352,7 @@
 
   .contenders {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--contender-min)), 1fr));
     gap: var(--space-xl) var(--space-l);
   }
 
@@ -371,7 +372,7 @@
 
   .input-selector {
     font-size: var(--step-1);
-    min-block-size: 56px;
+    min-block-size: var(--selector-size);
   }
 
   .field-messages:empty {
@@ -386,18 +387,18 @@
   .numerals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: clamp(0.75rem, 5cqi, 2.5rem);
+    column-gap: var(--score-gap);
     row-gap: var(--space-2xs);
-    max-inline-size: 34rem;
+    max-inline-size: var(--score-max);
     overflow: clip;
-    overflow-clip-margin: 0.2em;
+    overflow-clip-margin: var(--underline-offset);
   }
 
   .numeral {
     grid-row: 1;
-    font-size: clamp(4rem, 30cqi, 11rem);
+    font-size: var(--score-size);
     font-weight: var(--weight-regular);
-    line-height: 0.95;
+    line-height: var(--line-score);
     font-variant-numeric: tabular-nums;
     color: var(--text-muted);
 
@@ -418,7 +419,7 @@
 
   @keyframes numeral-tick {
     from {
-      transform: translateY(-0.3em);
+      transform: translateY(var(--score-tick-offset));
       opacity: 0;
     }
   }
@@ -432,7 +433,7 @@
     }
 
     .numeral {
-      font-size: clamp(3rem, 18vw, 5rem);
+      font-size: var(--score-size-compact);
     }
 
     .contenders {
@@ -467,7 +468,7 @@
   }
 
   .verdict {
-    max-inline-size: 48ch;
+    max-inline-size: var(--measure-verdict);
     font-size: var(--step-1);
     font-weight: var(--weight-medium);
     line-height: var(--line-body);
@@ -504,7 +505,7 @@
 
   .fix + .fix {
     padding-block-start: var(--space-l);
-    border-block-start: 1px solid var(--border-subtle);
+    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   .fix-title {
@@ -517,7 +518,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-m);
-    border-block-end: 1px solid var(--border-subtle);
+    border-block-end: var(--stroke-hairline) solid var(--border-subtle);
   }
 
   /*
@@ -534,18 +535,18 @@
 
   :root[data-js] [data-panel-heading] {
     position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
+    inline-size: var(--stroke-hairline);
+    block-size: var(--stroke-hairline);
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
   }
 
   .tab {
-    min-block-size: 48px;
+    min-block-size: var(--input-size);
     padding: 0 0 var(--space-3xs);
     border: 0;
-    border-block-end: 3px solid transparent;
+    border-block-end: var(--stroke-focus) solid transparent;
     background: none;
     color: var(--text-muted);
     font-size: var(--step-1);
@@ -604,7 +605,7 @@
 
     & :is(th, td) {
       padding: var(--space-2xs) var(--space-xs);
-      border-block-end: 1px solid var(--border-subtle);
+      border-block-end: var(--stroke-hairline) solid var(--border-subtle);
       vertical-align: top;
     }
 
@@ -630,16 +631,16 @@
   }
 
   code[data-depth='1'] {
-    margin-inline-start: 1.5ch;
+    margin-inline-start: var(--depth-indent);
   }
 
   code[data-depth='2'] {
-    margin-inline-start: 3ch;
+    margin-inline-start: calc(2 * var(--depth-indent));
   }
 
   code[data-depth='3'],
   code[data-depth='4'] {
-    margin-inline-start: 4.5ch;
+    margin-inline-start: calc(3 * var(--depth-indent));
   }
 
   /* ---------- Anatomy ---------- */
@@ -647,10 +648,10 @@
   .anatomy {
     display: grid;
     gap: var(--space-2xl);
-    max-inline-size: 60rem;
+    max-inline-size: var(--anatomy-max);
 
     & .table {
-      min-inline-size: 40rem;
+      min-inline-size: var(--table-min);
       overflow-wrap: normal;
     }
 
@@ -692,10 +693,10 @@
   }
 
   .part {
-    padding-block-end: 0.05em;
+    padding-block-end: var(--stroke-hairline);
     text-decoration-line: underline;
-    text-decoration-thickness: 3px;
-    text-underline-offset: 0.25em;
+    text-decoration-thickness: var(--stroke-focus);
+    text-underline-offset: var(--underline-offset);
     text-decoration-color: transparent;
 
     &[data-kind='id'] {
@@ -729,7 +730,7 @@
   /* ---------- Cascade ---------- */
 
   .layer-order {
-    max-inline-size: 36rem;
+    max-inline-size: var(--layer-order-max);
   }
 
   .decls {
@@ -742,7 +743,7 @@
     position: relative;
     margin: 0;
     padding: var(--space-s);
-    border: 1px solid var(--border-subtle);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-card);
     min-inline-size: 0;
   }
@@ -845,7 +846,7 @@
 
   .as-css {
     & summary {
-      min-block-size: 44px;
+      min-block-size: var(--control-size);
       display: flex;
       align-items: center;
       cursor: pointer;
@@ -917,7 +918,7 @@
     gap: var(--space-l) var(--space-2xl);
 
     @media (width >= 64rem) {
-      grid-template-columns: minmax(0, 54rem) 15rem;
+      grid-template-columns: minmax(0, var(--explainer-max)) var(--aside-width);
       grid-template-areas:
         'head nav'
         'body nav';
@@ -950,7 +951,7 @@
   .toc-summary {
     display: flex;
     align-items: center;
-    min-block-size: 44px;
+    min-block-size: var(--control-size);
     font-weight: var(--weight-medium);
     cursor: pointer;
   }
@@ -974,7 +975,7 @@
 
   .toc-link {
     display: block;
-    padding-block: 0.35em;
+    padding-block: var(--space-3xs);
     color: var(--text-muted);
     text-decoration: underline;
 
@@ -1045,14 +1046,14 @@
     gap: var(--space-2xs);
     min-inline-size: 0;
     padding: var(--space-m);
-    border: 1px solid var(--border-subtle);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-card);
     background: var(--surface);
     overflow-wrap: anywhere;
 
     &:has(a:focus-visible) {
       outline: var(--focus-outline);
-      outline-offset: 3px;
+      outline-offset: var(--stroke-focus);
     }
   }
 
@@ -1084,8 +1085,8 @@
 
   .tool-status {
     justify-self: start;
-    padding: 0.1em 0.6em;
-    border: 1px solid var(--border-subtle);
+    padding: var(--space-3xs) var(--space-2xs);
+    border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-control);
     color: var(--text-muted);
     font-size: var(--step--1);

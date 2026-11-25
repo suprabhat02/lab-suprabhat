@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
+import ExplainerBand from '../../components/ExplainerBand.astro';
 import { buildContender } from '../../lib/app/model';
 import { anatomyView, playgroundScoreView } from '../../lib/app/views';
 import { calculate } from '../../lib/cascade/specificity';
@@ -58,8 +59,8 @@ const anatomy = anatomyView([contender]).map(renderToString).join('');
       <div class="anatomy" id="playground-anatomy" set:html={anatomy} />
     </Fragment>
   </ToolWorkbench>
-  <section slot="explainer" class="section section-explainer" aria-labelledby="playground-explainer">
-    <div class="wrap prose flow">
+  <ExplainerBand slot="explainer" labelledby="playground-explainer">
+    <div class="prose flow">
       <h2 id="playground-explainer">Read a selector</h2>
       <p class="prose">
         Underlines show the column: solid for IDs, dashed for the class column, dotted for the type column,
@@ -67,7 +68,7 @@ const anatomy = anatomyView([contender]).map(renderToString).join('');
         <a href="/specificity/#how-calculated">how specificity is calculated</a>.
       </p>
     </div>
-  </section>
+  </ExplainerBand>
 </ToolLayout>
 
 <script>

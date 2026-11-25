@@ -1,7 +1,20 @@
 import { OGImageRoute } from 'astro-og-canvas';
-import { getCollection } from 'astro:content';
+import { getTools } from '../../lib/seo/tools';
+import { readTokens, resolveToken, toSrgb } from '../../../scripts/contrast.mjs';
+import tokenSource from '../../styles/tokens.css?raw';
 
-const tools = await getCollection('tools');
+const tools = await getTools();
+const tokens = readTokens(tokenSource);
+const rgb = (name: string): [number, number, number] => {
+  const [r, g, b] = toSrgb(resolveToken(tokens, name, 'dark'));
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+};
+const number = (name: string): number => {
+  const value = Number(resolveToken(tokens, name, 'dark'));
+  if (!Number.isFinite(value) || value <= 0) throw new Error(`Invalid OG number token: ${name}`);
+  return value;
+};
+const family = resolveToken(tokens, '--font-og-family', 'dark');
 
 const pages: Record<string, { title: string; description: string }> = {
   home: {
@@ -17,7 +30,7 @@ for (const tool of tools) {
   pages[tool.data.slug] = { title: tool.data.ogTitle ?? tool.data.title, description: tool.data.summary };
 }
 
-const FONT = './node_modules/@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2';
+const FONT = './node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2';
 
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,
@@ -25,24 +38,24 @@ export const { getStaticPaths, GET } = await OGImageRoute({
   getImageOptions: (_path, page: { title: string; description: string }) => ({
     title: page.title,
     description: page.description,
-    bgGradient: [[7, 12, 16]],
-    border: { color: [255, 77, 42], width: 12, side: 'block-end' },
-    padding: 80,
+    bgGradient: [rgb('--bg')],
+    border: { color: rgb('--border-subtle'), width: number('--og-border-width'), side: 'block-end' },
+    padding: number('--og-padding'),
     fonts: [FONT],
     font: {
       title: {
-        families: ['Geist Mono Variable'],
+        families: [family],
         weight: 'Bold',
-        size: 76,
-        lineHeight: 1.1,
-        color: [243, 245, 248],
+        size: number('--og-title-size'),
+        lineHeight: number('--line-display'),
+        color: rgb('--text'),
       },
       description: {
-        families: ['Geist Mono Variable'],
+        families: [family],
         weight: 'Normal',
-        size: 34,
-        lineHeight: 1.4,
-        color: [190, 197, 204],
+        size: number('--og-description-size'),
+        lineHeight: number('--line-ui'),
+        color: rgb('--text-muted'),
       },
     },
   }),

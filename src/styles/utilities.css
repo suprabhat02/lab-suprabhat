@@ -1,9 +1,9 @@
 @layer utilities {
   .visually-hidden {
     position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    margin: -1px;
+    inline-size: var(--stroke-hairline);
+    block-size: var(--stroke-hairline);
+    margin: calc(-1 * var(--stroke-hairline));
     padding: 0;
     overflow: hidden;
     clip-path: inset(50%);
