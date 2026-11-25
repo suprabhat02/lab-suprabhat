@@ -1,14 +1,9 @@
 ---
 import { getTools } from '../lib/seo/tools';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
 
 const tools = await getTools();
-const dateFormat = new Intl.DateTimeFormat('en', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'UTC',
-});
 ---
 
 <BaseLayout
@@ -34,28 +29,13 @@ const dateFormat = new Intl.DateTimeFormat('en', {
       <h2 id="tools-title">Tools</h2>
       <ul class="tool-list" role="list">
         {tools.map((tool) => (
-          <li class="tool-item">
-            <p class="tool-category">{tool.data.category}</p>
-            <h3 class="tool-title">
-              <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
-            </h3>
-            {tool.data.status === 'in-progress' && <p class="tool-status">In progress</p>}
-            <p class="prose">{tool.data.summary}</p>
-            <p class="muted">
-              <small>
-                Updated{' '}
-                <time datetime={tool.data.updatedAt.toISOString().slice(0, 10)}>
-                  {dateFormat.format(tool.data.updatedAt)}
-                </time>
-              </small>
-            </p>
-          </li>
+          <ToolCard tool={tool} />
         ))}
       </ul>
       <p class="prose">
-        More tools are on the way. Each one gets the same treatment: a tool that answers the question, and an
-        explainer that teaches the idea behind it. Read <a href="/about/">why this lab exists</a>, or see more
-        work on
+        <a href="/tools/">Browse all tools by topic</a>. More tools are on the way. Each one gets the same
+        treatment: a tool that answers the question, and an explainer that teaches the idea behind it. Read
+        <a href="/about/">why this lab exists</a>, or see more work on
         <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.
       </p>
     </div>

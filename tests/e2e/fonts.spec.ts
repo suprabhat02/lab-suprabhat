@@ -10,6 +10,8 @@ test.describe('font loading', () => {
     '/accessible-name/',
     '/stylesheet-audit/',
     '/about/',
+    '/tools/',
+    '/methodology/',
     '/404.html',
   ]) {
     test(`font roles and Latin requests match the contract on ${path}`, async ({ page, baseURL }) => {

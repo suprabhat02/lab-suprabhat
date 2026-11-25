@@ -1084,6 +1084,12 @@
     font-size: var(--step--1);
   }
 
+  .tool-trust {
+    --cluster-space: var(--space-2xs) var(--space-m);
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+
   .tool-status {
     justify-self: start;
     padding: var(--space-3xs) var(--space-2xs);

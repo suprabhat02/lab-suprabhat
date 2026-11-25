@@ -22,6 +22,19 @@ npm run test:e2e   # Playwright + axe against the build
 
 CI runs the same steps on every pull request, with the end-to-end tests split into one job per browser (Chromium, Firefox, WebKit), two workers and one retry. A failing job uploads its Playwright HTML report as an artifact.
 
+## Adding a tool
+
+A new entry in the `tools` collection appears in the header, on the home page
+and on `/tools/` automatically. Three places need a hand-written line, and the
+build or tests fail if one is missing:
+
+- `src/pages/methodology/index.astro`: a "How it is checked" and "Known
+  limits" entry, written only from what the code, tests and explainers prove.
+  The build fails for a live tool without one. Oracle versions on that page are
+  read from `package-lock.json` at build time; never type them by hand.
+- `public/llms.txt`: the collection summary, in collection order.
+- `.github/ISSUE_TEMPLATE/wrong-result.yml`: the tool title in the options list.
+
 ## Ground rules
 
 - **Types:** TypeScript strict (`astro/tsconfigs/strictest`), no `any`, no non-null `!` without a comment saying why.

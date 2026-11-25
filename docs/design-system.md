@@ -231,7 +231,9 @@ Do not clip an outline to hide overflow.
 8. Use `ExplainerBand` in the `explainer` slot with measured inner prose.
    Keep headings sequential. The optional `after-tool` slot supports larger tools.
 9. Keep engines headless, escape user data through the shared renderer, and
-   enhance with a small controller. Add the collection summary to `llms.txt`.
+   enhance with a small controller. Add the collection summary to `llms.txt`,
+   the title to the wrong-result issue form, and a methodology entry (checks and
+   known limits). `/tools/` and the tool page's trust links are automatic.
 10. Add route coverage for metadata, fonts, headings, keyboard use, both themes,
     no-JS and reflow. Run lint/check/tests/contrast/build/e2e and inspect screenshots.
 
