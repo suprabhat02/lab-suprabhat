@@ -74,7 +74,7 @@ Every tool is an entry in the `tools` content collection. The home page and site
 
    The schema lives in `src/content.config.ts`; the build fails if a field is missing or the summary is too long.
 
-2. **Build the page** at `src/pages/<slug>/index.astro`, using `ToolLayout` with the collection entry, title, heading and lead. Use `ToolWorkbench` with named `input` and `output` slots and `inputLabelledby` matching the input label; input comes first in the DOM and becomes sticky at 64rem. Put an `ExplainerBand` in the layout's `explainer` slot. Metadata, related tools and the OG image derive from the collection. Follow the [design-system checklist](docs/design-system.md#adding-a-tool-ten-steps).
+2. **Build the page** at `src/pages/<slug>/index.astro`, using `ToolLayout` with the collection entry, title, heading and lead. Use `ToolWorkbench` with named `input` and `output` slots and a short `inputLabel` such as "CSS source"; input comes first in the DOM and becomes sticky at 64rem. Put an `ExplainerBand` in the layout's `explainer` slot. Metadata, related tools and the OG image derive from the collection. Follow the [design-system checklist](docs/design-system.md#adding-a-tool-ten-steps).
 3. **Keep logic headless.** Put pure TypeScript in `src/lib/<name>/` with Vitest tests in `__tests__/`, and render through `src/lib/view/h.ts` so the build can pre-render the default state.
 4. **Enhance, don't depend.** Add one small `<script>` island. Load anything heavy on first interaction and keep the page under 15 KB of gzipped JS before interaction.
 5. **Test.** Add the route to `ROUTES` in `tests/e2e/a11y.spec.ts`, write e2e tests, and add it to `public/llms.txt`.

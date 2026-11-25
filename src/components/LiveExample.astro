@@ -27,7 +27,7 @@ const withWinner = (source: string, quote: string) =>
 // The demo runs in its own shadow tree, so its layers and selectors can't touch the page.
 // This fixed white/dark canvas is the CSS demonstration, not site chrome; changing it would change the example.
 const base = `:host { display: block; }
-.canvas { padding: var(--space-s) var(--space-m); border-radius: var(--radius-control); background: #ffffff; color: #11171c; font-size: var(--step-1); font-weight: var(--weight-semibold); line-height: var(--line-heading); }
+.canvas { padding: var(--space-s) var(--space-m); border-radius: var(--radius-control); background: #ffffff; color: #11171c; font-size: var(--step-3); font-weight: var(--weight-semibold); line-height: var(--line-heading); }
 .canvas p { margin: 0; }
 .canvas p::after { content: " " var(--won, "unstyled"); }
 @media (forced-colors: active) { .canvas { border: var(--stroke-hairline) solid CanvasText; } }`;

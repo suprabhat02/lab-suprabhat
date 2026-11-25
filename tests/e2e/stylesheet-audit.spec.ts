@@ -72,6 +72,41 @@ test('typing updates metrics, graph and table without putting CSS in the URL', a
   expect(await page.evaluate(() => Object.keys(localStorage).filter((key) => key !== 'theme'))).toEqual([]);
 });
 
+test('200% text zoom preserves stacked panes, controls and internal scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 640, height: 900 });
+  await page.goto(route);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%';
+  });
+  await page.evaluate(() => document.fonts.ready);
+  const input = await page.locator('.workbench-input').boundingBox();
+  const output = await page.locator('.workbench-output').boundingBox();
+  if (!input || !output) throw new Error('Missing zoomed workbench boxes.');
+  expect(input.y + input.height).toBeLessThan(output.y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(640);
+  const metrics = await page.locator('.audit-metrics > div').evaluateAll((els) =>
+    els.map((el) => {
+      const b = el.getBoundingClientRect();
+      return { x: b.x, y: b.y, right: b.right, bottom: b.bottom };
+    }),
+  );
+  expect(metrics.length).toBeGreaterThan(1);
+  let previousBottom = 0;
+  for (const metric of metrics) {
+    expect(metric.y).toBeGreaterThanOrEqual(previousBottom);
+    previousBottom = metric.bottom;
+  }
+  for (const control of await page.locator('.workbench-input :is(textarea, button)').all()) {
+    const box = await control.boundingBox();
+    if (!box) throw new Error('Missing zoomed control.');
+    expect(box.x).toBeGreaterThanOrEqual(input.x);
+    expect(box.x + box.width).toBeLessThanOrEqual(input.x + input.width);
+    expect(box.y + box.height).toBeLessThanOrEqual(input.y + input.height);
+  }
+  await page.getByLabel('Your CSS', { exact: true }).fill('a{}');
+  await expect(page.locator('[data-audit-table] tbody tr')).toHaveCount(1);
+});
+
 test('sorts by real specificity with a keyboard header and linked focus/hover', async ({ page }) => {
   await page.goto(route);
   await page.getByLabel('Your CSS', { exact: true }).fill(css);
@@ -92,6 +127,7 @@ test('sorts by real specificity with a keyboard header and linked focus/hover', 
   await expect(page.locator('[data-audit-row="0"]')).toBeFocused();
   await page.locator('[data-audit-point="2"]').hover();
   await expect(page.locator('[data-audit-row="2"]')).toHaveAttribute('data-active', '');
+  await page.mouse.move(0, 0);
   await page.locator('[data-audit-point="0"]').focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('[data-audit-point="1"]')).toBeFocused();
@@ -128,7 +164,8 @@ test('enforces input, share and selector caps and reports malformed input', asyn
   await input.fill('a{');
   await expect(page.locator('[data-audit-output]')).toContainText('Unclosed CSS');
   await input.fill('a{}'.repeat(5001));
-  await expect(page.locator('[data-audit-truncated]')).toContainText('first 5,000');
+  // Rendering the maximum-size table in WebKit can exceed 5s under parallel browser load.
+  await expect(page.locator('[data-audit-truncated]')).toContainText('first 5,000', { timeout: 15_000 });
   await expect(page.locator('[data-audit-point]')).toHaveCount(5000);
   await expect(page.locator('[data-audit-table] tbody tr')).toHaveCount(5000);
   await input.fill('b{}');

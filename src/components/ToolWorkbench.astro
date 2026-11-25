@@ -1,16 +1,19 @@
 ---
 interface Props {
   stacked?: boolean;
-  inputLabelledby?: string;
+  inputLabel?: string;
 }
-const { stacked = false, inputLabelledby } = Astro.props;
-if (Astro.slots.has('input') && !inputLabelledby) throw new Error('A workbench input needs a group label.');
+const { stacked = false, inputLabel } = Astro.props;
+if (Astro.slots.has('input') && !inputLabel) throw new Error('A workbench input needs a group label.');
 ---
 
 <div class:list={['wrap', 'workbench', { 'workbench-stacked': stacked }]}>
   {Astro.slots.has('input') && (
-    <div class="workbench-input flow" role="group" aria-labelledby={inputLabelledby}>
+    <div class="workbench-input flow" role="group" aria-labelledby="workbench-input-label">
       <slot name="input" />
+      <span id="workbench-input-label" class="visually-hidden">
+        {inputLabel}
+      </span>
     </div>
   )}
   <div class="workbench-output flow">

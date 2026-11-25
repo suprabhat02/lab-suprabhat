@@ -22,7 +22,7 @@ const output = auditView(result.value).map(renderToString).join('');
   lead="Stylesheet Audit: follow specificity from the first selector to the last."
   app="stylesheet-audit"
 >
-  <ToolWorkbench inputLabelledby="audit-input-label">
+  <ToolWorkbench inputLabel="CSS source">
     <Fragment slot="input">
       <p class="notice" data-audit-notice role="status" hidden></p>
       <div class="field">

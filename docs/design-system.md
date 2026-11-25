@@ -22,6 +22,10 @@ Latin Mono is **23,128 bytes**. Together they cost **52,528 bytes** on a fresh l
 Latin-ext is demand-loaded, never preloaded. All pages preload exactly the two
 Latin files: Sans for prose and Mono for the above-fold logo/data. Match the
 font-face URL and anonymous `crossorigin` so preload and CSS share one request.
+The same-origin preview disables Vite's CORS middleware: its `Vary: Origin`
+header otherwise makes WebKit refetch an anonymous preload as a CSS font request.
+Font tests count requests at a local forwarding origin, because WebKit's
+automation events also report memory-cache reads as transfers.
 
 Run `npm run fonts` to copy assets and regenerate
 [fonts.generated.css](../src/styles/fonts.generated.css). The existing Capsize
@@ -178,8 +182,9 @@ Do not clip an outline to hide overflow.
 4. Create the route with [ToolLayout](../src/layouts/ToolLayout.astro), passing
    the collection entry, title, heading and lead. It owns metadata, breadcrumbs,
    the single h1, WebApplication schema, no-JS notice and related links.
-5. Put `ToolWorkbench` in the default slot. Supply `inputLabelledby` matching a
-   real input label/heading; input goes before output, never CSS-reordered.
+5. Put `ToolWorkbench` in the default slot. Supply a short `inputLabel` such as
+   "CSS source", distinct from the form control's own label. It names the group
+   through `aria-labelledby`; input goes before output, never CSS-reordered.
 6. Place limits, units and privacy/sharing behaviour immediately under the input.
    Do not change existing URL behaviour as part of visual work.
 7. Pre-render a useful result. Add labeled output sections and plain anchor

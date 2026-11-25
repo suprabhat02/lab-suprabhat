@@ -198,7 +198,7 @@ export function contenderView(
     h(
       'p',
       { class: 'input-help', id: `${id}-help` },
-      'Up to 1,000 characters. Local analysis; edits update the URL.',
+      '1,000 characters max. Local analysis; edits update URL.',
     ),
     h(
       'div',

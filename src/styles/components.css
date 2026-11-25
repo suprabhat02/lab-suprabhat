@@ -69,7 +69,7 @@
     }
 
     & .theme-toggle-icon {
-      fill: none;
+      fill: currentColor;
     }
 
     &[aria-pressed='true'] {
@@ -430,6 +430,7 @@
        so the hero spacing leaves room for the third line instead of depending on it. */
     .tool-hero {
       padding-block-start: var(--space-m);
+      gap: var(--space-s);
     }
 
     .numeral {

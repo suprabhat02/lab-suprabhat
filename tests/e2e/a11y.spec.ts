@@ -67,10 +67,65 @@ test('pages have one h1 and a skip link to #main', async ({ page }) => {
   for (const route of ROUTES) {
     await page.goto(route);
     await expect(page.locator('h1')).toHaveCount(1);
+    const levels = await page
+      .locator('main :is(h1,h2,h3,h4,h5,h6)')
+      .evaluateAll((headings) =>
+        headings.filter((el) => el.getClientRects().length > 0).map((el) => Number(el.tagName.slice(1))),
+      );
+    expect(levels[0], route).toBe(1);
+    let previousLevel = 0;
+    for (const [i, level] of levels.entries()) {
+      expect(level, `${route}: heading ${i + 1}`).toBeLessThanOrEqual(previousLevel + 1);
+      previousLevel = level;
+    }
     await expect(page.locator('a.skip-link')).toHaveAttribute('href', '#main');
     await expect(page.locator('main#main')).toHaveCount(1);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   }
+});
+
+test('all routes reflow at 320px with user text spacing', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  for (const route of ROUTES) {
+    await page.goto(route);
+    await page.evaluate(() => {
+      for (const el of document.querySelectorAll<HTMLElement>('body, body *')) {
+        el.style.setProperty('line-height', '1.5', 'important');
+        el.style.setProperty('letter-spacing', '.12em', 'important');
+        el.style.setProperty('word-spacing', '.16em', 'important');
+        if (el.tagName === 'P') el.style.setProperty('margin-block-end', '2em', 'important');
+      }
+      for (const section of document.querySelectorAll<HTMLElement>('.section-deferred')) {
+        section.style.contentVisibility = 'visible';
+      }
+    });
+    await page.evaluate(() => document.fonts.ready);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), route).toBeLessThanOrEqual(320);
+    for (const pane of await page.locator('.workbench-input, .workbench-output, .tool-item').all()) {
+      const box = await pane.boundingBox();
+      if (!box) throw new Error(`Missing layout box on ${route}`);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(320);
+    }
+  }
+});
+
+test('long code remains keyboard-scrollable inside its named region', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/accessible-name/');
+  await page
+    .getByLabel('Your HTML', { exact: true })
+    .fill(`<button aria-label="${'Long label '.repeat(20)}">Go</button>`);
+  const summary = page.getByText('Show selected element as source', { exact: true });
+  await summary.focus();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  const code = page.getByRole('region', { name: 'Selected element HTML', exact: true });
+  await expect(code).toBeFocused();
+  expect(await code.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => code.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
 test('header exposes every tool and marks the current page', async ({ page }) => {
