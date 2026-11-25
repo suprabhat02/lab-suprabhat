@@ -59,6 +59,14 @@ The `/accessible-name/` page follows the same progressive-enhancement split. Its
 
 The default name, recursive ladder, description, and repairs are static HTML. Only results and selection options are replaced after edits; the textarea retains focus. The selected markup is displayed as escaped code, never inserted into the live document. The engine receives neither the live page nor permission to fetch resources.
 
+## Stylesheet Audit
+
+`/stylesheet-audit/` runs `src/lib/audit/model.ts` at build time and pre-renders a complete default audit through the shared view layer. `stylesheet-audit.ts` lazily loads the controller on interaction or an incoming share link. The controller preserves the textarea, debounces edits, validates the byte cap and sends CSS to a local module worker. `stylesheet-audit-worker.ts` owns parsing and analysis; it does not fetch imports or resources.
+
+Each edit invalidates the previous response and terminates obsolete work. A visible polite “Working…” status precedes analysis; a ten-second worker deadline reports an explicit error instead of leaving stale busy state. Results render through `h()` as a summary, inline SVG, full data table, findings and layer order. Sorting affects only the table, using real specificity triples, while the graph stays in source order. Roving keyboard focus and pointer highlighting link table rows and graph points by stable entry index. There is no animation.
+
+No automatic URL state, input localStorage, analytics, stylesheet injection or third-party transport is used. The parser remains off the initial loading path; no dependency or asset budget was added or raised.
+
 ## CSS
 
 `@layer reset, tokens, base, layout, components, utilities;` is declared first. Base styles use `:where()` for zero specificity, there are no IDs in selectors and no `!important` outside the reduced-motion override. Colours come from `light-dark()` driven by `color-scheme`, which the theme toggle sets through `data-theme`. Below-the-fold sections use `content-visibility: auto`.

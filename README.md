@@ -16,6 +16,8 @@ The first tool is **CSS Specificity Wars** at [`/specificity/`](https://lab.supr
 
 **Accessible Name Wars** at [`/accessible-name/`](https://lab.suprabhat-dev.com/accessible-name/) explains which label names a control, with a recursive computation ladder, a separate description, markup checks, and shareable links. Pasted HTML is parsed but never rendered or executed. A build-time example works without JavaScript.
 
+**Stylesheet Audit** at [`/stylesheet-audit/`](https://lab.suprabhat-dev.com/stylesheet-audit/) graphs selectors in source order, with a sortable data table, layer order, metrics and focused maintenance findings. CSS is parsed locally in a worker, never applied or fetched. Only Copy link puts input in a URL; the default audit works without JavaScript.
+
 ## Run it
 
 Requires Node 22.23.4 or newer (CI uses Node 24) and npm.
