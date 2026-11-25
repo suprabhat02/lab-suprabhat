@@ -1,0 +1,124 @@
+@layer components {
+  .audit-css {
+    resize: vertical;
+    white-space: pre-wrap;
+  }
+
+  .audit-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-m);
+    margin-block: var(--space-m);
+  }
+
+  .audit-metrics dt {
+    color: var(--text-2);
+    font-size: var(--step--1);
+  }
+
+  .audit-metrics dd {
+    font-size: var(--step-2);
+    font-weight: 600;
+  }
+
+  .audit-graph {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    min-block-size: 12rem;
+    margin-block: var(--space-m);
+    background: var(--bg-2);
+    border-block-end: 1px solid var(--control-border);
+  }
+
+  .audit-line,
+  .audit-axis,
+  .audit-boundary {
+    fill: none;
+    stroke: var(--text-2);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .audit-boundary {
+    stroke-dasharray: 4 5;
+  }
+
+  .audit-point {
+    fill: var(--bg);
+    stroke: var(--accent);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .audit-point[data-active],
+  .audit-point:focus {
+    fill: var(--accent);
+    stroke: var(--text);
+    stroke-width: 4;
+  }
+
+  .audit-table-wrap {
+    overflow-x: auto;
+  }
+
+  .audit-table {
+    inline-size: 100%;
+    min-inline-size: 42rem;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+
+  .audit-table caption {
+    text-align: start;
+    padding-block: var(--space-s);
+    color: var(--text-2);
+  }
+
+  .audit-table th,
+  .audit-table td {
+    text-align: start;
+    vertical-align: top;
+    padding: var(--space-xs);
+    border-block-end: 1px solid var(--line);
+    overflow-wrap: anywhere;
+  }
+
+  .audit-table th:first-child {
+    inline-size: 4rem;
+  }
+
+  .audit-table tr[data-active],
+  .audit-table tr:focus {
+    background: var(--bg-3);
+    outline: var(--focus-ring);
+    outline-offset: -3px;
+  }
+
+  .audit-layers {
+    padding-inline-start: var(--space-l);
+    overflow-wrap: anywhere;
+  }
+
+  [data-js] .audit-nojs {
+    display: none;
+  }
+
+  [data-audit-output] {
+    overflow-wrap: anywhere;
+    min-inline-size: 0;
+  }
+
+  @media (forced-colors: active) {
+    .audit-point,
+    .audit-line,
+    .audit-axis,
+    .audit-boundary {
+      stroke: CanvasText;
+    }
+    .audit-point[data-active] {
+      fill: Highlight;
+    }
+  }
+}
