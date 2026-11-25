@@ -33,6 +33,25 @@ test('typing updates the verdict, live region, and element selection', async ({ 
   await expect(select).toBeFocused();
 });
 
+test('keeps markup out of the URL until Copy link is pressed', async ({ page }) => {
+  await page.goto(route);
+  const input = page.getByLabel('Your HTML', { exact: true });
+  const verdict = page.locator('[data-name-verdict]');
+  await input.fill('<button>Private draft</button><button>Another draft</button>');
+  await expect(verdict).toHaveText('The name is "Private draft"');
+  expect(await page.evaluate(() => location.search)).toBe('');
+  await page.getByLabel('Element to check').selectOption('1');
+  await expect(verdict).toHaveText('The name is "Another draft"');
+  expect(await page.evaluate(() => location.search)).toBe('');
+
+  await page.getByRole('button', { name: 'Copy link', exact: true }).click();
+  await expect(page).toHaveURL(/\?s=[A-Za-z0-9_-]+$/);
+  const sharedUrl = page.url();
+  await input.fill('<button>Unshared edit</button>');
+  await expect(verdict).toHaveText('The name is "Unshared edit"');
+  await expect(page).toHaveURL(sharedUrl);
+});
+
 test('keeps the chosen index across edits and resets when that index disappears', async ({ page }) => {
   await page.goto(route);
   const input = page.getByLabel('Your HTML', { exact: true });
@@ -46,6 +65,7 @@ test('keeps the chosen index across edits and resets when that index disappears'
   await expect(verdict).toHaveText('The name is "Homepage"');
   await expect(select).toHaveValue('2');
   await expect(input).toBeFocused();
+  await page.getByRole('button', { name: 'Copy link', exact: true }).click();
   await page.reload();
   await expect(select).toHaveValue('2');
   await expect(verdict).toHaveText('The name is "Homepage"');
@@ -54,6 +74,7 @@ test('keeps the chosen index across edits and resets when that index disappears'
   await expect(verdict).toHaveText('The name is "Save changes"');
   await expect(select).toHaveValue('0');
   await expect(input).not.toHaveAttribute('aria-invalid');
+  await page.getByRole('button', { name: 'Copy link', exact: true }).click();
   await page.reload();
   await expect(select).toHaveValue('0');
   await expect(verdict).toHaveText('The name is "Save changes"');
@@ -74,6 +95,7 @@ test('restores HTML and the selected element from a shared link', async ({ page 
   await page.getByLabel('Your HTML', { exact: true }).fill(html);
   await page.getByLabel('Element to check').selectOption('1');
   await expect(page.locator('[data-name-verdict]')).toHaveText('The name is "Delete"');
+  await page.getByRole('button', { name: 'Copy link', exact: true }).click();
   await expect(page).toHaveURL(/\?s=[A-Za-z0-9_-]+$/);
   const url = page.url();
   await page.goto(url);

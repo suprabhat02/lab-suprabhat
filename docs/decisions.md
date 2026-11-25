@@ -93,6 +93,8 @@ The one gap is mobile performance on `/specificity/` (individual runs 96 to 100;
 
 ## Accessible name adapters and oracle
 
+Sharing pasted HTML is opt-in: rendering and editing never encode it into the URL. Only pressing "Copy link" updates the URL and offers the share link; incoming `?s=` links still restore their saved state. Pasted markup may contain sensitive content, and URL-encoded data can persist in browser history or reach server logs when a link is opened. Base64url is not encryption.
+
 The headless naming engine uses read-only snapshots rather than DOM globals. The browser adapter wraps an inert document created with `DOMParser`; the build adapter uses parse5 8.1.1, checked with `npm view`. This avoids shipping a second HTML parser to visitors. No pasted nodes are adopted into the live page. Unit tests use a script-capable jsdom environment with intercepted resources; browser tests separately assert no markup-triggered requests or dialogs.
 
 The oracle dependencies are development-only: dom-accessibility-api 0.7.1 and jsdom 29.1.1, with declaration files inspected before use. jsdom 31.0.1 was checked but requires a newer Node 24 minor than the local environment; 29.1.1 supports the existing runtime. No runtime dependency other than parse5 was added.

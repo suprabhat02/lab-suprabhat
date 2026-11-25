@@ -74,16 +74,6 @@ export function start(app: HTMLElement): void {
       announceTimer = window.setTimeout(() => {
         live.textContent = `${result.value.verdict}.`;
       }, 300);
-    const encoded = encodeState({ v: SHARE_VERSION, html: input.value, element: selected });
-    if (encoded.ok) {
-      const url = new URL(location.href);
-      if (input.value === DEFAULT_HTML && selected === 0) url.searchParams.delete('s');
-      else url.searchParams.set('s', encoded.value);
-      history.replaceState(history.state, '', url);
-    } else {
-      notice.hidden = false;
-      notice.textContent = encoded.error.message;
-    }
     return result;
   };
   input.addEventListener('input', () => {
@@ -110,6 +100,7 @@ export function start(app: HTMLElement): void {
     }
     const url = new URL('/accessible-name/', location.origin);
     url.searchParams.set('s', encoded.value);
+    history.replaceState(history.state, '', url);
     const manual = () => {
       fallbackWrap.hidden = false;
       fallback.value = url.href;
