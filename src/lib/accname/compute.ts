@@ -180,6 +180,8 @@ function evaluate(node: AccNode, context: Context): Computation {
       : 'There is no aria-labelledby reference.',
   );
   context.seen.add(node);
+  // AccName 1.2 (2026-11-04), section 4.3.2: Embedded Control, AriaLabel, Host Language Label.
+  // https://www.w3.org/TR/2026/WD-accname-1.2-20261104/#computation-steps
   steps.step(
     '2C',
     'embedded control',

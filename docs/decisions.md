@@ -97,7 +97,9 @@ The headless naming engine uses read-only snapshots rather than DOM globals. The
 
 The oracle dependencies are development-only: dom-accessibility-api 0.7.1 and jsdom 29.1.1, with declaration files inspected before use. jsdom 31.0.1 was checked but requires a newer Node 24 minor than the local environment; 29.1.1 supports the existing runtime. No runtime dependency other than parse5 was added.
 
-The calculation follows the referenced editor's drafts as read on 2026-11-25, not a promise that every browser already implements every draft change. It cannot evaluate stylesheet rules, generated content, layout, shadow trees, or script-mutated values. A class or style element triggers an additional notice. Inline hiding is recognized from markup; competing CSS declarations and visibility overrides still need verification on the rendered page.
+The calculation follows the [published AccName 1.2 Working Draft of 4 November 2026](https://www.w3.org/TR/2026/WD-accname-1.2-20261104/#computation-steps) and the referenced HTML-AAM editor's draft as read on 2026-11-25, not a promise that every browser already implements every draft change. Section 4.3.2 lists Embedded Control third, AriaLabel fourth, and Host Language Label fifth. The trace's letter-based IDs therefore remain `2C`, `2D`, and `2E`, respectively; neither renumbering nor an execution-order change is warranted. Regression tests pin these IDs, native/ARIA precedence, and an embedded value competing with an aria-label.
+
+The engine cannot evaluate stylesheet rules, generated content, layout, shadow trees, or script-mutated values. A class or style element triggers an additional notice. Inline hiding is recognized from markup; competing CSS declarations and visibility overrides still need verification on the rendered page.
 
 The oracle is a cross-check, not authority. Both adapters must match every fixture, and expected engine results remain hand-specified. The following differences are pinned explicitly in the oracle tests, not skipped:
 

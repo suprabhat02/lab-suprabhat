@@ -452,9 +452,32 @@ describe('accessible name fixtures', () => {
     }
   });
 
+  it.each([
+    { ariaLabel: ' aria-label="Author"', name: 'Author', outcome: 'used' },
+    { ariaLabel: '', name: 'Native', outcome: 'skipped' },
+  ])('keeps published step IDs and precedence with aria-label=$ariaLabel', ({ ariaLabel, name, outcome }) => {
+    const node = parseHtml(
+      `<label for="target">Native</label><input id="target"${ariaLabel}>`,
+    ).lookupId('target');
+    if (!node) throw new Error('Missing target');
+    const result = computeName(node);
+    expect(result.value).toBe(name);
+    expect(
+      result.trace
+        .filter((step) => ['2C', '2D', '2E'].includes(step.id))
+        .map(({ id, source, outcome }) => ({ id, source, outcome })),
+    ).toEqual([
+      { id: '2C', source: 'embedded control', outcome: 'skipped' },
+      { id: '2D', source: 'aria-label', outcome },
+      { id: '2E', source: 'label[for]', outcome: ariaLabel ? 'not-reached' : 'used' },
+      { id: '2E', source: 'placeholder', outcome: 'not-reached' },
+      { id: '2E', source: 'aria-placeholder', outcome: 'not-reached' },
+    ]);
+  });
+
   it('traces nested embedded controls and referenced content', () => {
     const root = parseHtml(
-      '<span id="a">Flash <input value="5"> times</span><button id="target" aria-labelledby="a"></button>',
+      '<span id="a">Flash <input value="5" aria-label="Count"> times</span><button id="target" aria-labelledby="a"></button>',
     );
     const node = root.lookupId('target');
     if (!node) throw new Error('Missing target');

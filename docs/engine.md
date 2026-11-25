@@ -158,7 +158,9 @@ decodeState(encoded.value); // { ok: true, value: state }
 
 ## Accessible Name Wars
 
-`src/lib/accname/` computes markup-only accessible names and descriptions using [AccName 1.2](https://w3c.github.io/accname/#computation-steps) and [HTML-AAM](https://w3c.github.io/html-aam/#accname-computation). The core does not read a browser DOM. `AccNode` exposes a tag, read-only attributes and children, text, a parent, and same-tree ID lookup.
+`src/lib/accname/` computes markup-only accessible names and descriptions using [AccName 1.2, 4 November 2026 Working Draft, section 4.3.2](https://www.w3.org/TR/2026/WD-accname-1.2-20261104/#computation-steps) and [HTML-AAM](https://w3c.github.io/html-aam/#accname-computation). The core does not read a browser DOM. `AccNode` exposes a tag, read-only attributes and children, text, a parent, and same-tree ID lookup.
+
+Trace IDs use letters for the computation substeps: `2C` is Embedded Control (third), `2D` is AriaLabel (fourth), and `2E` is Host Language Label (fifth). This matches the published draft's order; an embedded control's value can therefore precede its `aria-label` during label traversal.
 
 - `adapters/parse5.ts`: `parseHtml(html)` creates the build-time tree.
 - `adapters/dom.ts`: `parseDom(html)` uses an inert `DOMParser` document; `fromDocument(document)` adapts one already parsed.
