@@ -1,26 +1,26 @@
 /* Built by scripts/font-fallbacks.mjs from the served Latin fonts. Do not edit by hand. */
-/* Sans stack: "Figtree Variable", "Figtree Variable Fallback: Arial", "Figtree Variable Fallback: Segoe UI", "Figtree Variable Fallback: Helvetica", Arial, "Segoe UI", Helvetica */
+/* Sans stack: "Geist Variable", "Geist Variable Fallback: Arial", "Geist Variable Fallback: Segoe UI", "Geist Variable Fallback: Helvetica", Arial, "Segoe UI", Helvetica */
 @font-face {
-  font-family: "Figtree Variable Fallback: Arial";
+  font-family: "Geist Variable Fallback: Arial";
   src: local('Arial'), local('ArialMT'), local('Liberation Sans');
-  ascent-override: 94.3231%;
-  descent-override: 24.8219%;
+  ascent-override: 95.9379%;
+  descent-override: 28.1609%;
   line-gap-override: 0%;
-  size-adjust: 100.7176%;
+  size-adjust: 104.7553%;
 }
 @font-face {
-  font-family: "Figtree Variable Fallback: Segoe UI";
+  font-family: "Geist Variable Fallback: Segoe UI";
   src: local('Segoe UI'), local('SegoeUI');
-  ascent-override: 93.8065%;
-  descent-override: 24.6859%;
-  size-adjust: 101.2722%;
+  ascent-override: 95.4125%;
+  descent-override: 28.0066%;
+  size-adjust: 105.3322%;
 }
 @font-face {
-  font-family: "Figtree Variable Fallback: Helvetica";
+  font-family: "Geist Variable Fallback: Helvetica";
   src: local('Helvetica');
-  ascent-override: 94.3231%;
-  descent-override: 24.8219%;
-  size-adjust: 100.7176%;
+  ascent-override: 95.9379%;
+  descent-override: 28.1609%;
+  size-adjust: 104.7553%;
 }
 /* Stack: "Geist Mono Variable", "Geist Mono Variable Fallback: Consolas", "Geist Mono Variable Fallback: Menlo", "Geist Mono Variable Fallback: Courier New", Consolas, Menlo, "Courier New" */
 @font-face {
