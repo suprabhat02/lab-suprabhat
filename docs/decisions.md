@@ -91,6 +91,42 @@ The one gap is mobile performance on `/specificity/` (individual runs 96 to 100;
   - In Firefox, a Playwright role-and-name query on a tab panel followed immediately by an axe scan crashes the content process. The panel scan locates the panel by id instead. It doesn't happen in normal browsing.
   - Firefox ignores `@view-transition`; navigation works the same without the animation.
 
+## Accessible name adapters and oracle
+
+The headless naming engine uses read-only snapshots rather than DOM globals. The browser adapter wraps an inert document created with `DOMParser`; the build adapter uses parse5 8.1.1, checked with `npm view`. This avoids shipping a second HTML parser to visitors. No pasted nodes are adopted into the live page. Unit tests use a script-capable jsdom environment with intercepted resources; browser tests separately assert no markup-triggered requests or dialogs.
+
+The oracle dependencies are development-only: dom-accessibility-api 0.7.1 and jsdom 29.1.1, with declaration files inspected before use. jsdom 31.0.1 was checked but requires a newer Node 24 minor than the local environment; 29.1.1 supports the existing runtime. No runtime dependency other than parse5 was added.
+
+The calculation follows the referenced editor's drafts as read on 2026-11-25, not a promise that every browser already implements every draft change. It cannot evaluate stylesheet rules, generated content, layout, shadow trees, or script-mutated values. A class or style element triggers an additional notice. Inline hiding is recognized from markup; competing CSS declarations and visibility overrides still need verification on the rendered page.
+
+The oracle is a cross-check, not authority. Both adapters must match every fixture, and expected engine results remain hand-specified. The following differences are pinned explicitly in the oracle tests, not skipped:
+
+| Fixture or rule | Engine expectation | Oracle result | Specification |
+| --- | --- | --- | --- |
+| Title already used as name (three fixtures) | No repeated description | Repeats title | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description) |
+| Text input with only a placeholder | Uses placeholder | Empty name | [HTML-AAM text controls](https://w3c.github.io/html-aam/#accname-computation) |
+| ARIA-named table with caption | Caption is description | Empty description | [Native descriptions](https://w3c.github.io/html-aam/#accdesc-computation) |
+| Hidden referenced label with hidden child | Includes both text portions | Omits hidden child | [Hidden reference traversal](https://w3c.github.io/accname/#comp_hidden_not_referenced) |
+| Focusable button with presentation role | Keeps button name | Empty name | [Presentation conflicts](https://www.w3.org/TR/wai-aria-1.2/#presentational-roles-conflict-resolution) |
+| Generic div with aria-label | Naming prohibited | Uses aria-label | [Generic role](https://www.w3.org/TR/wai-aria-1.2/#generic) |
+| Whitespace at an inline text boundary | `Save this file` | `Savethis file` | [Text nodes](https://w3c.github.io/accname/#comp_text_node); also verified in Chromium, Firefox, and WebKit |
+| Empty aria-labelledby target | Falls through to aria-label | Empty name | [LabelledBy step](https://w3c.github.io/accname/#comp_labelledby) |
+| Empty applicable description (two fixtures) | Stops with empty description | Uses title | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description) |
+
+### Validation on 2026-11-25
+
+Lint, type checks, all 311 unit tests, and the production build passed. The complete Chromium, Firefox, and WebKit suite passed 247 tests, with 50 existing skips. Initial JavaScript for `/accessible-name/` is 2.24 KB gzip; total CSS is 5.58 KB. Existing budgets are unchanged. Traversing all 22 client modules, including lazy imports, found no parse5 or oracle dependencies.
+
+Lighthouse 13.6.0 against the local preview measured:
+
+| Route | Mobile performance samples | Mobile median | Desktop performance samples |
+| --- | --- | --- | --- |
+| `/accessible-name/` | 96, 100, 100 | 100 | 100, 100, 100 |
+| `/specificity/` | 98, 99, 99 | 99 | 100 |
+| `/about/` | 89, 100, 98 | 98 | 100 |
+
+Accessibility, Best Practices, and SEO scored 100 in every measured run. Home and `/playground/` scored 100 in all four categories in one mobile and one desktop run each. The new page therefore has three-run medians of 100 in all four categories on both presets, but these measurements do **not** establish site-wide 100 performance. The existing-route results were accepted for this feature's scope; no existing-page performance behavior, budgets, or assertions were relaxed.
+
 ## Scaffold clean-up
 
 The Astro template's `AGENTS.md` and `favicon.ico` were removed, and the template's initial commit was re-attributed to the repository author before anything was pushed.

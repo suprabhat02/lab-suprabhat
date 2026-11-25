@@ -8,6 +8,7 @@ Every tool pairs an interactive answer with a long-form explainer. Pages are sta
 
 - [CSS Specificity Wars](https://lab.suprabhat-dev.com/specificity/): compare up to eight CSS selectors and see which wins and why. Shows (A, B, C) specificity, the deciding column in plain English, a part-by-part anatomy, a nesting expander that shows the `:is()` form, and a cascade resolver that walks all seven cascade steps (origin and importance, context, element-attached styles, layers, specificity, @scope proximity, order of appearance). Includes fix suggestions and shareable links.
 - [Selector Playground](https://lab.suprabhat-dev.com/playground/): Type any CSS selector and instantly see every part, what it contributes to specificity, and warnings about deprecated or risky patterns.
+- [Accessible Name Wars](https://lab.suprabhat-dev.com/accessible-name/): Find which label names a button, link, input or image. Follow the accessible name algorithm, inspect competing sources, and fix common labeling mistakes.
 
 ## Explainer topics on the specificity page
 
