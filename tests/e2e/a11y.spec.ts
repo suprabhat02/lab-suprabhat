@@ -96,6 +96,27 @@ test('header exposes every tool and marks the current page', async ({ page }) =>
   }
 });
 
+test('home lists tools in learning order with one full-item link each', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const links = page.locator('.tool-item a');
+  await expect(links).toHaveText([
+    'CSS Specificity Wars',
+    'Selector Playground',
+    'Stylesheet Audit',
+    'Accessible Name Wars',
+  ]);
+  await expect(page.locator('.tool-item')).toHaveCount(4);
+  const first = page.locator('.tool-item').first();
+  await expect(first.locator('a, button, input, select')).toHaveCount(1);
+  await expect(first.locator('time')).toHaveAttribute('datetime', /\d{4}-\d{2}-\d{2}/);
+  await first.scrollIntoViewIfNeeded();
+  const box = await first.boundingBox();
+  if (!box) throw new Error('Missing tool item.');
+  await page.mouse.click(box.x + box.width - 12, box.y + box.height - 12);
+  await expect(page).toHaveURL(/\/specificity\/$/);
+});
+
 test('native mobile menu opens and closes by keyboard without scripting', async ({ browser }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
