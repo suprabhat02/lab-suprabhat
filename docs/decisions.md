@@ -48,6 +48,38 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
 
+## Workbench surfaces and type
+
+The elevation scale separates page (`--surface-0`), explainer/footer bands
+(`--surface-1`), workbench panels and tool items (`--surface-2`), and code,
+input and table-header insets (`--surface-3`). Existing `--bg`, `--bg-2`,
+`--surface` and `--bg-3` respectively alias these roles. One-pixel `--line`
+borders distinguish zones without shadows.
+
+Geist Mono remains the heading, code, selector, numeric data, brand and
+navigation face. Paragraphs, explanation lists, findings and footer prose use
+the local system sans stack (`--font-prose`), with no font request or generated
+fallback metrics. Default mono line-height is 1.5; prose is 1.6. The existing
+mono fallback setup is unchanged; normal builds still run their prebuild hook.
+
+WCAG relative-luminance contrast, light / dark, measured against every surface:
+
+| Foreground | Surface 0 | Surface 1 | Surface 2 | Surface 3 |
+| --- | --- | --- | --- | --- |
+| `--text` | 17.28 / 17.98 | 14.93 / 16.36 | 18.05 / 14.37 | 16.36 / 17.64 |
+| `--text-2` | 9.58 / 11.27 | 8.28 / 10.25 | 10.02 / 9.00 | 9.07 / 11.05 |
+| `--text-3` | 6.28 / 7.62 | 5.43 / 6.93 | 6.57 / 6.08 | 5.95 / 7.47 |
+| `--accent` / focus | 6.32 / 5.94 | 5.46 / 5.40 | 6.60 / 4.74 | 5.98 / 5.82 |
+| `--accent-strong` | 8.03 / 11.68 | 6.94 / 10.62 | 8.40 / 9.33 | 7.61 / 11.45 |
+| `--success` | 6.21 / 10.48 | 5.37 / 9.53 | 6.49 / 8.37 | 5.88 / 10.28 |
+| `--danger` | 6.40 / 6.76 | 5.53 / 6.15 | 6.69 / 5.40 | 6.06 / 6.63 |
+| `--line` | 4.10 / 6.29 | 3.54 / 5.72 | 4.28 / 5.02 | 3.88 / 6.17 |
+| `--control-border` | 3.72 / 4.08 | 3.22 / 3.71 | 3.89 / 3.26 | 3.52 / 4.00 |
+
+All text pairs exceed 4.5:1, including small accent text; every border and focus
+pair exceeds 3:1. Surface differences are quiet grouping cues, not the sole
+indication of an interactive boundary.
+
 ## Explainer
 
 - **"On this page"** is one `<nav>` holding a `<details>`. Below 1024px it's a collapsed disclosure; at 1024px and up, `::details-content` keeps the list visible and the summary is hidden, so it works without JavaScript. A 0.6 KB script, imported only when the explainer comes within 600px of the viewport, marks the current section with `aria-current="location"`.
