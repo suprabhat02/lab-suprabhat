@@ -957,6 +957,10 @@
     gap: var(--space-3xs);
     margin: 0;
     padding: 0;
+
+    & li {
+      font-family: var(--font);
+    }
   }
 
   .toc-link {
