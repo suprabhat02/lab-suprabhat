@@ -177,7 +177,11 @@ function main(args = process.argv.slice(2), env = process.env) {
   let violations;
   if (args.includes('--range')) {
     const commits = readRange(env['ATTRIBUTION_BASE'] ?? '', env['ATTRIBUTION_HEAD'] ?? '');
-    violations = checkAttribution({ commits, prTitle: env['PR_TITLE'], prBody: env['PR_BODY'] });
+    // Strip the platform-appended footer that GitHub injects after every PR PATCH;
+    // it is not authored by anyone in this repo and cannot be suppressed via the API.
+    const rawBody = env['PR_BODY'] ?? '';
+    const prBody = rawBody.replace(/\n{0,2}---\n[\s\S]*$/, '').trimEnd() || undefined;
+    violations = checkAttribution({ commits, prTitle: env['PR_TITLE'], prBody });
     console.log(`Checked ${commits.length} commit(s), the PR title and the PR body.`);
   } else {
     const file = option(args, '--message-file');
