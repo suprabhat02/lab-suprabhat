@@ -14,7 +14,6 @@
     display: grid;
     align-items: start;
     gap: var(--space-m);
-    margin-block-start: var(--space-l);
 
     @media (width >= 64rem) {
       &:not(.workbench-stacked) {
@@ -33,6 +32,7 @@
 
   .workbench-input,
   .workbench-output {
+    container-type: inline-size;
     min-inline-size: 0;
     padding: var(--space-s);
     border: 1px solid var(--border-subtle);
@@ -43,7 +43,7 @@
 
   .workbench-output {
     & h2 {
-      font-size: var(--step-2);
+      font-size: var(--step-1);
     }
 
     & :is(h2, h3, section) {
@@ -56,7 +56,6 @@
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-s);
     padding-block-end: var(--space-s);
-    margin-block-end: var(--space-s);
     border-block-end: 1px solid var(--border-subtle);
     font-size: var(--step--1);
 
@@ -93,16 +92,11 @@
   }
 
   .section {
-    padding-block: var(--space-section);
+    padding-block: var(--space-xl-2xl);
   }
 
   .section + .section {
     border-block-start: 1px solid var(--border-subtle);
-  }
-
-  /* A hero already ends with space; don't stack a full section gap on top of it. */
-  :is(.tool-hero, .hub-hero) + .section {
-    padding-block-start: var(--space-xl);
   }
 
   /* Below-the-fold sections: skip style and layout until they're near the viewport. */
@@ -111,31 +105,16 @@
     contain-intrinsic-size: auto 1600px;
   }
 
-  .stack > * + * {
-    margin-block-start: var(--stack-space, var(--space-s));
-  }
-
   .prose {
     max-inline-size: var(--measure);
 
-    & > * + * {
-      margin-block-start: 1.1em;
-    }
-
-    & > :is(h2, h3) {
-      margin-block-start: 2.2em;
-    }
-
-    & > h2 {
-      margin-block-start: var(--space-xl);
+    & :is(ul, ol) {
+      padding-inline-start: var(--space-m);
     }
 
     & :is(ul, ol) {
-      padding-inline-start: 1.4em;
-    }
-
-    & li + li {
-      margin-block-start: 0.4em;
+      display: grid;
+      gap: var(--space-2xs);
     }
   }
 
@@ -240,7 +219,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-m);
-    margin-block-start: var(--space-m);
     color: var(--text-muted);
     font-size: var(--step--1);
   }

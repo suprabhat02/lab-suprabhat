@@ -1,9 +1,4 @@
 @layer utilities {
-  /* In the last layer so `hidden` beats any component's display value, whatever its specificity. */
-  :where([hidden]) {
-    display: none;
-  }
-
   .visually-hidden {
     position: absolute;
     inline-size: 1px;
@@ -20,16 +15,42 @@
     display: none;
   }
 
-  .mt-s {
-    margin-block-start: var(--space-s);
+  :where(.flow) > :where(:not([hidden]) ~ :not([hidden])) {
+    margin-block-start: var(--flow-space, var(--space-s));
   }
 
-  .mt-m {
+  :where(.flow) > :where(:not([hidden]) ~ h2) {
+    margin-block-start: var(--space-l-xl);
+  }
+
+  :where(.flow) > :where(:not([hidden]) ~ h3) {
     margin-block-start: var(--space-m);
   }
 
-  .mt-l {
-    margin-block-start: var(--space-l);
+  :where(.flow) > :where(h1, h2, h3, h4) + * {
+    margin-block-start: var(--space-xs);
+  }
+
+  :where(.stack) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-space, var(--space-s));
+  }
+
+  :where(.cluster) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cluster-space, var(--space-2xs));
+  }
+
+  :where(.region) {
+    padding-block: var(--space-xl-2xl);
+  }
+
+  /* After layout primitives, so hidden also wins over .stack and .cluster. */
+  :where([hidden]) {
+    display: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

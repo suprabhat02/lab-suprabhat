@@ -26,7 +26,7 @@ export function traceView(trace: ReadonlyArray<TraceStep>): VElement {
       h(
         'li',
         {
-          class: 'ladder-step',
+          class: 'ladder-step flow',
           'data-outcome': step.outcome === 'used' ? 'decided' : step.outcome,
           'data-step': step.id,
         },
@@ -44,7 +44,7 @@ export function traceView(trace: ReadonlyArray<TraceStep>): VElement {
         step.children.length
           ? h(
               'details',
-              { class: 'name-recursion' },
+              { class: 'name-recursion flow' },
               h('summary', {}, `Show ${step.source} traversal`),
               traceView(step.children),
             )
@@ -92,12 +92,12 @@ export function verdictView(model: Analysis): VNode[] {
     h('p', { class: 'name-verdict', 'data-name-verdict': true }, model.verdict),
     h(
       'p',
-      { class: 'mt-s' },
+      {},
       `Roughly announced as: ${model.name.value ? `${model.name.value}, ` : ''}${SPOKEN_ROLES[model.role] ?? model.role}.`,
     ),
     h(
       'p',
-      { class: 'muted mt-s' },
+      { class: 'muted' },
       'Exact wording, role exposure, state announcements, and order vary by browser and screen reader.',
     ),
   ];
@@ -117,35 +117,31 @@ export function analysisView(model: Analysis): VNode[] {
     model.cssUnknown
       ? h(
           'p',
-          { class: 'notice mt-m', 'data-css-limit': true },
+          { class: 'notice', 'data-css-limit': true },
           'This HTML contains a class or a style element. Class-based CSS hiding, stylesheet layout, and CSS-generated content (::before/::after) cannot be computed from this markup.',
         )
       : null,
     h(
       'details',
-      { class: 'as-css' },
+      { class: 'as-css flow' },
       h('summary', {}, 'Show selected element as source'),
       h('pre', { class: 'code' }, h('code', {}, source(model.node))),
     ),
-    h('h2', { class: 'mt-l', id: 'name-trace' }, 'Which source wins?'),
+    h('h2', { id: 'name-trace' }, 'Which source wins?'),
     traceView(model.name.trace),
-    h('h2', { class: 'mt-l', id: 'name-description' }, 'Description'),
-    h(
-      'p',
-      { class: 'mt-s', 'data-name-description': true },
-      model.description.value || 'No additional description.',
-    ),
+    h('h2', { id: 'name-description' }, 'Description'),
+    h('p', { 'data-name-description': true }, model.description.value || 'No additional description.'),
     h(
       'details',
-      { class: 'as-css' },
+      { class: 'as-css flow' },
       h('summary', {}, 'Show description computation'),
       traceView(model.description.trace),
     ),
-    h('h2', { class: 'mt-l', id: 'name-checks' }, 'Checks and fixes'),
+    h('h2', { id: 'name-checks' }, 'Checks and fixes'),
     model.checks.length
       ? h(
           'ul',
-          { class: 'fixes mt-m', role: 'list', 'data-name-checks': true },
+          { class: 'fixes', role: 'list', 'data-name-checks': true },
           model.checks.map((check) =>
             h(
               'li',
@@ -169,10 +165,6 @@ export function analysisView(model: Analysis): VNode[] {
             ),
           ),
         )
-      : h(
-          'p',
-          { class: 'mt-s' },
-          'No issues found by these markup checks. This is not a complete accessibility audit.',
-        ),
+      : h('p', {}, 'No issues found by these markup checks. This is not a complete accessibility audit.'),
   ];
 }

@@ -24,7 +24,6 @@
     color: var(--text);
     font-weight: var(--weight-semibold);
     font-size: var(--step-1);
-    letter-spacing: -0.04em;
     text-decoration: none;
 
     &:hover {
@@ -108,8 +107,8 @@
     max-inline-size: 16ch;
     font-size: var(--step-4);
     font-weight: var(--weight-semibold);
-    line-height: 1;
-    letter-spacing: -0.06em;
+    line-height: var(--line-display);
+    letter-spacing: var(--tracking-display);
   }
 
   .site-footer-home .footer-slogan {
@@ -136,7 +135,7 @@
     background: var(--surface-inset);
     color: var(--text);
     font-size: var(--step-0);
-    line-height: 1.4;
+    line-height: var(--line-ui);
 
     &:hover {
       border-color: var(--text-muted);
@@ -162,7 +161,7 @@
     min-block-size: 16rem;
     resize: vertical;
     font-size: var(--step--1);
-    line-height: 1.6;
+    line-height: var(--line-code);
     white-space: pre;
     overflow-x: auto;
   }
@@ -171,8 +170,9 @@
     appearance: auto;
   }
 
-  .field > .label {
-    margin-block-end: var(--space-3xs);
+  .field {
+    display: grid;
+    gap: var(--space-3xs);
   }
 
   .field-inline {
@@ -261,7 +261,7 @@
     gap: var(--space-2xs);
     align-items: baseline;
     font-size: var(--step--1);
-    line-height: 1.5;
+    line-height: var(--line-code);
 
     & .icon {
       flex: none;
@@ -296,7 +296,7 @@
     background: var(--surface-inset);
     border: 1px solid var(--border-subtle);
     font-size: var(--step--1);
-    line-height: 1.6;
+    line-height: var(--line-code);
     /* Wrap rather than scroll, so no code block becomes a keyboard trap or an unreachable scroller. */
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -305,25 +305,27 @@
   .callout {
     max-inline-size: 60ch;
     font-size: var(--step-1);
-    line-height: 1.45;
+    line-height: var(--line-body);
   }
 
   /* ---------- Tool hero and duel ---------- */
 
   .tool-hero {
-    padding-block: var(--space-xl) var(--space-2xl);
+    display: grid;
+    gap: var(--space-l-xl);
+    padding-block: var(--space-xl-2xl);
   }
 
   .tool-lead {
-    margin-block-start: var(--space-s);
     max-inline-size: var(--measure-lead);
     color: var(--text-muted);
     font-size: var(--step-1);
-    line-height: 1.45;
+    line-height: var(--line-body);
   }
 
   .duel {
-    margin-block-start: var(--space-xl);
+    display: grid;
+    gap: var(--space-m-l);
   }
 
   .contenders {
@@ -356,13 +358,15 @@
   }
 
   .score {
-    margin-block-start: var(--space-s);
+    display: grid;
+    gap: var(--space-2xs);
   }
 
   .numerals {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: clamp(0.75rem, 5cqi, 2.5rem);
+    row-gap: var(--space-2xs);
     max-inline-size: 34rem;
     overflow: clip;
     overflow-clip-margin: 0.2em;
@@ -373,7 +377,6 @@
     font-size: clamp(4rem, 30cqi, 11rem);
     font-weight: var(--weight-regular);
     line-height: 0.95;
-    letter-spacing: -0.06em;
     font-variant-numeric: tabular-nums;
     color: var(--text-muted);
 
@@ -407,10 +410,6 @@
       padding-block-start: var(--space-m);
     }
 
-    .duel {
-      margin-block-start: var(--space-l);
-    }
-
     .numeral {
       font-size: clamp(3rem, 18vw, 5rem);
     }
@@ -422,7 +421,6 @@
 
   .numeral-caption {
     grid-row: 2;
-    margin-block-start: var(--space-2xs);
     color: var(--text-muted);
     font-size: var(--step--1);
 
@@ -433,7 +431,6 @@
   }
 
   .outcome {
-    margin-block-start: var(--space-3xs);
     color: var(--text-muted);
     font-size: var(--step--1);
   }
@@ -444,17 +441,15 @@
   }
 
   .list-note {
-    margin-block-start: var(--space-2xs);
     color: var(--text-muted);
     font-size: var(--step--1);
   }
 
   .verdict {
-    margin-block-start: var(--space-xl);
     max-inline-size: 48ch;
     font-size: var(--step-1);
     font-weight: var(--weight-medium);
-    line-height: 1.45;
+    line-height: var(--line-body);
   }
 
   .duel-actions {
@@ -462,7 +457,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-xs);
-    margin-block-start: var(--space-m);
   }
 
   .status {
@@ -479,7 +473,6 @@
   .fixes {
     display: grid;
     gap: var(--space-l);
-    margin-block-start: var(--space-l);
   }
 
   .fix {
@@ -550,15 +543,7 @@
   }
 
   .panel {
-    padding-block-start: var(--space-xl);
-  }
-
-  .panel + .panel {
-    margin-block-start: var(--space-2xl);
-  }
-
-  :root[data-js] .panel + .panel {
-    margin-block-start: 0;
+    padding-block-start: var(--space-l);
   }
 
   /* With tabs, the tab list already separates the panel from what's above it. */
@@ -579,9 +564,7 @@
   .panel-grid {
     display: grid;
     gap: var(--space-xl);
-    margin-block-start: var(--space-l);
-
-    @media (width >= 64rem) {
+    @container (width >= 48rem) {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     }
   }
@@ -596,7 +579,7 @@
   .table {
     inline-size: 100%;
     font-size: var(--step--1);
-    line-height: 1.5;
+    line-height: var(--line-code);
 
     & :is(th, td) {
       padding: var(--space-2xs) var(--space-xs);
@@ -656,14 +639,13 @@
 
     & td:last-child:not(.num) {
       font-family: var(--font-sans);
-      line-height: 1.6;
+      line-height: var(--line-body);
     }
   }
 
   .selector-scores {
     display: grid;
     gap: var(--space-s);
-    margin-block-start: var(--space-s);
 
     & dd {
       font-size: var(--step-3);
@@ -676,10 +658,6 @@
     gap: var(--space-s);
   }
 
-  .anatomy-selector + .anatomy-selector {
-    margin-block-start: var(--space-xl);
-  }
-
   .anatomy-title {
     font-size: var(--step-1);
   }
@@ -687,7 +665,7 @@
   .parts {
     font-family: var(--font-mono);
     font-size: var(--step-2);
-    line-height: 1.6;
+    line-height: var(--line-code);
     overflow-wrap: anywhere;
     white-space: pre-wrap;
   }
@@ -736,7 +714,6 @@
   .decls {
     display: grid;
     gap: var(--space-m);
-    margin-block-start: var(--space-m);
   }
 
   .decl {
@@ -787,22 +764,22 @@
   .cascade-winner {
     font-size: var(--step-1);
     font-weight: var(--weight-semibold);
-    line-height: 1.4;
+    line-height: var(--line-ui);
   }
 
   .cascade-summary {
-    margin-block-start: var(--space-xs);
     color: var(--text-muted);
   }
 
   .ladder {
     display: grid;
     gap: var(--space-xs);
-    margin-block-start: var(--space-m);
-    padding-inline-start: 2.2em;
+    padding-inline-start: var(--space-l);
   }
 
   .ladder-step {
+    --flow-space: var(--space-2xs);
+    display: list-item;
     padding-inline-start: var(--space-2xs);
     color: var(--text-muted);
 
@@ -842,12 +819,10 @@
 
   .ladder-text {
     font-size: var(--step--1);
-    line-height: 1.6;
+    line-height: var(--line-body);
   }
 
   .as-css {
-    margin-block-start: var(--space-m);
-
     & summary {
       min-block-size: 44px;
       display: flex;
@@ -860,10 +835,8 @@
   /* ---------- Explainer ---------- */
 
   .example {
-    & .table {
-      margin-block-start: var(--space-2xs);
-    }
-
+    display: grid;
+    gap: var(--space-s);
     & figcaption {
       font-weight: var(--weight-medium);
     }
@@ -893,7 +866,6 @@
   .example-body {
     display: grid;
     gap: var(--space-s) var(--space-m);
-    margin-block-start: var(--space-s);
 
     @media (width >= 64rem) {
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
@@ -902,7 +874,6 @@
   }
 
   .example-label {
-    margin-block-end: var(--space-3xs);
     color: var(--text-muted);
     font-size: var(--step--1);
   }
@@ -912,7 +883,6 @@
   }
 
   .example-summary {
-    margin-block-start: var(--space-s);
     max-inline-size: var(--measure);
   }
 
@@ -945,7 +915,7 @@
 
   .toc {
     font-size: var(--step--1);
-    line-height: 1.45;
+    line-height: var(--line-ui);
 
     @media (width >= 64rem) {
       grid-area: nav;
@@ -966,7 +936,6 @@
 
   .toc-title {
     display: none;
-    margin-block-end: var(--space-2xs);
     color: var(--text-muted);
     font-weight: var(--weight-medium);
   }
@@ -1020,7 +989,23 @@
   /* ---------- Hub ---------- */
 
   .hub-hero {
-    padding-block: var(--space-2xl) var(--space-xl);
+    padding-block: var(--space-xl-2xl);
+  }
+
+  .hub-hero h1 {
+    font-size: var(--step-4);
+  }
+
+  .hub-hero-home h1 {
+    font-size: var(--step-5);
+  }
+
+  .tabs,
+  .anatomy-item,
+  .example-code,
+  .example-result {
+    display: grid;
+    gap: var(--space-xs);
   }
 
   .tool-list {

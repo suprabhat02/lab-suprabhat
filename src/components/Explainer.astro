@@ -55,7 +55,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
 
 <section class="section section-deferred section-explainer" aria-labelledby="explainer-title" data-explainer>
   <div class="wrap explainer">
-    <header class="explainer-head prose">
+    <header class="explainer-head prose flow">
       <h2 id="explainer-title">Specificity and the cascade, explained</h2>
       <p>
         When two rules set the same property on the same element, the browser has to pick one. Most people learn
@@ -64,7 +64,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
       </p>
     </header>
 
-    <nav class="toc" aria-label="On this page" data-toc>
+    <nav class="toc flow" aria-label="On this page" data-toc>
       <p class="toc-title" aria-hidden="true">On this page</p>
       <details class="toc-details">
         <summary class="toc-summary">On this page</summary>
@@ -82,7 +82,7 @@ const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : 
       </details>
     </nav>
 
-    <article class="explainer-body prose prose-wide">
+    <article class="explainer-body prose prose-wide flow">
       <h2 id="how-calculated">How is CSS specificity calculated?</h2>
       <p>
         Specificity is three separate counts, written <code>(A, B, C)</code>. Look at every simple selector in the

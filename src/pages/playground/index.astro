@@ -50,50 +50,54 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <section class="tool-hero" aria-labelledby="tool-title">
-    <div class="wrap">
+    <div class="wrap flow">
       <h1 id="tool-title">{tool.data.title}</h1>
       <p class="tool-lead">
         Type a CSS selector. See every part, its specificity, and what to watch out for.
       </p>
       <noscript>
-        <p class="notice mt-m">JavaScript is off, so this shows a worked example that won't update.</p>
+        <p class="notice">JavaScript is off, so this shows a worked example that won't update.</p>
       </noscript>
     </div>
     <ToolWorkbench>
       <Fragment slot="input">
-      <div class="field">
-        <label class="label" for="playground-selector">
-          CSS selector
-        </label>
-        <input
-          class="input input-selector"
-          id="playground-selector"
-          type="text"
-          value={selector}
-          spellcheck="false"
-          autocapitalize="off"
-          autocomplete="off"
-          autocorrect="off"
-          aria-describedby="playground-help playground-status"
+        <div class="field">
+          <label class="label" for="playground-selector">
+            CSS selector
+          </label>
+          <input
+            class="input input-selector"
+            id="playground-selector"
+            type="text"
+            value={selector}
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            aria-describedby="playground-help playground-status"
+          />
+          <p class="muted" id="playground-help">
+            The breakdown updates as you type. No comparison needed.
+          </p>
+          <p class="status" id="playground-status" role="status" aria-atomic="true"></p>
+        </div>
+        <div
+          class="flow"
+          id="playground-score"
+          set:html={playgroundScoreView(contender).map(renderToString).join('')}
         />
-        <p class="muted mt-s" id="playground-help">
-          The breakdown updates as you type. No comparison needed.
-        </p>
-        <p class="status mt-s" id="playground-status" role="status" aria-atomic="true"></p>
-      </div>
-      <div id="playground-score" set:html={playgroundScoreView(contender).map(renderToString).join('')} />
       </Fragment>
       <Fragment slot="output">
         <h2 id="anatomy-title">Selector anatomy</h2>
-        <div class="anatomy mt-l" id="playground-anatomy" set:html={anatomy} />
+        <div class="anatomy" id="playground-anatomy" set:html={anatomy} />
       </Fragment>
     </ToolWorkbench>
   </section>
 
   <section class="section section-explainer" aria-labelledby="playground-explainer">
-    <div class="wrap">
+    <div class="wrap prose flow">
       <h2 id="playground-explainer">Read a selector</h2>
-      <p class="prose mt-s">
+      <p class="prose">
         Underlines show the column: solid for IDs, dashed for the class column, dotted for the type column,
         double for functional pseudo-classes. Read{' '}
         <a href="/specificity/#how-calculated">how specificity is calculated</a>.

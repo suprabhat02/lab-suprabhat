@@ -98,6 +98,20 @@ underline styles, labels and selected point shapes still convey meaning.
 The fixed LiveExample canvas is demonstration content and intentionally
 keeps its original white/dark colors.
 
+## Design-system rhythm
+
+Type interpolates from 16px at 320px to 18px at 1280px, with ratios 1.2 and
+1.25. Section space now uses rem/vi pairs rather than viewport height.
+Only display h1 and headings have tightened tracking. Prose retains a 66ch
+measure; workbench panes do not inherit that constraint.
+
+Zero-specificity flow, stack, cluster and region primitives live in the
+utilities layer so a parent can opt into a layout without specificity
+escalation. Flow owns prose margins; components use grid/flex gaps. Hidden
+siblings do not add flow gaps, and the hidden utility follows all primitives.
+Both workbench panes are inline-size containers; metrics and pane grids use
+container queries, while page columns still use viewport queries.
+
 ## Workbench surfaces and type (historical baseline)
 
 The elevation scale separates page (`--surface-0`), explainer/footer bands

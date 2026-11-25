@@ -49,62 +49,67 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <section class="tool-hero" aria-labelledby="tool-title" data-name-app>
-    <div class="wrap">
+    <div class="wrap flow">
       <h1 id="tool-title">Which accessible name wins?</h1>
       <p class="tool-lead">Accessible Name Wars: paste HTML and follow the label the browser chooses.</p>
       <noscript>
-        <p class="notice mt-m">JavaScript is off. This complete worked example will not update.</p>
+        <p class="notice">JavaScript is off. This complete worked example will not update.</p>
       </noscript>
     </div>
     <ToolWorkbench>
       <Fragment slot="input">
-      <p class="notice mt-m" data-name-notice role="status" hidden></p>
-      <div class="field">
-        <label class="label" for="name-html">
-          Your HTML
-        </label>
-        <textarea
-          class="input name-html"
-          id="name-html"
-          rows="5"
-          spellcheck="false"
-          autocapitalize="off"
-          autocomplete="off"
-          aria-describedby="name-help"
-          data-name-html
-        >{DEFAULT_HTML}</textarea>
-        <p class="muted mt-s" id="name-help">
-          Up to 4 KB. Your markup is parsed, never rendered. Scripts and resources in it do not run or load.
-        </p>
-      </div>
-      <div class="field mt-m js-only" data-name-select hidden={result.value.elements.length < 2}>
-        <label class="label" for="name-element">
-          Element to check
-        </label>
-        <select
-          class="input select"
-          id="name-element"
-          data-name-element
-          set:html={optionsView(result.value).map(renderToString).join('')}
+        <p class="notice" data-name-notice role="status" hidden></p>
+        <div class="field">
+          <label class="label" for="name-html">
+            Your HTML
+          </label>
+          <textarea
+            class="input name-html"
+            id="name-html"
+            rows="5"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            aria-describedby="name-help"
+            data-name-html
+          >{DEFAULT_HTML}</textarea>
+          <p class="muted" id="name-help">
+            Up to 4 KB. Your markup is parsed, never rendered. Scripts and resources in it do not run or load.
+          </p>
+        </div>
+        <div class="field js-only" data-name-select hidden={result.value.elements.length < 2}>
+          <label class="label" for="name-element">
+            Element to check
+          </label>
+          <select
+            class="input select"
+            id="name-element"
+            data-name-element
+            set:html={optionsView(result.value).map(renderToString).join('')}
+          />
+        </div>
+        <div class="duel-actions js-only">
+          <button class="button" type="button" data-name-copy>
+            Copy link
+          </button>
+          <p class="status" data-name-copy-status role="status"></p>
+        </div>
+        <div class="field" data-name-link-wrap hidden>
+          <label class="label" for="name-link">
+            Link to this calculation
+          </label>
+          <input class="input" id="name-link" type="text" readonly data-name-link />
+        </div>
+        <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-name-live></p>
+        <div
+          class="flow"
+          data-name-answer
+          set:html={verdictView(result.value).map(renderToString).join('')}
         />
-      </div>
-      <div class="duel-actions mt-m js-only">
-        <button class="button" type="button" data-name-copy>
-          Copy link
-        </button>
-        <p class="status" data-name-copy-status role="status"></p>
-      </div>
-      <div class="field mt-s" data-name-link-wrap hidden>
-        <label class="label" for="name-link">
-          Link to this calculation
-        </label>
-        <input class="input" id="name-link" type="text" readonly data-name-link />
-      </div>
-      <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-name-live></p>
-      <div class="mt-m" data-name-answer set:html={verdictView(result.value).map(renderToString).join('')} />
       </Fragment>
       <div
         slot="output"
+        class="flow"
         data-name-output
         set:html={analysisView(result.value).map(renderToString).join('')}
       />
@@ -112,7 +117,7 @@ const jsonLd = [
   </section>
 
   <section class="section section-explainer" aria-labelledby="name-explainer">
-    <div class="wrap stack">
+    <div class="wrap prose flow">
       <h2 id="name-explainer">A label, not everything on screen</h2>
       <p class="prose">
         An accessible name identifies an element; a description adds context. A screen reader can combine the
@@ -152,7 +157,9 @@ const jsonLd = [
         wins even if it is empty. A <code>figcaption</code> does not automatically name its
         <code>figure</code>; reference it explicitly when appropriate. See{' '}
         <a href="https://w3c.github.io/accname/#mapping_additional_nd_description">description precedence</a>
-        and <a href="https://w3c.github.io/html-aam/#figure-element-accessible-name-computation">figure naming</a>.
+        and{' '}
+        <a href="https://w3c.github.io/html-aam/#figure-element-accessible-name-computation">figure naming</a>
+        .
       </p>
       <h3>What pasted HTML cannot tell us</h3>
       <p class="prose">

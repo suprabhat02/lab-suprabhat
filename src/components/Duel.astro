@@ -14,16 +14,16 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
 ---
 
 <section class="tool-hero" aria-labelledby="tool-title" data-app>
-  <div class="wrap">
+  <div class="wrap flow">
     <h1 id="tool-title">Which CSS selector wins?</h1>
     <p class="tool-lead">Type two selectors. See the score, and exactly why.</p>
     <noscript>
-      <p class="notice mt-m">
+      <p class="notice">
         JavaScript is off, so this shows a worked example that won't update. The explainer below covers
         everything the tool does.
       </p>
     </noscript>
-    <p class="notice mt-m" data-share-notice role="status" hidden></p>
+    <p class="notice" data-share-notice role="status" hidden></p>
 
     <form class="duel" data-duel aria-label="Compare selectors" novalidate>
       <div class="contenders" data-contenders set:html={contenders} />
@@ -54,12 +54,12 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
 <section class="section" aria-labelledby="fix-title">
   <ToolWorkbench stacked>
     <Fragment slot="output">
-    <h2 id="fix-title">Want a different winner?</h2>
-    <p class="panel-intro mt-s">
-      Ways to change the result, from the gentlest to the most heavy-handed. Read more in{' '}
-      <a href="#why-not-applying">why is my CSS not applying?</a>
-    </p>
-    <div class="mt-l" data-suggestions set:html={html(suggestionsView(duel))} />
+      <h2 id="fix-title">Want a different winner?</h2>
+      <p class="panel-intro">
+        Ways to change the result, from the gentlest to the most heavy-handed. Read more in{' '}
+        <a href="#why-not-applying">why is my CSS not applying?</a>
+      </p>
+      <div class="flow" data-suggestions set:html={html(suggestionsView(duel))} />
     </Fragment>
   </ToolWorkbench>
 </section>

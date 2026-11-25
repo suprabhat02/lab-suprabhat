@@ -127,29 +127,43 @@
     --weight-semibold: 600;
     --weight-bold: 700;
 
-    /* Modular scale, ratio 1.25, fluid between 320px and 1440px. */
-    --step--1: clamp(0.85rem, 0.82rem + 0.12vw, 0.9rem);
-    --step-0: clamp(1.0625rem, 1.03rem + 0.12vw, 1.125rem);
-    --step-1: clamp(1.33rem, 1.26rem + 0.3vw, 1.41rem);
-    --step-2: clamp(1.66rem, 1.52rem + 0.6vw, 1.95rem);
-    --step-3: clamp(2.07rem, 1.8rem + 1.2vw, 2.75rem);
-    --step-4: clamp(2.6rem, 2.05rem + 2.6vw, 4.3rem);
-    --footer-display: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
+    /* Utopia interpolation: 320 -> 1280px, 16 -> 18px, ratios 1.2 -> 1.25. */
+    --step--2: clamp(0.6944rem, 0.6859rem + 0.0426vi, 0.72rem);
+    --step--1: clamp(0.8333rem, 0.8111rem + 0.1111vi, 0.9rem);
+    --step-0: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
+    --step-1: clamp(1.2rem, 1.1312rem + 0.3438vi, 1.4062rem);
+    --step-2: clamp(1.44rem, 1.3341rem + 0.5297vi, 1.7578rem);
+    --step-3: clamp(1.728rem, 1.5716rem + 0.7821vi, 2.1973rem);
+    --step-4: clamp(2.0736rem, 1.8493rem + 1.1216vi, 2.7466rem);
+    --step-5: clamp(2.4883rem, 2.1734rem + 1.5748vi, 3.4332rem);
+    --footer-display: var(--step-5);
+    --line-display: 1.1;
+    --line-heading: 1.2;
+    --line-ui: 1.4;
+    --line-body: 1.6;
+    --line-code: 1.5;
+    --tracking-display: -0.02em;
+    --tracking-heading: -0.01em;
 
-    --space-3xs: clamp(0.25rem, 0.23rem + 0.1vw, 0.3rem);
-    --space-2xs: clamp(0.5rem, 0.47rem + 0.12vw, 0.6rem);
-    --space-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
-    --space-s: clamp(1rem, 0.95rem + 0.25vw, 1.2rem);
-    --space-m: clamp(1.5rem, 1.4rem + 0.45vw, 1.8rem);
-    --space-l: clamp(2rem, 1.85rem + 0.7vw, 2.6rem);
-    --space-xl: clamp(3rem, 2.75rem + 1.2vw, 4rem);
-    --space-2xl: clamp(4rem, 3.5rem + 2.4vw, 6rem);
-    --space-section: clamp(6rem, 14vh, 12rem);
+    --space-3xs: clamp(0.25rem, 0.2396rem + 0.0521vi, 0.2812rem);
+    --space-2xs: clamp(0.5rem, 0.4792rem + 0.1042vi, 0.5625rem);
+    --space-xs: clamp(0.75rem, 0.7188rem + 0.1562vi, 0.8438rem);
+    --space-s: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
+    --space-m: clamp(1.5rem, 1.4375rem + 0.3125vi, 1.6875rem);
+    --space-l: clamp(2rem, 1.9167rem + 0.4167vi, 2.25rem);
+    --space-xl: clamp(3rem, 2.875rem + 0.625vi, 3.375rem);
+    --space-2xl: clamp(4rem, 3.8333rem + 0.8333vi, 4.5rem);
+    --space-3xl: clamp(6rem, 5.75rem + 1.25vi, 6.75rem);
+    --space-s-m: clamp(1rem, 0.7708rem + 1.1458vi, 1.6875rem);
+    --space-m-l: clamp(1.5rem, 1.25rem + 1.25vi, 2.25rem);
+    --space-l-xl: clamp(2rem, 1.5417rem + 2.2917vi, 3.375rem);
+    --space-xl-2xl: clamp(3rem, 2.5rem + 2.5vi, 4.5rem);
+    --space-section: var(--space-xl-2xl);
 
-    --measure: 68ch;
+    --measure: 66ch;
     /* Stable while proportional fallback glyph widths change during font swap. */
     --measure-lead: 48rem;
-    --gutter: clamp(1rem, 0.5rem + 3vw, 4rem);
+    --gutter: var(--space-s-m);
     --max-width: 90rem;
     --header-height: 4rem;
     --focus-outline: 3px solid var(--focus-ring);

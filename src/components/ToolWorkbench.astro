@@ -7,11 +7,11 @@ const { stacked = false } = Astro.props;
 
 <div class:list={['wrap', 'workbench', { 'workbench-stacked': stacked }]}>
   {Astro.slots.has('input') && (
-    <div class="workbench-input">
+    <div class="workbench-input flow">
       <slot name="input" />
     </div>
   )}
-  <div class="workbench-output">
+  <div class="workbench-output flow">
     <slot name="output" />
   </div>
 </div>

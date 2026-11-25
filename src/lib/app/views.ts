@@ -374,7 +374,7 @@ export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] 
 export function playgroundScoreView(contender: ContenderModel): VNode[] {
   if (!contender.parsed.ok) return [];
   return [
-    h('h2', { class: 'mt-m' }, 'Specificity'),
+    h('h2', {}, 'Specificity'),
     h(
       'dl',
       { class: 'selector-scores' },
@@ -616,7 +616,7 @@ const OUTCOME_LABEL = { decided: 'Decided here', tie: 'Tie', 'not-reached': 'Not
 export function cascadeResultView(model: CascadeModel): VNode[] {
   const css = h(
     'details',
-    { class: 'as-css' },
+    { class: 'as-css flow' },
     h('summary', {}, 'Show as CSS'),
     h('pre', { class: 'code' }, h('code', {}, cascadeAsCss(model))),
   );
@@ -636,7 +636,7 @@ export function cascadeResultView(model: CascadeModel): VNode[] {
       result.steps.map((s) =>
         h(
           'li',
-          { class: 'ladder-step', 'data-outcome': s.outcome },
+          { class: 'ladder-step flow', 'data-outcome': s.outcome },
           h(
             'p',
             { class: 'ladder-head' },
