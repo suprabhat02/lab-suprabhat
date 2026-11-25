@@ -5,6 +5,13 @@ interface Props {
   path: string;
 }
 const { path } = Astro.props;
+const links = [
+  ['/specificity/', 'Specificity'],
+  ['/playground/', 'Playground'],
+  ['/accessible-name/', 'Accessible name'],
+  ['/stylesheet-audit/', 'Audit'],
+  ['/about/', 'About'],
+];
 ---
 
 <header class="site-header">
@@ -16,14 +23,16 @@ const { path } = Astro.props;
       </span>
       <span class="visually-hidden"> home</span>
     </a>
-    <nav class="site-nav" aria-label="Main">
-      <a class="nav-link" href="/specificity/" aria-current={path === '/specificity/' ? 'page' : undefined}>
-        Specificity
-      </a>
-      <a class="nav-link" href="/about/" aria-current={path === '/about/' ? 'page' : undefined}>
-        About
-      </a>
-      <ThemeToggle />
-    </nav>
+    <details class="site-menu">
+      <summary class="menu-summary">Menu</summary>
+      <nav class="site-nav" aria-label="Main">
+        {links.map(([href, label]) => (
+          <a class="nav-link" href={href} aria-current={path === href ? 'page' : undefined}>
+            {label}
+          </a>
+        ))}
+      </nav>
+    </details>
+    <ThemeToggle />
   </div>
 </header>

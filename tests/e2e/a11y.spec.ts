@@ -2,7 +2,15 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
-const ROUTES = ['/', '/specificity/', '/playground/', '/accessible-name/', '/stylesheet-audit/', '/about/', '/404.html'];
+const ROUTES = [
+  '/',
+  '/specificity/',
+  '/playground/',
+  '/accessible-name/',
+  '/stylesheet-audit/',
+  '/about/',
+  '/404.html',
+];
 const THEMES = ['dark', 'light'] as const;
 
 // The specificity page is long; axe needs more than the default 30s when the suite runs in parallel.
@@ -62,5 +70,57 @@ test('pages have one h1 and a skip link to #main', async ({ page }) => {
     await expect(page.locator('a.skip-link')).toHaveAttribute('href', '#main');
     await expect(page.locator('main#main')).toHaveCount(1);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  }
+});
+
+test('header exposes every tool and marks the current page', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const links = [
+    ['/specificity/', 'Specificity'],
+    ['/playground/', 'Playground'],
+    ['/accessible-name/', 'Accessible name'],
+    ['/stylesheet-audit/', 'Audit'],
+    ['/about/', 'About'],
+  ] as const;
+  for (const [route, label] of links) {
+    await page.goto(route);
+    const nav = page.getByRole('navigation', { name: 'Main', exact: true });
+    for (const [href, name] of links) {
+      await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
+      await expect(nav.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+    }
+    await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
+    const current = nav.getByRole('link', { name: label, exact: true });
+    await expect(current).toHaveAttribute('aria-current', 'page');
+    expect(await current.evaluate((el) => getComputedStyle(el).textDecorationLine)).toContain('underline');
+  }
+});
+
+test('native mobile menu opens and closes by keyboard without scripting', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 320, height: 640 },
+  });
+  const page = await context.newPage();
+  try {
+    await page.goto('http://localhost:4322/playground/');
+    const summary = page.locator('.menu-summary');
+    const nav = page.locator('.site-nav');
+    await expect(nav).toBeHidden();
+    await summary.focus();
+    await page.keyboard.press('Enter');
+    await expect(nav).toBeVisible();
+    for (const link of await nav.locator('a').all()) {
+      const box = await link.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(24);
+      expect(box?.height).toBeGreaterThanOrEqual(24);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    await summary.focus();
+    await page.keyboard.press('Space');
+    await expect(nav).toBeHidden();
+    await expect(summary).toBeFocused();
+  } finally {
+    await context.close();
   }
 });
