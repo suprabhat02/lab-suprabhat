@@ -87,7 +87,7 @@ export function optionsView(model: Analysis): VNode[] {
   );
 }
 
-export function analysisView(model: Analysis): VNode[] {
+export function verdictView(model: Analysis): VNode[] {
   return [
     h('p', { class: 'name-verdict', 'data-name-verdict': true }, model.verdict),
     h(
@@ -99,6 +99,20 @@ export function analysisView(model: Analysis): VNode[] {
       'p',
       { class: 'muted mt-s' },
       'Exact wording, role exposure, state announcements, and order vary by browser and screen reader.',
+    ),
+  ];
+}
+
+export function analysisView(model: Analysis): VNode[] {
+  return [
+    h(
+      'nav',
+      { class: 'results-nav', 'aria-label': 'Results sections' },
+      [
+        ['name-trace', 'Trace'],
+        ['name-description', 'Description'],
+        ['name-checks', 'Checks'],
+      ].map(([id, label]) => h('a', { href: `#${id}` }, label)),
     ),
     model.cssUnknown
       ? h(
@@ -113,9 +127,9 @@ export function analysisView(model: Analysis): VNode[] {
       h('summary', {}, 'Show selected element as source'),
       h('pre', { class: 'code' }, h('code', {}, source(model.node))),
     ),
-    h('h2', { class: 'mt-l' }, 'Which source wins?'),
+    h('h2', { class: 'mt-l', id: 'name-trace' }, 'Which source wins?'),
     traceView(model.name.trace),
-    h('h2', { class: 'mt-l' }, 'Description'),
+    h('h2', { class: 'mt-l', id: 'name-description' }, 'Description'),
     h(
       'p',
       { class: 'mt-s', 'data-name-description': true },
@@ -127,7 +141,7 @@ export function analysisView(model: Analysis): VNode[] {
       h('summary', {}, 'Show description computation'),
       traceView(model.description.trace),
     ),
-    h('h2', { class: 'mt-l' }, 'Checks and fixes'),
+    h('h2', { class: 'mt-l', id: 'name-checks' }, 'Checks and fixes'),
     model.checks.length
       ? h(
           'ul',

@@ -1,7 +1,7 @@
 import { parseDom } from '../lib/accname/adapters/dom';
 import { analyze, DEFAULT_HTML } from '../lib/accname/model';
 import { decodeState, encodeState, SHARE_VERSION } from '../lib/accname/share';
-import { analysisView, optionsView } from '../lib/accname/views';
+import { analysisView, optionsView, verdictView } from '../lib/accname/views';
 import { errorMessage } from '../lib/app/views';
 import { mount } from '../lib/view/h';
 
@@ -10,6 +10,7 @@ export function start(app: HTMLElement): void {
   const select = app.querySelector<HTMLSelectElement>('[data-name-element]');
   const selectWrap = app.querySelector<HTMLElement>('[data-name-select]');
   const output = app.querySelector<HTMLElement>('[data-name-output]');
+  const answer = app.querySelector<HTMLElement>('[data-name-answer]');
   const live = app.querySelector<HTMLElement>('[data-name-live]');
   const notice = app.querySelector<HTMLElement>('[data-name-notice]');
   const copy = app.querySelector<HTMLButtonElement>('[data-name-copy]');
@@ -21,6 +22,7 @@ export function start(app: HTMLElement): void {
     !select ||
     !selectWrap ||
     !output ||
+    !answer ||
     !live ||
     !notice ||
     !copy ||
@@ -61,6 +63,7 @@ export function start(app: HTMLElement): void {
     if (!result.ok) {
       input.setAttribute('aria-invalid', 'true');
       selectWrap.hidden = true;
+      mount(answer, []);
       mount(output, errorMessage(result.error.message));
       live.textContent = result.error.message;
       return result;
@@ -68,6 +71,7 @@ export function start(app: HTMLElement): void {
     input.removeAttribute('aria-invalid');
     mount(select, optionsView(result.value));
     selectWrap.hidden = result.value.elements.length < 2;
+    mount(answer, verdictView(result.value));
     mount(output, analysisView(result.value));
     window.clearTimeout(announceTimer);
     if (announce)

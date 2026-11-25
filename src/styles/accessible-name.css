@@ -1,24 +1,21 @@
 @layer components {
-  .name-tool {
-    max-inline-size: var(--measure);
-  }
-
   .name-html {
     resize: vertical;
     white-space: pre-wrap;
+    font-size: var(--step--1);
+    line-height: 1.5;
   }
 
   .name-verdict {
+    font-family: var(--font);
     font-size: var(--step-2);
     line-height: 1.25;
     font-weight: 600;
     overflow-wrap: anywhere;
   }
 
-  @media (width >= 40rem) {
-    .name-verdict {
-      font-size: var(--step-3);
-    }
+  [data-name-app] .workbench-input .muted {
+    font-size: var(--step--1);
   }
 
   .name-ladder {

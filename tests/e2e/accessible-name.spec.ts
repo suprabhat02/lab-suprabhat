@@ -3,6 +3,37 @@ import { expect, test } from '@playwright/test';
 
 const route = '/accessible-name/';
 
+test('keeps the source and answer beside the trace, with sticky input', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(route);
+  await page.evaluate(() => document.fonts.ready);
+  const pane = page.locator('.workbench-input');
+  await expect(pane.locator('[data-name-verdict]')).toHaveText('The name is "Search"');
+  const input = await pane.boundingBox();
+  const result = await page.locator('#name-trace').boundingBox();
+  if (!input || !result) throw new Error('Missing workbench boxes.');
+  expect(input.x + input.width).toBeLessThan(result.x);
+  for (const box of [input, result]) {
+    expect(box.y).toBeGreaterThanOrEqual(64);
+    expect(box.y + box.height).toBeLessThanOrEqual(900);
+  }
+  await page.locator('#name-checks').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-name-html]')).toBeInViewport({ ratio: 1 });
+  const sticky = await pane.boundingBox();
+  expect(sticky?.y).toBeGreaterThanOrEqual(64);
+});
+
+test('keeps input before output without horizontal overflow at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto(route);
+  await page.evaluate(() => document.fonts.ready);
+  const input = await page.locator('.workbench-input').boundingBox();
+  const output = await page.locator('.workbench-output').boundingBox();
+  if (!input || !output) throw new Error('Missing workbench boxes.');
+  expect(input.y + input.height).toBeLessThan(output.y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('pre-renders the default verdict, full ladder, description, and fix', async ({ page }) => {
