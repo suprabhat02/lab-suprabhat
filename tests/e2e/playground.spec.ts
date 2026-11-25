@@ -25,6 +25,7 @@ test('analyzes typed selectors with highlighted parts and per-part contributions
     '.activeClass010Adds 1 to the second column.',
   );
   await expect(output.locator('tfoot .num')).toHaveText(['1', '2', '2']);
+  await expect(page.locator('.workbench-input #playground-score dd')).toHaveText('(1,2,2)');
   await expect(page.getByRole('status')).toContainText('specificity (1,2,2)');
   await expect(input).toBeFocused();
   expect(errors).toEqual([]);
@@ -45,6 +46,7 @@ test('shows functional selector rules, warnings, and each score in a selector li
 
   await input.fill('.item, #hero');
   await expect(output.locator('tfoot .num')).toHaveText(['0', '1', '0', '1', '0', '0']);
+  await expect(page.locator('#playground-score dd')).toHaveText(['(0,1,0)', '(1,0,0)']);
   await expect(output.locator('.message-warning')).toHaveCount(0);
 });
 
@@ -56,6 +58,7 @@ test('clears stale results on invalid or empty input and recovers', async ({ pag
   await expect(input).toHaveAttribute('aria-invalid', 'true');
   await expect(output.locator('.message-error')).toContainText('unexpected ) at character 8');
   await expect(output.locator('table')).toHaveCount(0);
+  await expect(page.locator('#playground-score dd')).toHaveCount(0);
   await input.fill('   ');
   await expect(output.locator('.message-error')).toContainText('Type a selector to see its specificity.');
   await input.fill('button');
@@ -95,6 +98,7 @@ test.describe('without JavaScript', () => {
       '#nav .link:hover > a::before',
     );
     await expect(page.locator('#playground-anatomy tfoot .num')).toHaveText(['1', '2', '2']);
+    await expect(page.locator('#playground-score dd')).toHaveText('(1,2,2)');
     await expect(page.locator('#playground-anatomy tbody tr')).toHaveCount(7);
     expect(await page.locator('noscript').evaluate((node) => node.innerHTML)).toContain('JavaScript is off');
     const toggle = page.locator('[data-theme-toggle]');

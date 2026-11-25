@@ -110,11 +110,16 @@
   }
 
   .footer-slogan {
+    font-family: var(--font);
     max-inline-size: 16ch;
-    font-size: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
+    font-size: var(--step-4);
     font-weight: 700;
     line-height: 1;
     letter-spacing: -0.06em;
+  }
+
+  .site-footer-home .footer-slogan {
+    font-size: var(--footer-display);
   }
 
   /* ---------- Controls ---------- */
@@ -134,7 +139,7 @@
     padding: var(--space-2xs) var(--space-xs);
     border: 1px solid var(--control-border);
     border-radius: var(--radius-control);
-    background: var(--surface);
+    background: var(--surface-3);
     color: var(--text);
     font-size: var(--step-0);
     line-height: 1.4;
@@ -289,7 +294,7 @@
   .code {
     padding: var(--space-xs) var(--space-s);
     border-radius: var(--radius-control);
-    background: var(--bg-2);
+    background: var(--surface-3);
     border: 1px solid var(--line);
     font-size: var(--step--1);
     line-height: 1.6;
@@ -563,7 +568,7 @@
 
   /* Panels end at their content; only a short gap separates them from the explainer, whichever tab is open. */
   .section-tools {
-    padding-block-end: var(--space-xl);
+    padding-block-end: var(--space-l);
   }
 
   .panel-intro {
@@ -600,6 +605,7 @@
     }
 
     & thead th {
+      background: var(--surface-3);
       color: var(--text-2);
       font-weight: 600;
     }
@@ -638,6 +644,31 @@
     display: grid;
     gap: var(--space-2xl);
     max-inline-size: 60rem;
+
+    & .table {
+      min-inline-size: 40rem;
+      overflow-wrap: normal;
+    }
+
+    & thead th {
+      white-space: nowrap;
+    }
+
+    & td:last-child:not(.num) {
+      font-family: var(--font-prose);
+      line-height: 1.6;
+    }
+  }
+
+  .selector-scores {
+    display: grid;
+    gap: var(--space-s);
+    margin-block-start: var(--space-s);
+
+    & dd {
+      font-size: var(--step-3);
+      font-weight: 600;
+    }
   }
 
   .anatomy-selector {
@@ -654,6 +685,7 @@
   }
 
   .parts {
+    font-family: var(--font);
     font-size: var(--step-2);
     line-height: 1.6;
     overflow-wrap: anywhere;
@@ -943,6 +975,10 @@
     gap: var(--space-3xs);
     margin: 0;
     padding: 0;
+
+    & li {
+      font-family: var(--font);
+    }
   }
 
   .toc-link {
@@ -988,22 +1024,51 @@
 
   .tool-list {
     display: grid;
-    gap: 0;
+    gap: var(--space-m);
+
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .tool-item {
+    position: relative;
     display: grid;
+    align-content: start;
     gap: var(--space-2xs);
-    padding-block: var(--space-l);
-    border-block-start: 1px solid var(--line);
+    min-inline-size: 0;
+    padding: var(--space-m);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface-2);
+    overflow-wrap: anywhere;
 
-    &:last-child {
-      border-block-end: 1px solid var(--line);
+    &:hover,
+    &:has(a:focus-visible) {
+      border-color: var(--accent);
+    }
+
+    &:has(a:focus-visible) {
+      outline: var(--focus-ring);
+      outline-offset: 3px;
     }
   }
 
   .tool-title {
-    font-size: var(--step-3);
+    font-size: var(--step-2);
+
+    & a::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      inset-inline: 0;
+      border-radius: var(--radius-card);
+    }
+  }
+
+  .tool-category {
+    color: var(--text-2);
+    font-size: var(--step--1);
   }
 
   .tool-status {

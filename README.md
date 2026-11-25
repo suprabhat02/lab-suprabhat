@@ -18,6 +18,12 @@ The first tool is **CSS Specificity Wars** at [`/specificity/`](https://lab.supr
 
 **Stylesheet Audit** at [`/stylesheet-audit/`](https://lab.suprabhat-dev.com/stylesheet-audit/) graphs selectors in source order, with a sortable data table, layer order, metrics and focused maintenance findings. CSS is parsed locally in a worker, never applied or fetched. Only Copy link puts input in a URL; the default audit works without JavaScript.
 
+At desktop widths, the single-input tools keep source and results side by side;
+the source stays available while you scroll the report. Narrow screens stack
+source before results. Audit and Accessible Name have plain links between
+result sections. The header's native Menu disclosure exposes every tool on
+small screens, including without JavaScript.
+
 ## Run it
 
 Requires Node 22.23.4 or newer (CI uses Node 24) and npm.
@@ -64,7 +70,7 @@ Every tool is an entry in the `tools` content collection. The home page and site
 
    The schema lives in `src/content.config.ts`; the build fails if a field is missing or the summary is too long.
 
-2. **Build the page** at `src/pages/<slug>/index.astro`, using `BaseLayout` with `path="/<slug>/"` and `og="<slug>"`. The OG image is generated automatically from the collection entry.
+2. **Build the page** at `src/pages/<slug>/index.astro`, using `BaseLayout` with `path="/<slug>/"` and `og="<slug>"`. Use `ToolWorkbench` with named `input` and `output` slots for the worked example; input comes first in the DOM and becomes sticky at 64rem. Put an explainer in a full-width `section section-explainer` band. The OG image is generated automatically from the collection entry.
 3. **Keep logic headless.** Put pure TypeScript in `src/lib/<name>/` with Vitest tests in `__tests__/`, and render through `src/lib/view/h.ts` so the build can pre-render the default state.
 4. **Enhance, don't depend.** Add one small `<script>` island. Load anything heavy on first interaction and keep the page under 15 KB of gzipped JS before interaction.
 5. **Test.** Add the route to `ROUTES` in `tests/e2e/a11y.spec.ts`, write e2e tests, and add it to `public/llms.txt`.

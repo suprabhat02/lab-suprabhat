@@ -1,8 +1,9 @@
 ---
 import { getEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolWorkbench from '../../components/ToolWorkbench.astro';
 import { buildContender } from '../../lib/app/model';
-import { anatomyView } from '../../lib/app/views';
+import { anatomyView, playgroundScoreView } from '../../lib/app/views';
 import { calculate } from '../../lib/cascade/specificity';
 import { PERSON_ID, ref } from '../../lib/seo/entities';
 import { renderToString } from '../../lib/view/h';
@@ -57,7 +58,10 @@ const jsonLd = [
       <noscript>
         <p class="notice mt-m">JavaScript is off, so this shows a worked example that won't update.</p>
       </noscript>
-      <div class="field mt-l">
+    </div>
+    <ToolWorkbench>
+      <Fragment slot="input">
+      <div class="field">
         <label class="label" for="playground-selector">
           CSS selector
         </label>
@@ -77,18 +81,23 @@ const jsonLd = [
         </p>
         <p class="status mt-s" id="playground-status" role="status" aria-atomic="true"></p>
       </div>
-    </div>
+      <div id="playground-score" set:html={playgroundScoreView(contender).map(renderToString).join('')} />
+      </Fragment>
+      <Fragment slot="output">
+        <h2 id="anatomy-title">Selector anatomy</h2>
+        <div class="anatomy mt-l" id="playground-anatomy" set:html={anatomy} />
+      </Fragment>
+    </ToolWorkbench>
   </section>
 
-  <section class="section" aria-labelledby="anatomy-title">
+  <section class="section section-explainer" aria-labelledby="playground-explainer">
     <div class="wrap">
-      <h2 id="anatomy-title">Selector anatomy</h2>
-      <p class="panel-intro mt-s">
+      <h2 id="playground-explainer">Read a selector</h2>
+      <p class="prose mt-s">
         Underlines show the column: solid for IDs, dashed for the class column, dotted for the type column,
         double for functional pseudo-classes. Read{' '}
         <a href="/specificity/#how-calculated">how specificity is calculated</a>.
       </p>
-      <div class="anatomy mt-l" id="playground-anatomy" set:html={anatomy} />
     </div>
   </section>
 </BaseLayout>
@@ -97,15 +106,16 @@ const jsonLd = [
   const input = document.querySelector<HTMLInputElement>('#playground-selector');
   const output = document.querySelector<HTMLElement>('#playground-anatomy');
   const status = document.querySelector<HTMLElement>('#playground-status');
-  if (!input || !output || !status) throw new Error('Missing playground elements.');
+  const score = document.querySelector<HTMLElement>('#playground-score');
+  if (!input || !output || !status || !score) throw new Error('Missing playground elements.');
 
   let loading = false;
   async function enhance() {
-    if (loading || !input || !output || !status) return;
+    if (loading || !input || !output || !status || !score) return;
     loading = true;
     try {
       const { start } = await import('../../scripts/playground');
-      start(input, output, status);
+      start(input, output, status, score);
       input.removeEventListener('focus', enhance);
       input.removeEventListener('input', enhance);
     } catch (error) {

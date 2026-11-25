@@ -1,0 +1,17 @@
+---
+interface Props {
+  stacked?: boolean;
+}
+const { stacked = false } = Astro.props;
+---
+
+<div class:list={['wrap', 'workbench', { 'workbench-stacked': stacked }]}>
+  {Astro.slots.has('input') && (
+    <div class="workbench-input">
+      <slot name="input" />
+    </div>
+  )}
+  <div class="workbench-output">
+    <slot name="output" />
+  </div>
+</div>

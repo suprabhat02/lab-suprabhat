@@ -3,6 +3,7 @@ import { renderToString } from '../lib/view/h';
 import type { VNode } from '../lib/view/h';
 import { contenderView, suggestionsView, verdictView } from '../lib/app/views';
 import type { DuelModel } from '../lib/app/model';
+import ToolWorkbench from './ToolWorkbench.astro';
 
 interface Props {
   duel: DuelModel;
@@ -51,12 +52,14 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
 </section>
 
 <section class="section" aria-labelledby="fix-title">
-  <div class="wrap">
+  <ToolWorkbench stacked>
+    <Fragment slot="output">
     <h2 id="fix-title">Want a different winner?</h2>
     <p class="panel-intro mt-s">
       Ways to change the result, from the gentlest to the most heavy-handed. Read more in{' '}
       <a href="#why-not-applying">why is my CSS not applying?</a>
     </p>
     <div class="mt-l" data-suggestions set:html={html(suggestionsView(duel))} />
-  </div>
+    </Fragment>
+  </ToolWorkbench>
 </section>

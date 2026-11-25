@@ -1,7 +1,7 @@
 import type { Audit } from '../lib/audit/model';
 import type { Result } from '../lib/cascade/types';
 import { decodeState, encodeState, validateCss } from '../lib/audit/share';
-import { summaryView, graphView, tableView, detailsView } from '../lib/audit/views';
+import { auditView, tableView } from '../lib/audit/views';
 import type { Sort } from '../lib/audit/views';
 import { h, mount } from '../lib/view/h';
 
@@ -46,12 +46,7 @@ export function start(app: HTMLElement): void {
   const render = () => {
     if (!model) return;
     const sorting = document.activeElement?.hasAttribute('data-audit-sort');
-    mount(output, [
-      summaryView(model),
-      graphView(model),
-      h('div', { 'data-audit-table-slot': true }, tableView(model, sort)),
-      detailsView(model),
-    ]);
+    mount(output, auditView(model, sort));
     if (sorting) output.querySelector<HTMLButtonElement>('[data-audit-sort]')?.focus();
   };
   const run = () => {

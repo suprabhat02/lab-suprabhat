@@ -2,6 +2,7 @@
 import Anatomy from './Anatomy.astro';
 import NestingPanel from './NestingPanel.astro';
 import CascadeLadder from './CascadeLadder.astro';
+import ToolWorkbench from './ToolWorkbench.astro';
 import type { CascadeModel, DuelModel, NestingModel } from '../lib/app/model';
 
 interface Props {
@@ -14,7 +15,8 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
 ---
 
 <section class="section section-tools" aria-label="Inspect selectors and the cascade">
-  <div class="wrap tabs" data-tabs>
+  <ToolWorkbench stacked>
+  <div slot="output" class="tabs" data-tabs>
     <div class="tablist" role="tablist" aria-label="Inspect" data-tablist>
       <button
         class="tab"
@@ -56,4 +58,5 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
     <NestingPanel css={nestingCss} model={nesting} />
     <CascadeLadder model={cascade} />
   </div>
+  </ToolWorkbench>
 </section>

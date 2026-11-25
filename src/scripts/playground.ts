@@ -1,9 +1,14 @@
 import { buildContender } from '../lib/app/model';
-import { anatomyView } from '../lib/app/views';
+import { anatomyView, playgroundScoreView } from '../lib/app/views';
 import { calculate, formatSpecificity } from '../lib/cascade/specificity';
 import { mount } from '../lib/view/h';
 
-export function start(input: HTMLInputElement, output: HTMLElement, status: HTMLElement): void {
+export function start(
+  input: HTMLInputElement,
+  output: HTMLElement,
+  status: HTMLElement,
+  score: HTMLElement,
+): void {
   function render(): void {
     const contender = buildContender(input.value, calculate);
     if (contender.parsed.ok) {
@@ -16,6 +21,7 @@ export function start(input: HTMLInputElement, output: HTMLElement, status: HTML
       status.textContent = contender.parsed.error.message;
     }
     mount(output, anatomyView([contender]));
+    mount(score, playgroundScoreView(contender));
   }
 
   render();

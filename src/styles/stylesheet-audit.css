@@ -2,6 +2,13 @@
   .audit-css {
     resize: vertical;
     white-space: pre-wrap;
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .audit-privacy,
+  [data-audit-app] .workbench-input .muted {
+    font-size: var(--step--1);
   }
 
   .audit-metrics {
@@ -87,6 +94,10 @@
 
   .audit-table th:first-child {
     inline-size: 4rem;
+  }
+
+  .audit-table thead {
+    background: var(--surface-3);
   }
 
   .audit-table tr[data-active],

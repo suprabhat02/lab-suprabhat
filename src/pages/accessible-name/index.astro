@@ -1,9 +1,10 @@
 ---
 import { getEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolWorkbench from '../../components/ToolWorkbench.astro';
 import { parseHtml } from '../../lib/accname/adapters/parse5';
 import { analyze, DEFAULT_HTML } from '../../lib/accname/model';
-import { analysisView, optionsView } from '../../lib/accname/views';
+import { analysisView, optionsView, verdictView } from '../../lib/accname/views';
 import { renderToString } from '../../lib/view/h';
 import { PERSON_ID, ref } from '../../lib/seo/entities';
 import '../../styles/accessible-name.css';
@@ -48,14 +49,17 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <section class="tool-hero" aria-labelledby="tool-title" data-name-app>
-    <div class="wrap name-tool">
+    <div class="wrap">
       <h1 id="tool-title">Which accessible name wins?</h1>
       <p class="tool-lead">Accessible Name Wars: paste HTML and follow the label the browser chooses.</p>
       <noscript>
         <p class="notice mt-m">JavaScript is off. This complete worked example will not update.</p>
       </noscript>
+    </div>
+    <ToolWorkbench>
+      <Fragment slot="input">
       <p class="notice mt-m" data-name-notice role="status" hidden></p>
-      <div class="field mt-l">
+      <div class="field">
         <label class="label" for="name-html">
           Your HTML
         </label>
@@ -97,16 +101,18 @@ const jsonLd = [
         <input class="input" id="name-link" type="text" readonly data-name-link />
       </div>
       <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-name-live></p>
+      <div class="mt-m" data-name-answer set:html={verdictView(result.value).map(renderToString).join('')} />
+      </Fragment>
       <div
-        class="mt-xl"
+        slot="output"
         data-name-output
         set:html={analysisView(result.value).map(renderToString).join('')}
       />
-    </div>
+    </ToolWorkbench>
   </section>
 
-  <section class="section" aria-labelledby="name-explainer">
-    <div class="wrap name-tool stack">
+  <section class="section section-explainer" aria-labelledby="name-explainer">
+    <div class="wrap stack">
       <h2 id="name-explainer">A label, not everything on screen</h2>
       <p class="prose">
         An accessible name identifies an element; a description adds context. A screen reader can combine the

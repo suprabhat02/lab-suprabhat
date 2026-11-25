@@ -113,6 +113,6 @@ const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
     <main class="site-main" id="main" tabindex="-1">
       <slot />
     </main>
-    <SiteFooter />
+    <SiteFooter home={path === '/'} />
   </body>
 </html>

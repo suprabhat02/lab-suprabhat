@@ -1,8 +1,12 @@
 ---
+interface Props {
+  home?: boolean;
+}
+const { home = false } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
-<footer class="site-footer">
+<footer class:list={['site-footer', { 'site-footer-home': home }]}>
   <div class="wrap">
     <p class="footer-slogan">Web for all, all for web.</p>
     <div class="site-footer-meta">
