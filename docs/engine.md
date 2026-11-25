@@ -155,3 +155,20 @@ decodeState(encoded.value); // { ok: true, value: state }
 ```
 
 `decodeState` checks length and alphabet before decoding, caps the decoded JSON at 4 KB, decodes UTF-8 strictly, parses JSON in a `try`, rejects other versions, and rebuilds a clean object through a hand-written type guard (`readState`). Nothing is ever evaluated.
+
+## Accessible Name Wars
+
+`src/lib/accname/` computes markup-only accessible names and descriptions using [AccName 1.2, 4 November 2026 Working Draft, section 4.3.2](https://www.w3.org/TR/2026/WD-accname-1.2-20261104/#computation-steps) and [HTML-AAM](https://w3c.github.io/html-aam/#accname-computation). The core does not read a browser DOM. `AccNode` exposes a tag, read-only attributes and children, text, a parent, and same-tree ID lookup.
+
+Trace IDs use letters for the computation substeps: `2C` is Embedded Control (third), `2D` is AriaLabel (fourth), and `2E` is Host Language Label (fifth). This matches the published draft's order; an embedded control's value can therefore precede its `aria-label` during label traversal.
+
+- `adapters/parse5.ts`: `parseHtml(html)` creates the build-time tree.
+- `adapters/dom.ts`: `parseDom(html)` uses an inert `DOMParser` document; `fromDocument(document)` adapts one already parsed.
+- `computeName(node)` and `computeDescription(node)` return `{ value, source, trace }`. Each trace item contains a specification step ID, source, outcome (`used`, `skipped`, `empty`, `not-reached`), explanation, text, and nested traversal steps. Initialization is step `1`; descendant recursion includes `2H`. Description precedence uses `description-1` through `description-4`, with nested name-computation steps. HTML-AAM fallback sources retain `2E` even when the host-language order places them after `title`.
+- `roleOf(node)` resolves valid explicit tokens and implicit HTML roles; naming permissions live in `ROLE_NAMES`.
+- `checkName(node)` returns messages, suggested repairs, escaped-source examples, and WCAG references where applicable. Label-in-Name checking ignores case and ordinary punctuation; symbolic labels and visual proximity require manual review.
+- `analyze(html, selected, parse)` validates a 4 KB UTF-8 markup limit before parsing and returns a `Result<Analysis>`. Empty input, no eligible elements, and an invalid element index are explicit errors.
+- The interactive tool preserves the selected index across markup edits. If valid edited markup no longer contains that index, it selects the first eligible element; other validation errors remain visible. Only "Copy link" encodes the current input and updates the URL. Incoming `?s=` links still restore the shared input and selection.
+- `encodeState` / `decodeState` use a separate versioned base64url payload containing `{ v, html, element }`. The markup limit remains 4096 bytes; the JSON envelope permits escaping overhead. Decoding checks size, alphabet, UTF-8, JSON, version, and types and rebuilds the object.
+
+Hidden attributes, `aria-hidden`, and supported inline hiding declarations are recognized. Stylesheet rules, generated content, layout-dependent whitespace, shadow DOM, and script-updated control values are not available. Default submit/reset labels are English examples of implementation-defined browser strings. See [the adapter limits and oracle differences](decisions.md#accessible-name-adapters-and-oracle).

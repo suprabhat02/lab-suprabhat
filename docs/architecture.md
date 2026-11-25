@@ -51,6 +51,14 @@ docs/
 
 User input never reaches `innerHTML`: the view layer builds DOM nodes and text nodes, and escapes text when rendering strings at build time.
 
+## Accessible Name Wars
+
+The `/accessible-name/` page follows the same progressive-enhancement split. Its build-time result uses `src/lib/accname/adapters/parse5.ts`; its browser controller uses only `adapters/dom.ts`. Both adapt to the same read-only `AccNode` tree and share role data, computations, checks, models, and `h()` views. The parse5 dependency is build-only in usage and is not imported by the browser entry or controller.
+
+`src/scripts/accessible-name.ts` is the small page entry. Focus, pointer input, or a share parameter loads `accessible-name-tool.ts`. It preserves text typed while loading, replays an early Copy link click, debounces editing, announces a verdict through a polite live region, and provides a focused manual-copy field if clipboard access fails.
+
+The default name, recursive ladder, description, and repairs are static HTML. Only results and selection options are replaced after edits; the textarea retains focus. The selected markup is displayed as escaped code, never inserted into the live document. The engine receives neither the live page nor permission to fetch resources.
+
 ## CSS
 
 `@layer reset, tokens, base, layout, components, utilities;` is declared first. Base styles use `:where()` for zero specificity, there are no IDs in selectors and no `!important` outside the reduced-motion override. Colours come from `light-dark()` driven by `color-scheme`, which the theme toggle sets through `data-theme`. Below-the-fold sections use `content-visibility: auto`.

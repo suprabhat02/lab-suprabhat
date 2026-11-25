@@ -14,6 +14,8 @@ The first tool is **CSS Specificity Wars** at [`/specificity/`](https://lab.supr
 
 **Selector Playground** at [`/playground/`](https://lab.suprabhat-dev.com/playground/) analyzes one input as you type, with highlighted selector parts, specificity contributions, and engine warnings. It uses the same anatomy renderer and pre-renders a worked example for visitors without JavaScript.
 
+**Accessible Name Wars** at [`/accessible-name/`](https://lab.suprabhat-dev.com/accessible-name/) explains which label names a control, with a recursive computation ladder, a separate description, markup checks, and shareable links. Pasted HTML is parsed but never rendered or executed. A build-time example works without JavaScript.
+
 ## Run it
 
 Requires Node 22.23.4 or newer (CI uses Node 24) and npm.
