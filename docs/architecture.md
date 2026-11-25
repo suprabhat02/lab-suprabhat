@@ -69,6 +69,22 @@ No automatic URL state, input localStorage, analytics, stylesheet injection or t
 
 ## CSS
 
+`components/ToolWorkbench.astro` supplies named `input` and `output` slots.
+Use a `Fragment slot="input"` for the form and short answer, followed by a
+`Fragment slot="output"` for the detailed results. Both slots must contain the
+build-time example as well as the client update targets. Do not replace form
+controls when refreshing results.
+
+Below 64rem the workbench is input-first; above it, CSS provides a 2:3 grid and
+a viewport-bounded sticky input with internal scrolling. The `stacked` variant
+applies the same output surface to tools with an existing independent input
+layout, such as the specificity duel. No layout script is involved.
+
+For more than two output sections, add a `results-nav` with
+`aria-label="Results sections"` and plain fragment links to stable headings.
+Keep these IDs in both server and client renderers. Explainers use
+`section-explainer` for a full-width band with measure-limited prose.
+
 `@layer reset, tokens, base, layout, components, utilities;` is declared first. Base styles use `:where()` for zero specificity, there are no IDs in selectors and no `!important` outside the reduced-motion override. Colours come from `light-dark()` driven by `color-scheme`, which the theme toggle sets through `data-theme`. Below-the-fold sections use `content-visibility: auto`.
 
 ## Budgets

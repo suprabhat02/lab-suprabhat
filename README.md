@@ -64,7 +64,7 @@ Every tool is an entry in the `tools` content collection. The home page and site
 
    The schema lives in `src/content.config.ts`; the build fails if a field is missing or the summary is too long.
 
-2. **Build the page** at `src/pages/<slug>/index.astro`, using `BaseLayout` with `path="/<slug>/"` and `og="<slug>"`. The OG image is generated automatically from the collection entry.
+2. **Build the page** at `src/pages/<slug>/index.astro`, using `BaseLayout` with `path="/<slug>/"` and `og="<slug>"`. Use `ToolWorkbench` with named `input` and `output` slots for the worked example; input comes first in the DOM and becomes sticky at 64rem. Put an explainer in a full-width `section section-explainer` band. The OG image is generated automatically from the collection entry.
 3. **Keep logic headless.** Put pure TypeScript in `src/lib/<name>/` with Vitest tests in `__tests__/`, and render through `src/lib/view/h.ts` so the build can pre-render the default state.
 4. **Enhance, don't depend.** Add one small `<script>` island. Load anything heavy on first interaction and keep the page under 15 KB of gzipped JS before interaction.
 5. **Test.** Add the route to `ROUTES` in `tests/e2e/a11y.spec.ts`, write e2e tests, and add it to `public/llms.txt`.
