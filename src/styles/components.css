@@ -642,6 +642,17 @@
     max-inline-size: 60rem;
   }
 
+  .selector-scores {
+    display: grid;
+    gap: var(--space-s);
+    margin-block-start: var(--space-s);
+
+    & dd {
+      font-size: var(--step-3);
+      font-weight: 600;
+    }
+  }
+
   .anatomy-selector {
     display: grid;
     gap: var(--space-s);
