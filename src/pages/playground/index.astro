@@ -1,0 +1,119 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildContender } from '../../lib/app/model';
+import { anatomyView } from '../../lib/app/views';
+import { calculate } from '../../lib/cascade/specificity';
+import { PERSON_ID, ref } from '../../lib/seo/entities';
+import { renderToString } from '../../lib/view/h';
+
+const tool = await getEntry('tools', 'playground');
+if (!tool) throw new Error('Missing tools/playground.md');
+
+const selector = '#nav .link:hover > a::before';
+const contender = buildContender(selector, calculate);
+const anatomy = anatomyView([contender]).map(renderToString).join('');
+const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
+const url = new URL('/playground/', site).href;
+const jsonLd = [
+  {
+    '@type': 'WebApplication',
+    '@id': `${url}#app`,
+    name: tool.data.title,
+    url,
+    description: tool.data.summary,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern web browser. Works without JavaScript as a read-only example.',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
+    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
+    keywords: tool.data.keywords.join(', '),
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+    author: ref(PERSON_ID),
+  },
+];
+---
+
+<BaseLayout
+  title="Selector Playground: CSS Selector Analyzer"
+  description={tool.data.summary}
+  path="/playground/"
+  og="playground"
+  ogAlt={tool.data.ogTitle ?? tool.data.title}
+  breadcrumbs={[
+    { name: 'Lab', path: '/' },
+    { name: tool.data.title, path: '/playground/' },
+  ]}
+  jsonLd={jsonLd}
+>
+  <section class="tool-hero" aria-labelledby="tool-title">
+    <div class="wrap">
+      <h1 id="tool-title">{tool.data.title}</h1>
+      <p class="tool-lead">
+        Type a CSS selector. See every part, its specificity, and what to watch out for.
+      </p>
+      <noscript>
+        <p class="notice mt-m">JavaScript is off, so this shows a worked example that won't update.</p>
+      </noscript>
+      <div class="field mt-l">
+        <label class="label" for="playground-selector">
+          CSS selector
+        </label>
+        <input
+          class="input input-selector"
+          id="playground-selector"
+          type="text"
+          value={selector}
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          aria-describedby="playground-help playground-status"
+        />
+        <p class="muted mt-s" id="playground-help">
+          The breakdown updates as you type. No comparison needed.
+        </p>
+        <p class="status mt-s" id="playground-status" role="status" aria-atomic="true"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="anatomy-title">
+    <div class="wrap">
+      <h2 id="anatomy-title">Selector anatomy</h2>
+      <p class="panel-intro mt-s">
+        Underlines show the column: solid for IDs, dashed for the class column, dotted for the type column,
+        double for functional pseudo-classes. Read{' '}
+        <a href="/specificity/#how-calculated">how specificity is calculated</a>.
+      </p>
+      <div class="anatomy mt-l" id="playground-anatomy" set:html={anatomy} />
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#playground-selector');
+  const output = document.querySelector<HTMLElement>('#playground-anatomy');
+  const status = document.querySelector<HTMLElement>('#playground-status');
+  if (!input || !output || !status) throw new Error('Missing playground elements.');
+
+  let loading = false;
+  async function enhance() {
+    if (loading || !input || !output || !status) return;
+    loading = true;
+    try {
+      const { start } = await import('../../scripts/playground');
+      start(input, output, status);
+      input.removeEventListener('focus', enhance);
+      input.removeEventListener('input', enhance);
+    } catch (error) {
+      loading = false;
+      status.textContent = 'The analyzer could not load. Type again to retry, or reload the page.';
+      console.error('Could not start the selector playground.', error);
+    }
+  }
+  input.addEventListener('focus', enhance);
+  input.addEventListener('input', enhance);
+</script>

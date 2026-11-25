@@ -12,6 +12,8 @@ The first tool is **CSS Specificity Wars** at [`/specificity/`](https://lab.supr
 - **Cascade resolver:** describe two to four competing declarations and watch all seven cascade steps decide: origin and importance, context, inline styles, layers, specificity, `@scope` proximity and order of appearance.
 - **Fix suggestions** and **shareable links**, plus a long-form explainer on the same page.
 
+**Selector Playground** at [`/playground/`](https://lab.suprabhat-dev.com/playground/) analyzes one input as you type, with highlighted selector parts, specificity contributions, and engine warnings. It uses the same anatomy renderer and pre-renders a worked example for visitors without JavaScript.
+
 ## Run it
 
 Requires Node 22.23.4 or newer (CI uses Node 24) and npm.
