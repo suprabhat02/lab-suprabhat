@@ -143,8 +143,10 @@ describe('platform footer stripping', () => {
     // The raw body would trigger vendor-name and session-link violations, but after stripping the
     // footer the body is clean and no violations should be reported.
     const rawBody = bodyWithFooter;
-    const prBody = rawBody.replace(/\n{0,2}---\n[\s\S]*$/, '').trimEnd() || undefined;
-    expect(checkAttribution({ commits, prBody })).toEqual([]);
+    const stripped = rawBody.replace(/\n{0,2}---\n[\s\S]*$/, '').trimEnd();
+    // stripped is a non-empty string here, so the spread only sets prBody when it has a value
+    const extra = stripped ? { prBody: stripped } : {};
+    expect(checkAttribution({ commits, ...extra })).toEqual([]);
   });
 });
 
