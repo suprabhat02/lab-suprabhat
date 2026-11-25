@@ -50,7 +50,14 @@ export function start(app: HTMLElement): void {
   }
   const render = (announce = true) => {
     window.clearTimeout(announceTimer);
-    const result = analyze(input.value, selected, parseDom);
+    let result = analyze(input.value, selected, parseDom);
+    if (!result.ok && selected > 0) {
+      const first = analyze(input.value, 0, parseDom);
+      if (first.ok && selected >= first.value.elements.length) {
+        selected = 0;
+        result = first;
+      }
+    }
     if (!result.ok) {
       input.setAttribute('aria-invalid', 'true');
       selectWrap.hidden = true;
@@ -80,7 +87,6 @@ export function start(app: HTMLElement): void {
     return result;
   };
   input.addEventListener('input', () => {
-    selected = 0;
     window.clearTimeout(timer);
     window.clearTimeout(announceTimer);
     timer = window.setTimeout(() => render(), 120);

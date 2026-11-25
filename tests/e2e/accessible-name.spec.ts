@@ -33,6 +33,32 @@ test('typing updates the verdict, live region, and element selection', async ({ 
   await expect(select).toBeFocused();
 });
 
+test('keeps the chosen index across edits and resets when that index disappears', async ({ page }) => {
+  await page.goto(route);
+  const input = page.getByLabel('Your HTML', { exact: true });
+  const select = page.getByLabel('Element to check');
+  const verdict = page.locator('[data-name-verdict]');
+  await input.fill('<button>Save</button><button>Delete</button><a href="/">Home</a>');
+  await select.selectOption('2');
+  await expect(verdict).toHaveText('The name is "Home"');
+
+  await input.fill('<button>Save changes</button><button>Delete</button><a href="/">Homepage</a>');
+  await expect(verdict).toHaveText('The name is "Homepage"');
+  await expect(select).toHaveValue('2');
+  await expect(input).toBeFocused();
+  await page.reload();
+  await expect(select).toHaveValue('2');
+  await expect(verdict).toHaveText('The name is "Homepage"');
+
+  await input.fill('<button>Save changes</button><button>Delete</button>');
+  await expect(verdict).toHaveText('The name is "Save changes"');
+  await expect(select).toHaveValue('0');
+  await expect(input).not.toHaveAttribute('aria-invalid');
+  await page.reload();
+  await expect(select).toHaveValue('0');
+  await expect(verdict).toHaveText('The name is "Save changes"');
+});
+
 test('reports an icon-only button without a name and CSS limits', async ({ page }) => {
   await page.goto(route);
   await page.getByLabel('Your HTML', { exact: true }).fill('<button class="icon"><img alt=""></button>');
