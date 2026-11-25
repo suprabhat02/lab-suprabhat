@@ -20,44 +20,44 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('[data-audit-empty]')).toContainText('deep selectors');
     await expect(page.locator('[data-audit-findings="deep-selector"]')).toHaveCount(1);
   });
+});
 
-  test('keeps input beside the first results and sticky while reviewing findings', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(route);
-    await page.evaluate(() => document.fonts.ready);
-    const pane = page.locator('.workbench-input');
-    const first = page.locator('[data-audit-summary]');
-    const inputBox = await pane.boundingBox();
-    const resultBox = await first.boundingBox();
-    expect(inputBox).not.toBeNull();
-    expect(resultBox).not.toBeNull();
-    if (!inputBox || !resultBox) throw new Error('Missing workbench boxes.');
-    expect(inputBox.x + inputBox.width).toBeLessThan(resultBox.x);
-    for (const box of [inputBox, resultBox]) {
-      expect(box.y).toBeGreaterThanOrEqual(64);
-      expect(box.y + box.height).toBeLessThanOrEqual(900);
-    }
-    await page.locator('#audit-findings').scrollIntoViewIfNeeded();
-    await expect(page.locator('[data-audit-css]')).toBeInViewport({ ratio: 1 });
-    const sticky = await pane.boundingBox();
-    expect(sticky?.y).toBeGreaterThanOrEqual(64);
-    await page.locator('[data-audit-css]').fill('a{}');
-    await expect(page.locator('[data-audit-empty]')).toContainText('specificity spikes');
-    await expect(page.locator('[data-audit-findings="id-selector"]')).toBeHidden();
-    await page.locator('[data-audit-css]').fill('#hero{} a{}');
-    await expect(page.locator('[data-audit-findings="id-selector"]')).toBeVisible();
-  });
+test('keeps input beside the first results and sticky while reviewing findings', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(route);
+  await page.evaluate(() => document.fonts.ready);
+  const pane = page.locator('.workbench-input');
+  const first = page.locator('[data-audit-summary]');
+  const inputBox = await pane.boundingBox();
+  const resultBox = await first.boundingBox();
+  expect(inputBox).not.toBeNull();
+  expect(resultBox).not.toBeNull();
+  if (!inputBox || !resultBox) throw new Error('Missing workbench boxes.');
+  expect(inputBox.x + inputBox.width).toBeLessThan(resultBox.x);
+  for (const box of [inputBox, resultBox]) {
+    expect(box.y).toBeGreaterThanOrEqual(64);
+    expect(box.y + box.height).toBeLessThanOrEqual(900);
+  }
+  await page.locator('#audit-findings').scrollIntoViewIfNeeded();
+  await expect(page.locator('[data-audit-css]')).toBeInViewport({ ratio: 1 });
+  const sticky = await pane.boundingBox();
+  expect(sticky?.y).toBeGreaterThanOrEqual(64);
+  await page.locator('[data-audit-css]').fill('a{}');
+  await expect(page.locator('[data-audit-empty]')).toContainText('specificity spikes');
+  await expect(page.locator('[data-audit-findings="id-selector"]')).toBeHidden();
+  await page.locator('[data-audit-css]').fill('#hero{} a{}');
+  await expect(page.locator('[data-audit-findings="id-selector"]')).toBeVisible();
+});
 
-  test('stacks input before results without horizontal overflow at 320px', async ({ page }) => {
-    await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto(route);
-    await page.evaluate(() => document.fonts.ready);
-    const input = await page.locator('.workbench-input').boundingBox();
-    const output = await page.locator('.workbench-output').boundingBox();
-    if (!input || !output) throw new Error('Missing workbench boxes.');
-    expect(input.y + input.height).toBeLessThan(output.y);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
-  });
+test('stacks input before results without horizontal overflow at 320px', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto(route);
+  await page.evaluate(() => document.fonts.ready);
+  const input = await page.locator('.workbench-input').boundingBox();
+  const output = await page.locator('.workbench-output').boundingBox();
+  if (!input || !output) throw new Error('Missing workbench boxes.');
+  expect(input.y + input.height).toBeLessThan(output.y);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
 test('typing updates metrics, graph and table without putting CSS in the URL', async ({ page }) => {

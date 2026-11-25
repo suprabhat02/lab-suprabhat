@@ -184,26 +184,25 @@ export function detailsView(model: Audit): VNode[] {
           { class: 'fixes', role: 'list', 'data-audit-findings': code },
           model.issues.findings
             .filter((finding) => finding.code === code)
-            .map(
-              (finding) =>
-                h(
-                  'li',
-                  { class: 'fix' },
-                  h('p', {}, `Line ${finding.line}: ${finding.message}`),
-                  h('p', {}, finding.fix),
-                  h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
-                ),
-              empty.length
-                ? h(
-                    'p',
-                    { class: 'muted mt-m', 'data-audit-empty': true },
-                    `No findings for: ${empty.map((code) => ISSUE_NAMES[code].toLowerCase()).join(', ')}.`,
-                  )
-                : null,
+            .map((finding) =>
+              h(
+                'li',
+                { class: 'fix' },
+                h('p', {}, `Line ${finding.line}: ${finding.message}`),
+                h('p', {}, finding.fix),
+                h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
+              ),
             ),
         ),
       ),
     ),
+    empty.length
+      ? h(
+          'p',
+          { class: 'muted mt-m', 'data-audit-empty': true },
+          `No findings for: ${empty.map((code) => ISSUE_NAMES[code].toLowerCase()).join(', ')}.`,
+        )
+      : null,
     model.issues.omitted
       ? h(
           'p',

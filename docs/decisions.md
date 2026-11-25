@@ -80,6 +80,63 @@ All text pairs exceed 4.5:1, including small accent text; every border and focus
 pair exceeds 3:1. Surface differences are quiet grouping cues, not the sole
 indication of an interactive boundary.
 
+The workbench uses CSS sticky inputs from 64rem and a native navigation
+disclosure below 80rem, where the full five-link header no longer fits reliably.
+The header remains one row, so its sticky offset stays equal to `--header-height`.
+The menu opens and closes with Enter or Space on its summary; it is not a
+scripted popup.
+
+The specificity duel already compares side-by-side inputs. It keeps that layout
+and uses the shared workbench's stacked output variant for suggestions and tabs,
+without another sticky pane. Its pre-existing automatic URL synchronization is
+unchanged, as agreed. Audit and Accessible Name remain Copy-link-only.
+Presentation-only view functions were approved for refactoring; computation,
+models, parsers and share codecs are unchanged.
+
+Zero-count audit groups remain in the DOM with `hidden`; a single visible
+sentence lists their names. Non-zero groups become visible again after edits.
+Anatomy tables retain readable columns in their existing keyboard-focusable
+scroll containers rather than breaking headings into individual letters.
+Home summaries remain complete and wrap when needed instead of being clipped.
+
+### Workbench validation on 2026-11-25
+
+Lint, Astro/TypeScript checks (zero errors, warnings or hints), all 382 unit
+tests, and the production build passed. Total CSS is 6.87 KB gzip; the largest
+initial page JavaScript is 3.12 KB. Dependency manifests, generated font metrics,
+engine computations and asset budgets are unchanged.
+
+The complete Chromium, Firefox and WebKit run passed 316 tests. Its 170 skips
+include 168 opt-in screenshot cases and two existing browser-specific skips.
+The full 56-image matrix was run separately in Chromium: seven routes including
+404, four viewports (1440x900, 1024x768, 768x1024, 320x640), and both themes.
+All captures passed the document-overflow assertion and were visually reviewed,
+with additional menu-focus and sticky-findings captures. Screenshots are local,
+gitignored output under `.shots/review/`; run `SCREENSHOTS=1 npx playwright test
+screenshots.spec.ts --project=chromium` to reproduce them.
+
+New browser coverage checks input/result bounds at 1440, sticky source visibility
+while reviewing findings, input-before-output order at 320, all header links and
+current-page indicators, keyboard-only native disclosure, full-item home links,
+per-selector scores and empty-finding groups. Footer links fit within the first
+270 pixels of the footer at 1440x900.
+
+Lighthouse 13.6.0, three-run medians (Performance / Accessibility / Best Practices / SEO):
+
+| Route | Mobile | Desktop | CLS, both |
+| --- | --- | --- | --- |
+| `/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
+| `/stylesheet-audit/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
+| `/accessible-name/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
+
+One initial accessible-name mobile performance sample was 97; the other two
+were 100. A separate three-run mobile confirmation returned 100, 100, 100,
+with CLS 0. Single mobile and desktop checks on `/specificity/`, `/playground/`
+and `/about/` also returned all four 100s with CLS 0. These are local
+measurements, not a guarantee about every device or run. The intentionally
+non-indexable 404 page is covered by browser/accessibility and screenshot tests,
+not the public-content Lighthouse SEO gate.
+
 ## Explainer
 
 - **"On this page"** is one `<nav>` holding a `<details>`. Below 1024px it's a collapsed disclosure; at 1024px and up, `::details-content` keeps the list visible and the summary is hidden, so it works without JavaScript. A 0.6 KB script, imported only when the explainer comes within 600px of the viewport, marks the current section with `aria-current="location"`.

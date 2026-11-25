@@ -348,24 +348,6 @@ export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] 
       );
     }
 
-    export function playgroundScoreView(contender: ContenderModel): VNode[] {
-      if (!contender.parsed.ok) return [];
-      return [
-        h('h2', { class: 'mt-m' }, 'Specificity'),
-        h(
-          'dl',
-          { class: 'selector-scores' },
-          contender.parsed.value.map((result) =>
-            h(
-              'div',
-              {},
-              h('dt', {}, h('code', {}, result.selector)),
-              h('dd', {}, formatSpecificity(result.value)),
-            ),
-          ),
-        ),
-      ];
-    }
     return h(
       'section',
       { class: 'anatomy-item' },
@@ -387,6 +369,25 @@ export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] 
       ),
     );
   });
+}
+
+export function playgroundScoreView(contender: ContenderModel): VNode[] {
+  if (!contender.parsed.ok) return [];
+  return [
+    h('h2', { class: 'mt-m' }, 'Specificity'),
+    h(
+      'dl',
+      { class: 'selector-scores' },
+      contender.parsed.value.map((result) =>
+        h(
+          'div',
+          {},
+          h('dt', {}, h('code', {}, result.selector)),
+          h('dd', {}, formatSpecificity(result.value)),
+        ),
+      ),
+    ),
+  ];
 }
 
 /* ---------- Nesting ---------- */

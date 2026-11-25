@@ -18,6 +18,12 @@ The first tool is **CSS Specificity Wars** at [`/specificity/`](https://lab.supr
 
 **Stylesheet Audit** at [`/stylesheet-audit/`](https://lab.suprabhat-dev.com/stylesheet-audit/) graphs selectors in source order, with a sortable data table, layer order, metrics and focused maintenance findings. CSS is parsed locally in a worker, never applied or fetched. Only Copy link puts input in a URL; the default audit works without JavaScript.
 
+At desktop widths, the single-input tools keep source and results side by side;
+the source stays available while you scroll the report. Narrow screens stack
+source before results. Audit and Accessible Name have plain links between
+result sections. The header's native Menu disclosure exposes every tool on
+small screens, including without JavaScript.
+
 ## Run it
 
 Requires Node 22.23.4 or newer (CI uses Node 24) and npm.
