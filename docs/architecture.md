@@ -1,5 +1,14 @@
 # Architecture
 
+Tool metadata lives in the tools collection: `order`, `navLabel`, `category`
+and `related` references drive the header, home grid and related links.
+`src/lib/seo/tools.ts` validates uniqueness and references and sorts explicitly.
+`ToolLayout.astro` owns the visible/JSON-LD breadcrumbs, h1 and lead,
+WebApplication metadata, tool slots and related-tools aside. Input workbenches
+require a group label. Their limits/privacy copy belongs directly below the
+input, not in a separate heading. The static llms tool list is checked against
+the collection by the SEO browser tests.
+
 A static Astro site. Every page is HTML at build time; the specificity tool adds one plain TypeScript island on top.
 
 ## Folder map

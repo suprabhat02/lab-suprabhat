@@ -12,11 +12,11 @@ const { css, model } = Astro.props;
 const html = nestingView(model).map(renderToString).join('');
 ---
 
-<section class="panel" id="panel-nesting" aria-labelledby="h-nesting" data-panel="nesting">
+<section class="panel flow" id="panel-nesting" aria-labelledby="h-nesting" data-panel="nesting">
   <h2 id="h-nesting" data-panel-heading>
     Nesting
   </h2>
-  <p class="panel-intro mt-s">
+  <p class="panel-intro">
     Paste nested CSS to see the selectors it really produces, and their specificity. Read{' '}
     <a href="#nesting">how nesting affects specificity</a>.
   </p>

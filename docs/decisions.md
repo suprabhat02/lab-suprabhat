@@ -48,7 +48,71 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
 
-## Workbench surfaces and type
+## Design-system font roles
+
+Geist Sans and Geist Mono are self-hosted from Fontsource 5.3.0 (OFL-1.1).
+Both served Latin files have unitsPerEm 1000, x-height 530, cap-height 710,
+ascent 1005, descent -295 and line-gap 0. The Sans file adds 29,400 bytes;
+Mono remains 23,128 bytes. Latin-ext stays demand-loaded.
+
+| Role                                                                    | Family     |
+| ----------------------------------------------------------------------- | ---------- |
+| Prose, UI, labels, navigation, headings, findings, footer               | Geist Sans |
+| Code, CSS/HTML inputs, selectors, scores, numeric table data, lab/ logo | Geist Mono |
+
+The existing copy/Capsize pipeline handles both families. Sans fallbacks use
+the installed Arial, Segoe UI and Helvetica metrics; Liberation Sans shares
+Arial's overrides. Mono fallbacks are unchanged. Both Latin files are preloaded:
+Sans paints the LCP text, and the Mono logo is above the fold on every route.
+Preload URLs match the font-face URLs and use anonymous CORS.
+
+Use weights 400/500/600 for body/UI/headings and 700 only for display h1.
+Tabular figures are scoped to numeric data; Mono disables ligatures.
+The old font tokens remain aliases until the release after the design-system
+release, but new styles use `--font-sans` and `--font-mono`.
+
+## Design-system color gate
+
+The warm OKLCH ramp uses hue 35 and chroma at most .010. Components consume
+semantic tokens, not numbered grays. In light mode the page is a step-2 band
+with step-1 paper panels; dark elevation runs from step 1 to 2 to 3.
+This implements the light/dark elevation asymmetry without shadows.
+Step 6 is decorative only. Required controls on filled surfaces use step 9,
+not step 8, whose light inset contrast is below 3:1.
+
+`npm run contrast` reads the actual token declarations, resolves both themes
+and increased-contrast overrides, and checks 264 WCAG pairs offline. It runs
+in CI and prebuild. Invalid colors, unresolved tokens, cycles, out-of-gamut
+values and failed ratios are errors, not fallback values. The warning chroma
+is .08 in light mode so it remains in sRGB.
+
+Minimum normal-theme text contrast is 4.77:1 light / 5.01:1 dark across the
+documented text roles and their allowed surfaces. Required borders are at
+least 3.14:1 light / 3.37:1 dark. Focus reaches 4.89:1 / 4.49:1 even on active
+fills. APCA Lc uses the verified 0.0.98G-4g equations as informational output,
+never as a WCAG conformance rule.
+
+Accent is reserved for links, focus, current navigation and primary actions.
+Scores, syntax underlines and graph marks are neutral; their weights,
+underline styles, labels and selected point shapes still convey meaning.
+The fixed LiveExample canvas is demonstration content and intentionally
+keeps its original white/dark colors.
+
+## Design-system rhythm
+
+Type interpolates from 16px at 320px to 18px at 1280px, with ratios 1.2 and
+1.25. Section space now uses rem/vi pairs rather than viewport height.
+Only display h1 and headings have tightened tracking. Prose retains a 66ch
+measure; workbench panes do not inherit that constraint.
+
+Zero-specificity flow, stack, cluster and region primitives live in the
+utilities layer so a parent can opt into a layout without specificity
+escalation. Flow owns prose margins; components use grid/flex gaps. Hidden
+siblings do not add flow gaps, and the hidden utility follows all primitives.
+Both workbench panes are inline-size containers; metrics and pane grids use
+container queries, while page columns still use viewport queries.
+
+## Workbench surfaces and type (historical baseline)
 
 The elevation scale separates page (`--surface-0`), explainer/footer bands
 (`--surface-1`), workbench panels and tool items (`--surface-2`), and code,
@@ -64,17 +128,17 @@ mono fallback setup is unchanged; normal builds still run their prebuild hook.
 
 WCAG relative-luminance contrast, light / dark, measured against every surface:
 
-| Foreground | Surface 0 | Surface 1 | Surface 2 | Surface 3 |
-| --- | --- | --- | --- | --- |
-| `--text` | 17.28 / 17.98 | 14.93 / 16.36 | 18.05 / 14.37 | 16.36 / 17.64 |
-| `--text-2` | 9.58 / 11.27 | 8.28 / 10.25 | 10.02 / 9.00 | 9.07 / 11.05 |
-| `--text-3` | 6.28 / 7.62 | 5.43 / 6.93 | 6.57 / 6.08 | 5.95 / 7.47 |
-| `--accent` / focus | 6.32 / 5.94 | 5.46 / 5.40 | 6.60 / 4.74 | 5.98 / 5.82 |
-| `--accent-strong` | 8.03 / 11.68 | 6.94 / 10.62 | 8.40 / 9.33 | 7.61 / 11.45 |
-| `--success` | 6.21 / 10.48 | 5.37 / 9.53 | 6.49 / 8.37 | 5.88 / 10.28 |
-| `--danger` | 6.40 / 6.76 | 5.53 / 6.15 | 6.69 / 5.40 | 6.06 / 6.63 |
-| `--line` | 4.10 / 6.29 | 3.54 / 5.72 | 4.28 / 5.02 | 3.88 / 6.17 |
-| `--control-border` | 3.72 / 4.08 | 3.22 / 3.71 | 3.89 / 3.26 | 3.52 / 4.00 |
+| Foreground         | Surface 0     | Surface 1     | Surface 2     | Surface 3     |
+| ------------------ | ------------- | ------------- | ------------- | ------------- |
+| `--text`           | 17.28 / 17.98 | 14.93 / 16.36 | 18.05 / 14.37 | 16.36 / 17.64 |
+| `--text-2`         | 9.58 / 11.27  | 8.28 / 10.25  | 10.02 / 9.00  | 9.07 / 11.05  |
+| `--text-3`         | 6.28 / 7.62   | 5.43 / 6.93   | 6.57 / 6.08   | 5.95 / 7.47   |
+| `--accent` / focus | 6.32 / 5.94   | 5.46 / 5.40   | 6.60 / 4.74   | 5.98 / 5.82   |
+| `--accent-strong`  | 8.03 / 11.68  | 6.94 / 10.62  | 8.40 / 9.33   | 7.61 / 11.45  |
+| `--success`        | 6.21 / 10.48  | 5.37 / 9.53   | 6.49 / 8.37   | 5.88 / 10.28  |
+| `--danger`         | 6.40 / 6.76   | 5.53 / 6.15   | 6.69 / 5.40   | 6.06 / 6.63   |
+| `--line`           | 4.10 / 6.29   | 3.54 / 5.72   | 4.28 / 5.02   | 3.88 / 6.17   |
+| `--control-border` | 3.72 / 4.08   | 3.22 / 3.71   | 3.89 / 3.26   | 3.52 / 4.00   |
 
 All text pairs exceed 4.5:1, including small accent text; every border and focus
 pair exceeds 3:1. Surface differences are quiet grouping cues, not the sole
@@ -123,11 +187,11 @@ per-selector scores and empty-finding groups. Footer links fit within the first
 
 Lighthouse 13.6.0, three-run medians (Performance / Accessibility / Best Practices / SEO):
 
-| Route | Mobile | Desktop | CLS, both |
-| --- | --- | --- | --- |
-| `/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
-| `/stylesheet-audit/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
-| `/accessible-name/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0 |
+| Route                | Mobile                | Desktop               | CLS, both |
+| -------------------- | --------------------- | --------------------- | --------- |
+| `/`                  | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0         |
+| `/stylesheet-audit/` | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0         |
+| `/accessible-name/`  | 100 / 100 / 100 / 100 | 100 / 100 / 100 / 100 | 0         |
 
 One initial accessible-name mobile performance sample was 97; the other two
 were 100. A separate three-run mobile confirmation returned 100, 100, 100,
@@ -212,17 +276,17 @@ The engine cannot evaluate stylesheet rules, generated content, layout, shadow t
 
 The oracle is a cross-check, not authority. Both adapters must match every fixture, and expected engine results remain hand-specified. The following differences are pinned explicitly in the oracle tests, not skipped:
 
-| Fixture or rule | Engine expectation | Oracle result | Specification |
-| --- | --- | --- | --- |
-| Title already used as name (three fixtures) | No repeated description | Repeats title | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description) |
-| Text input with only a placeholder | Uses placeholder | Empty name | [HTML-AAM text controls](https://w3c.github.io/html-aam/#accname-computation) |
-| ARIA-named table with caption | Caption is description | Empty description | [Native descriptions](https://w3c.github.io/html-aam/#accdesc-computation) |
-| Hidden referenced label with hidden child | Includes both text portions | Omits hidden child | [Hidden reference traversal](https://w3c.github.io/accname/#comp_hidden_not_referenced) |
-| Focusable button with presentation role | Keeps button name | Empty name | [Presentation conflicts](https://www.w3.org/TR/wai-aria-1.2/#presentational-roles-conflict-resolution) |
-| Generic div with aria-label | Naming prohibited | Uses aria-label | [Generic role](https://www.w3.org/TR/wai-aria-1.2/#generic) |
-| Whitespace at an inline text boundary | `Save this file` | `Savethis file` | [Text nodes](https://w3c.github.io/accname/#comp_text_node); also verified in Chromium, Firefox, and WebKit |
-| Empty aria-labelledby target | Falls through to aria-label | Empty name | [LabelledBy step](https://w3c.github.io/accname/#comp_labelledby) |
-| Empty applicable description (two fixtures) | Stops with empty description | Uses title | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description) |
+| Fixture or rule                             | Engine expectation           | Oracle result      | Specification                                                                                               |
+| ------------------------------------------- | ---------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Title already used as name (three fixtures) | No repeated description      | Repeats title      | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description)                  |
+| Text input with only a placeholder          | Uses placeholder             | Empty name         | [HTML-AAM text controls](https://w3c.github.io/html-aam/#accname-computation)                               |
+| ARIA-named table with caption               | Caption is description       | Empty description  | [Native descriptions](https://w3c.github.io/html-aam/#accdesc-computation)                                  |
+| Hidden referenced label with hidden child   | Includes both text portions  | Omits hidden child | [Hidden reference traversal](https://w3c.github.io/accname/#comp_hidden_not_referenced)                     |
+| Focusable button with presentation role     | Keeps button name            | Empty name         | [Presentation conflicts](https://www.w3.org/TR/wai-aria-1.2/#presentational-roles-conflict-resolution)      |
+| Generic div with aria-label                 | Naming prohibited            | Uses aria-label    | [Generic role](https://www.w3.org/TR/wai-aria-1.2/#generic)                                                 |
+| Whitespace at an inline text boundary       | `Save this file`             | `Savethis file`    | [Text nodes](https://w3c.github.io/accname/#comp_text_node); also verified in Chromium, Firefox, and WebKit |
+| Empty aria-labelledby target                | Falls through to aria-label  | Empty name         | [LabelledBy step](https://w3c.github.io/accname/#comp_labelledby)                                           |
+| Empty applicable description (two fixtures) | Stops with empty description | Uses title         | [Description precedence](https://w3c.github.io/accname/#mapping_additional_nd_description)                  |
 
 ### Validation on 2026-11-25
 
@@ -230,11 +294,11 @@ Lint, type checks, all 311 unit tests, and the production build passed. The comp
 
 Lighthouse 13.6.0 against the local preview measured:
 
-| Route | Mobile performance samples | Mobile median | Desktop performance samples |
-| --- | --- | --- | --- |
-| `/accessible-name/` | 96, 100, 100 | 100 | 100, 100, 100 |
-| `/specificity/` | 98, 99, 99 | 99 | 100 |
-| `/about/` | 89, 100, 98 | 98 | 100 |
+| Route               | Mobile performance samples | Mobile median | Desktop performance samples |
+| ------------------- | -------------------------- | ------------- | --------------------------- |
+| `/accessible-name/` | 96, 100, 100               | 100           | 100, 100, 100               |
+| `/specificity/`     | 98, 99, 99                 | 99            | 100                         |
+| `/about/`           | 89, 100, 98                | 98            | 100                         |
 
 Accessibility, Best Practices, and SEO scored 100 in every measured run. Home and `/playground/` scored 100 in all four categories in one mobile and one desktop run each. The new page therefore has three-run medians of 100 in all four categories on both presets, but these measurements do **not** establish site-wide 100 performance. The existing-route results were accepted for this feature's scope; no existing-page performance behavior, budgets, or assertions were relaxed.
 

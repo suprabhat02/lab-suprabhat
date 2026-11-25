@@ -10,6 +10,8 @@ import SkipLink from '../components/SkipLink.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { graph } from '../lib/seo/entities';
+import { readTokens, resolveToken, toSrgb } from '../../scripts/contrast.mjs';
+import tokenSource from '../styles/tokens.css?raw';
 
 export interface Crumb {
   name: string;
@@ -34,6 +36,16 @@ const { title, description, path, og, ogAlt, breadcrumbs = [], jsonLd = [], noin
 const site = Astro.site ?? new URL('https://lab.suprabhat-dev.com');
 const canonical = new URL(path, site).href;
 const ogImage = new URL(`/og/${og}.png`, site).href;
+const colorTokens = readTokens(tokenSource);
+const themeColor = (theme: 'light' | 'dark') =>
+  '#' +
+  toSrgb(resolveToken(colorTokens, '--bg', theme))
+    .map((channel) =>
+      Math.round(channel * 255)
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('');
 
 const nodes: Record<string, unknown>[] = [...jsonLd];
 if (breadcrumbs.length > 0) {
@@ -61,8 +73,8 @@ const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f9fafb" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={themeColor('dark')} media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content={themeColor('light')} media="(prefers-color-scheme: light)" />
     <meta name="author" content="Suprabhat Kumar" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     {/* Bing Webmaster Tools ownership check; Bing needs it on the home page and keeps checking it. */}
@@ -88,6 +100,8 @@ const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    {/* The lab/ logo uses Mono above the fold on every route. */}
     <link
       rel="preload"
       href="/fonts/geist-mono-latin-wght-normal.woff2"

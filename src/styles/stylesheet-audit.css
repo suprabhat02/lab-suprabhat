@@ -3,7 +3,7 @@
     resize: vertical;
     white-space: pre-wrap;
     font-size: var(--step--1);
-    line-height: 1.5;
+    line-height: var(--line-code);
   }
 
   .audit-privacy,
@@ -13,36 +13,40 @@
 
   .audit-metrics {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-m);
-    margin-block: var(--space-m);
+    @container (width >= 24rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    @container (width >= 40rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .audit-metrics dt {
-    color: var(--text-2);
+    color: var(--text-muted);
     font-size: var(--step--1);
   }
 
   .audit-metrics dd {
     font-size: var(--step-2);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 
   .audit-graph {
     display: block;
     inline-size: 100%;
     block-size: auto;
-    min-block-size: 12rem;
-    margin-block: var(--space-m);
-    background: var(--bg-2);
-    border-block-end: 1px solid var(--control-border);
+    min-block-size: var(--graph-min);
+    background: var(--surface-inset);
+    border-block-end: var(--stroke-hairline) solid var(--border-control-on-fill);
   }
 
   .audit-line,
   .audit-axis,
   .audit-boundary {
     fill: none;
-    stroke: var(--text-2);
+    stroke: var(--text-muted);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
   }
@@ -53,14 +57,14 @@
 
   .audit-point {
     fill: var(--bg);
-    stroke: var(--accent);
+    stroke: var(--text-muted);
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
   }
 
   .audit-point[data-active],
   .audit-point:focus {
-    fill: var(--accent);
+    fill: var(--text);
     stroke: var(--text);
     stroke-width: 4;
   }
@@ -71,7 +75,7 @@
 
   .audit-table {
     inline-size: 100%;
-    min-inline-size: 42rem;
+    min-inline-size: var(--audit-table-min);
     table-layout: fixed;
     border-collapse: collapse;
     font-size: var(--step--1);
@@ -80,7 +84,7 @@
   .audit-table caption {
     text-align: start;
     padding-block: var(--space-s);
-    color: var(--text-2);
+    color: var(--text-muted);
   }
 
   .audit-table th,
@@ -88,23 +92,23 @@
     text-align: start;
     vertical-align: top;
     padding: var(--space-xs);
-    border-block-end: 1px solid var(--line);
+    border-block-end: var(--stroke-hairline) solid var(--border-subtle);
     overflow-wrap: anywhere;
   }
 
   .audit-table th:first-child {
-    inline-size: 4rem;
+    inline-size: var(--column-number);
   }
 
   .audit-table thead {
-    background: var(--surface-3);
+    background: var(--surface-inset);
   }
 
   .audit-table tr[data-active],
   .audit-table tr:focus {
-    background: var(--bg-3);
-    outline: var(--focus-ring);
-    outline-offset: -3px;
+    background: var(--fill-active);
+    outline: var(--focus-outline);
+    outline-offset: calc(-1 * var(--stroke-focus));
   }
 
   .audit-layers {

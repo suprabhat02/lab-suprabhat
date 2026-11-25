@@ -1,6 +1,75 @@
 import { expect, test } from '@playwright/test';
+import { createServer, get } from 'node:http';
+import { once } from 'node:events';
 
 test.describe('font loading', () => {
+  for (const path of [
+    '/',
+    '/specificity/',
+    '/playground/',
+    '/accessible-name/',
+    '/stylesheet-audit/',
+    '/about/',
+    '/404.html',
+  ]) {
+    test(`font roles and Latin requests match the contract on ${path}`, async ({ page, baseURL }) => {
+      if (!baseURL) throw new Error('Font tests require the preview baseURL.');
+      const requests: string[] = [];
+      // Count origin requests: WebKit also reports memory-cache reads as network events.
+      const server = createServer((request, response) => {
+        if (!request.url) {
+          response.destroy(new Error('Missing request URL.'));
+          return;
+        }
+        const url = new URL(request.url, baseURL);
+        if (url.pathname.endsWith('.woff2')) requests.push(url.href);
+        get(url, (upstream) => {
+          response.writeHead(upstream.statusCode ?? 502, upstream.headers);
+          upstream.pipe(response);
+        }).on('error', (error) => response.destroy(error));
+      });
+      server.listen(0, '127.0.0.1');
+      await once(server, 'listening');
+      const address = server.address();
+      if (!address || typeof address === 'string') throw new Error('Missing font-test server port.');
+      try {
+        await page.goto(`http://127.0.0.1:${address.port}${path}`);
+        await page.evaluate(() => document.fonts.ready);
+        const sans = await page
+          .locator('body, h1, h2, p:not(.parts)')
+          .evaluateAll((elements) =>
+            elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
+          );
+        for (const item of sans) expect(item.family, item.tag).toMatch(/^["']?Geist Variable["']?,/);
+        const mono = await page
+          .locator(
+            'code, textarea, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd',
+          )
+          .evaluateAll((elements) =>
+            elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
+          );
+        for (const item of mono) expect(item.family, item.tag).toMatch(/^["']?Geist Mono Variable["']?,/);
+        const expected = [
+          '/fonts/geist-latin-wght-normal.woff2',
+          '/fonts/geist-mono-latin-wght-normal.woff2',
+        ];
+        const preloads = page.locator('link[rel="preload"][as="font"]');
+        expect(await preloads.evaluateAll((els) => els.map((el) => el.getAttribute('href')).sort())).toEqual(
+          expected,
+        );
+        for (const preload of await preloads.all()) await expect(preload).toHaveAttribute('crossorigin');
+        expect(requests.map((url) => new URL(url).pathname).sort()).toEqual(expected);
+        expect(new Set(requests).size).toBe(requests.length);
+      } finally {
+        await page.goto('about:blank');
+        server.closeAllConnections();
+        await new Promise<void>((resolve, reject) =>
+          server.close((error) => (error ? reject(error) : resolve())),
+        );
+      }
+    });
+  }
+
   test('the fallback stack matches Geist Mono widths closely', async ({ page }) => {
     await page.goto('/specificity/');
     await page.evaluate(() => document.fonts.ready);
@@ -15,7 +84,7 @@ test.describe('font loading', () => {
         span.remove();
         return width;
       };
-      const stack = getComputedStyle(document.documentElement).getPropertyValue('--font');
+      const stack = getComputedStyle(document.documentElement).getPropertyValue('--font-mono');
       return {
         geist: measure(stack),
         fallback: measure(stack.replace(/'Geist Mono Variable',\s*'Geist Mono',/, '')),

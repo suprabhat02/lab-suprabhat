@@ -1,9 +1,42 @@
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 const PERSON_ID = 'https://suprabhat-dev.com/#person';
-const ROUTES = ['/', '/specificity/', '/playground/', '/accessible-name/', '/stylesheet-audit/', '/about/'] as const;
+const ROUTES = [
+  '/',
+  '/specificity/',
+  '/playground/',
+  '/accessible-name/',
+  '/stylesheet-audit/',
+  '/about/',
+] as const;
+const toolsDirectory = new URL('../../src/content/tools/', import.meta.url);
+const tools = readdirSync(toolsDirectory)
+  .filter((file) => file.endsWith('.md'))
+  .map((file) => {
+    const source = readFileSync(new URL(file, toolsDirectory), 'utf8');
+    const field = (name: string): string => {
+      const value = new RegExp(`^${name}: (.+)$`, 'm').exec(source)?.[1]?.trim();
+      if (!value) throw new Error(`Missing ${name} in ${file}`);
+      return value;
+    };
+    const references = /^related:\r?\n((?:[ \t]+- [\w-]+\r?\n)+)/m.exec(source)?.[1];
+    if (!references) throw new Error(`Missing related references in ${file}`);
+    return {
+      id: file.slice(0, -3),
+      slug: field('slug'),
+      title: field('title'),
+      summary: field('summary'),
+      navLabel: field('navLabel'),
+      order: Number(field('order')),
+      related: references
+        .trim()
+        .split(/\r?\n/)
+        .map((line) => line.trim().slice(2)),
+    };
+  })
+  .sort((a, b) => a.order - b.order);
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type Obj = Record<string, Json>;
@@ -70,6 +103,65 @@ test('/specificity/ declares the tool under its canonical @id', async ({ page })
   expect(app?.['offers']).toMatchObject({ price: 0, priceCurrency: 'USD' });
   expect(nodes.some((n) => n['@type'] === 'BreadcrumbList')).toBe(true);
 });
+
+test('navigation, home cards and llms tool entries match the collection in order', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/');
+  const hrefs = tools.map((tool) => `/${tool.slug}/`);
+  await expect(page.locator('.site-nav a')).toHaveText([...tools.map((tool) => tool.navLabel), 'About']);
+  expect(
+    await page.locator('.site-nav a').evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href'))),
+  ).toEqual([...hrefs, '/about/']);
+  await expect(page.locator('.tool-list .tool-title a')).toHaveText(tools.map((tool) => tool.title));
+  expect(
+    await page
+      .locator('.tool-list .tool-title a')
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href'))),
+  ).toEqual(hrefs);
+  const response = await request.get('/llms.txt');
+  expect(response.ok()).toBe(true);
+  const section = (await response.text()).replace(/\r\n/g, '\n').split('## Tools\n')[1]?.split('\n## ')[0];
+  expect(section?.trim().split('\n')).toEqual(
+    tools.map((tool) => `- [${tool.title}](https://lab.suprabhat-dev.com/${tool.slug}/): ${tool.summary}`),
+  );
+});
+
+for (const tool of tools) {
+  test(`${tool.slug} shares collection breadcrumbs, metadata and related tools`, async ({ page }) => {
+    await page.goto(`/${tool.slug}/`);
+    await expect(page.locator('.breadcrumbs [aria-current="page"]')).toHaveText(tool.title);
+    const related = tools.filter((candidate) => tool.related.includes(candidate.id));
+    await expect(page.locator('aside[aria-labelledby="related-title"] a')).toHaveText(
+      related.map((entry) => entry.title),
+    );
+    expect(
+      await page
+        .locator('.related-tools a')
+        .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href'))),
+    ).toEqual(related.map((entry) => `/${entry.slug}/`));
+    const nodes = (await jsonLd(page)).flatMap((doc) => walk(doc, null)).map(({ node }) => node);
+    const app = nodes.find((node) => node['@type'] === 'WebApplication');
+    expect(app).toMatchObject({
+      name: tool.title,
+      description: tool.summary,
+      operatingSystem: 'Any',
+      isAccessibleForFree: true,
+    });
+    expect(app).not.toHaveProperty('aggregateRating');
+    expect(app).not.toHaveProperty('review');
+    const breadcrumb = nodes.find((node) => node['@type'] === 'BreadcrumbList');
+    expect(breadcrumb?.['itemListElement']).toMatchObject([
+      { name: 'Home', position: 1 },
+      { name: 'Tools', position: 2 },
+      { name: tool.title, position: 3 },
+    ]);
+    for (const nav of await page.locator('nav').all()) {
+      await expect(nav).toHaveAttribute('aria-label', /.+/);
+    }
+  });
+}
 
 test('serves the IndexNow key file at the site root', async ({ request }) => {
   const keyFiles = readdirSync(new URL('../../public/', import.meta.url)).filter((f) =>

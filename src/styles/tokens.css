@@ -1,6 +1,28 @@
 @layer reset, tokens, base, layout, components, utilities;
 
-/* Self-hosted Geist Mono: only the subsets a page actually uses are downloaded. */
+/* Self-hosted superfamily: only the subsets a page uses are downloaded. */
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @font-face {
   font-family: 'Geist Mono Variable';
   font-style: normal;
@@ -29,71 +51,167 @@
   :root {
     color-scheme: dark;
 
-    /* Ratios below are light/dark; text covers --text / --text-2 / --text-3.
-       Page: 17.28/17.98, 9.58/11.27, 6.28/7.62; accent/focus 6.32/5.94; line 4.10/6.29.
-       Accent-strong 8.03/11.68; success 6.21/10.48; danger 6.40/6.76; control-border 3.72/4.08. */
-    --surface-0: light-dark(#f9fafb, #070c10);
-    /* Band: text 14.93/16.36, 8.28/10.25, 5.43/6.93; accent/focus 5.46/5.40; line 3.54/5.72.
-       Accent-strong 6.94/10.62; success 5.37/9.53; danger 5.53/6.15; control-border 3.22/3.71. */
-    --surface-1: light-dark(#e6eaee, #111820);
-    /* Panel: text 18.05/14.37, 10.02/9.00, 6.57/6.08; accent/focus 6.60/4.74; line 4.28/5.02.
-       Accent-strong 8.40/9.33; success 6.49/8.37; danger 6.69/5.40; control-border 3.89/3.26. */
-    --surface-2: light-dark(#ffffff, #1b242e);
-    /* Inset: text 16.36/17.64, 9.07/11.05, 5.95/7.47; accent/focus 5.98/5.82; line 3.88/6.17.
-       Accent-strong 7.61/11.45; success 5.88/10.28; danger 6.06/6.63; control-border 3.52/4.00. */
-    --surface-3: light-dark(#f1f4f7, #080f16);
-    --bg: var(--surface-0);
-    --bg-2: var(--surface-1);
-    --bg-3: var(--surface-3);
-    --surface: var(--surface-2);
-    --text: light-dark(#11171c, #f3f5f8);
-    --text-2: light-dark(#3c434b, #bec5cc);
-    --text-3: light-dark(#575e66, #9ba2aa);
+    --gray-1: light-dark(oklch(99% 0.002 35), oklch(15.5% 0.004 35));
+    --gray-2: light-dark(oklch(97.5% 0.003 35), oklch(18.5% 0.005 35));
+    --gray-3: light-dark(oklch(95% 0.004 35), oklch(21.5% 0.006 35));
+    --gray-4: light-dark(oklch(92.5% 0.005 35), oklch(24.5% 0.007 35));
+    --gray-5: light-dark(oklch(90% 0.006 35), oklch(27.5% 0.008 35));
+    --gray-6: light-dark(oklch(87% 0.007 35), oklch(31% 0.008 35));
+    --gray-7: light-dark(oklch(82% 0.008 35), oklch(37% 0.009 35));
+    --gray-8: light-dark(oklch(64% 0.009 35), oklch(52% 0.01 35));
+    --gray-9: light-dark(oklch(52% 0.009 35), oklch(64% 0.008 35));
+    --gray-10: light-dark(oklch(47% 0.009 35), oklch(68% 0.008 35));
+    --gray-11: light-dark(oklch(43% 0.008 35), oklch(80% 0.006 35));
+    --gray-12: light-dark(oklch(20.5% 0.005 35), oklch(95.5% 0.003 35));
+
+    /* Light: paper (1) rises above a page band (2) with a step-6 hairline.
+       Dark: elevation gets lighter, page (1) -> panel (2) -> inset/overlay (3). */
+    --bg: light-dark(var(--gray-2), var(--gray-1));
+    --surface: light-dark(var(--gray-1), var(--gray-2));
+    --surface-overlay: var(--gray-3);
+    --surface-inset: var(--gray-3);
+    --fill: var(--gray-3);
+    --fill-hover: var(--gray-4);
+    --fill-active: var(--gray-5);
+    --border-subtle: var(--gray-6);
+    --border: var(--gray-7);
+    --border-strong: var(--gray-8);
+    /* Step 8 fails 3:1 on the light inset; filled controls need step 9. */
+    --border-control-on-fill: var(--gray-9);
+    --text: var(--gray-12);
+    --text-muted: var(--gray-11);
+    --text-faint: var(--gray-9);
     --accent: light-dark(#b42300, #ff4d2a);
-    --accent-strong: light-dark(#981c00, #ffb6a5);
-    --accent-dim: light-dark(#f03200, #772c1e);
-    --on-accent: light-dark(#ffffff, #06090d);
-    --success: light-dark(#106c3e, #4ed589);
-    --danger: light-dark(#b4144a, #f86685);
-    /* At least 3.54:1 light / 5.02:1 dark against all four surfaces. */
-    --line: light-dark(#747b83, #89939d);
-    /* Form control borders need 3:1 against the page (WCAG 1.4.11). */
-    --control-border: light-dark(#7b828a, #6b737b);
+    --accent-hover: light-dark(oklch(44% 0.15 33), oklch(78% 0.12 33));
+    --accent-subtle: light-dark(oklch(95% 0.02 33), oklch(24% 0.03 33));
+    --on-accent: light-dark(#ffffff, var(--gray-1));
+    --focus-ring: var(--accent);
+    --success: light-dark(oklch(45% 0.1 155), oklch(78% 0.12 155));
+    --success-subtle: light-dark(oklch(95% 0.02 155), oklch(24% 0.03 155));
+    --warning: light-dark(oklch(45% 0.08 80), oklch(80% 0.11 80));
+    --warning-subtle: light-dark(oklch(95% 0.02 80), oklch(24% 0.03 80));
+    --danger: light-dark(oklch(45% 0.16 10), oklch(77% 0.13 10));
+    --danger-subtle: light-dark(oklch(95% 0.02 10), oklch(24% 0.03 10));
+    --info: light-dark(oklch(45% 0.13 255), oklch(78% 0.11 255));
+    --info-subtle: light-dark(oklch(95% 0.02 255), oklch(24% 0.03 255));
+
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --surface-0: var(--bg);
+    --surface-1: var(--surface);
+    --surface-2: var(--surface);
+    --surface-3: var(--surface-inset);
+    --bg-2: var(--surface);
+    --bg-3: var(--surface-inset);
+    --text-2: var(--text-muted);
+    --text-3: var(--text-faint);
+    --line: var(--border-subtle);
+    --control-border: var(--border-strong);
+    --accent-strong: var(--accent-hover);
 
     --radius-control: 6px;
     --radius-card: 10px;
     --radius-shell: 12px;
+    --radius-inline: 4px;
+    --radius-focus: 2px;
+    --stroke-hairline: 1px;
+    --stroke-emphasis: 2px;
+    --stroke-focus: 3px;
+    --underline-offset: 0.2em;
+    --root-font-size: 100%;
+    --inline-code-size: 0.95em;
+    --inline-icon-offset: 0.15em;
 
-    --font:
+    --font-sans:
+      'Geist Variable', 'Geist Variable Fallback: Arial', 'Geist Variable Fallback: Segoe UI',
+      'Geist Variable Fallback: Helvetica', system-ui, sans-serif;
+    --font-mono:
       'Geist Mono Variable', 'Geist Mono', 'Geist Mono Variable Fallback: Consolas',
       'Geist Mono Variable Fallback: Menlo', 'Geist Mono Variable Fallback: Courier New', ui-monospace,
       monospace;
-    --font-prose: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --font: var(--font-mono);
+    --font-prose: var(--font-sans);
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
 
-    /* Modular scale, ratio 1.25, fluid between 320px and 1440px. */
-    --step--1: clamp(0.85rem, 0.82rem + 0.12vw, 0.9rem);
-    --step-0: clamp(1.0625rem, 1.03rem + 0.12vw, 1.125rem);
-    --step-1: clamp(1.33rem, 1.26rem + 0.3vw, 1.41rem);
-    --step-2: clamp(1.66rem, 1.52rem + 0.6vw, 1.95rem);
-    --step-3: clamp(2.07rem, 1.8rem + 1.2vw, 2.75rem);
-    --step-4: clamp(2.6rem, 2.05rem + 2.6vw, 4.3rem);
-    --footer-display: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
+    /* Utopia interpolation: 320 -> 1280px, 16 -> 18px, ratios 1.2 -> 1.25. */
+    --step--2: clamp(0.6944rem, 0.6859rem + 0.0426vi, 0.72rem);
+    --step--1: clamp(0.8333rem, 0.8111rem + 0.1111vi, 0.9rem);
+    --step-0: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
+    --step-1: clamp(1.2rem, 1.1312rem + 0.3438vi, 1.4062rem);
+    --step-2: clamp(1.44rem, 1.3341rem + 0.5297vi, 1.7578rem);
+    --step-3: clamp(1.728rem, 1.5716rem + 0.7821vi, 2.1973rem);
+    --step-4: clamp(2.0736rem, 1.8493rem + 1.1216vi, 2.7466rem);
+    --step-5: clamp(2.4883rem, 2.1734rem + 1.5748vi, 3.4332rem);
+    --footer-display: var(--step-5);
+    --line-display: 1.1;
+    --line-heading: 1.2;
+    --line-ui: 1.4;
+    --line-body: 1.6;
+    --line-code: 1.5;
+    --tracking-display: -0.02em;
+    --tracking-heading: -0.01em;
 
-    --space-3xs: clamp(0.25rem, 0.23rem + 0.1vw, 0.3rem);
-    --space-2xs: clamp(0.5rem, 0.47rem + 0.12vw, 0.6rem);
-    --space-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.9rem);
-    --space-s: clamp(1rem, 0.95rem + 0.25vw, 1.2rem);
-    --space-m: clamp(1.5rem, 1.4rem + 0.45vw, 1.8rem);
-    --space-l: clamp(2rem, 1.85rem + 0.7vw, 2.6rem);
-    --space-xl: clamp(3rem, 2.75rem + 1.2vw, 4rem);
-    --space-2xl: clamp(4rem, 3.5rem + 2.4vw, 6rem);
-    --space-section: clamp(6rem, 14vh, 12rem);
+    --space-3xs: clamp(0.25rem, 0.2396rem + 0.0521vi, 0.2812rem);
+    --space-2xs: clamp(0.5rem, 0.4792rem + 0.1042vi, 0.5625rem);
+    --space-xs: clamp(0.75rem, 0.7188rem + 0.1562vi, 0.8438rem);
+    --space-s: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
+    --space-m: clamp(1.5rem, 1.4375rem + 0.3125vi, 1.6875rem);
+    --space-l: clamp(2rem, 1.9167rem + 0.4167vi, 2.25rem);
+    --space-xl: clamp(3rem, 2.875rem + 0.625vi, 3.375rem);
+    --space-2xl: clamp(4rem, 3.8333rem + 0.8333vi, 4.5rem);
+    --space-3xl: clamp(6rem, 5.75rem + 1.25vi, 6.75rem);
+    --space-s-m: clamp(1rem, 0.7708rem + 1.1458vi, 1.6875rem);
+    --space-m-l: clamp(1.5rem, 1.25rem + 1.25vi, 2.25rem);
+    --space-l-xl: clamp(2rem, 1.5417rem + 2.2917vi, 3.375rem);
+    --space-xl-2xl: clamp(3rem, 2.5rem + 2.5vi, 4.5rem);
+    --space-section: var(--space-xl-2xl);
 
-    --measure: 68ch;
-    --gutter: clamp(1rem, 0.5rem + 3vw, 4rem);
+    --measure: 66ch;
+    /* Stable while proportional fallback glyph widths change during font swap. */
+    --measure-lead: 48rem;
+    --gutter: var(--space-s-m);
     --max-width: 90rem;
     --header-height: 4rem;
-    --focus-ring: 3px solid var(--accent);
+    --control-size: 2.75rem;
+    --input-size: 3rem;
+    --selector-size: 3.5rem;
+    --control-compact: 2rem;
+    --check-size: 1.25rem;
+    --target-min: 1.5rem;
+    --textarea-min: 16rem;
+    --pane-min: 22rem;
+    --contender-min: 24rem;
+    --menu-width: 24rem;
+    --table-min: 40rem;
+    --audit-table-min: 42rem;
+    --column-number: 4rem;
+    --graph-min: 12rem;
+    --anatomy-max: 60rem;
+    --layer-order-max: 36rem;
+    --explainer-max: 54rem;
+    --aside-width: 15rem;
+    --deferred-block: 100rem;
+    --measure-slogan: 16ch;
+    --measure-callout: 60ch;
+    --measure-verdict: 48ch;
+    --depth-indent: 1.5ch;
+    /* Data displays keep their container-relative scale, not the heading scale. */
+    --score-size: clamp(4rem, 30cqi, 11rem);
+    --score-size-compact: clamp(3rem, 18vi, 5rem);
+    --score-gap: clamp(var(--space-xs), 5cqi, var(--space-l));
+    --score-max: 34rem;
+    --line-score: 0.95;
+    --score-tick-offset: -0.3em;
+    /* Fixed-pixel OG canvas typography is generated at build time, not browser UI. */
+    --og-title-size: 80;
+    --og-description-size: 32;
+    --og-padding: 80;
+    --og-border-width: 12;
+    --font-og-family: Geist;
+    --focus-outline: var(--stroke-focus) solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
@@ -113,9 +231,11 @@
 
   @media (prefers-contrast: more) {
     :root {
-      --text-2: var(--text);
-      --text-3: var(--text);
-      --line: light-dark(#5c636b, #8d959d);
+      --text-muted: var(--text);
+      --text-faint: var(--text);
+      --border-strong: var(--gray-9);
+      --border-subtle: var(--border-strong);
+      --border: var(--border-strong);
     }
   }
 }

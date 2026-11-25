@@ -1,4 +1,5 @@
 import { h, rich } from '../view/h';
+import { codeBlock } from '../view/code';
 import type { VElement, VNode } from '../view/h';
 import { LIMITS } from '../cascade/share';
 import { formatSpecificity } from '../cascade/math';
@@ -190,10 +191,15 @@ export function contenderView(
       autocapitalize: 'off',
       autocomplete: 'off',
       autocorrect: 'off',
-      'aria-describedby': `${id}-msg`,
+      'aria-describedby': `${id}-help ${id}-msg`,
       'aria-invalid': invalid ? 'true' : null,
       'data-selector': index,
     }),
+    h(
+      'p',
+      { class: 'input-help', id: `${id}-help` },
+      '1,000 characters max. Local analysis; edits update URL.',
+    ),
     h(
       'div',
       { class: 'field-messages', id: `${id}-msg`, 'data-messages': index },
@@ -242,7 +248,7 @@ export function suggestionsView(duel: DuelModel): VNode[] {
           { class: 'fix', 'data-kind': s.kind },
           h('h3', { class: 'fix-title' }, s.title),
           h('p', {}, ...rich(s.detail)),
-          s.code ? h('pre', { class: 'code' }, h('code', {}, s.code)) : null,
+          s.code ? codeBlock(s.code, s.title) : null,
           s.warning ? warningMessage(s.warning) : null,
         ),
       ),
@@ -374,7 +380,7 @@ export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] 
 export function playgroundScoreView(contender: ContenderModel): VNode[] {
   if (!contender.parsed.ok) return [];
   return [
-    h('h2', { class: 'mt-m' }, 'Specificity'),
+    h('h2', { id: 'playground-specificity' }, 'Specificity'),
     h(
       'dl',
       { class: 'selector-scores' },
@@ -616,9 +622,9 @@ const OUTCOME_LABEL = { decided: 'Decided here', tie: 'Tie', 'not-reached': 'Not
 export function cascadeResultView(model: CascadeModel): VNode[] {
   const css = h(
     'details',
-    { class: 'as-css' },
+    { class: 'as-css flow' },
     h('summary', {}, 'Show as CSS'),
-    h('pre', { class: 'code' }, h('code', {}, cascadeAsCss(model))),
+    codeBlock(cascadeAsCss(model), 'Competing CSS declarations'),
   );
   if (!model.result)
     return [errorMessage(model.problem ?? 'Fill in the declarations to resolve the cascade.'), css];
@@ -636,7 +642,7 @@ export function cascadeResultView(model: CascadeModel): VNode[] {
       result.steps.map((s) =>
         h(
           'li',
-          { class: 'ladder-step', 'data-outcome': s.outcome },
+          { class: 'ladder-step flow', 'data-outcome': s.outcome },
           h(
             'p',
             { class: 'ladder-head' },

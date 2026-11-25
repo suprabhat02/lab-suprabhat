@@ -69,5 +69,5 @@ const tryHref = encoded.ok ? `/specificity/?s=${encoded.value}` : null;
       </tbody>
     </table>
   </div>
-  {verdict && <p class="mt-s" set:html={verdictHtml} />}
+  {verdict && <p set:html={verdictHtml} />}
 </figure>

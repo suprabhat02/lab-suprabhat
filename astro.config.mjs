@@ -36,6 +36,8 @@ export default defineConfig({
     inlineStylesheets: 'never',
   },
   devToolbar: { enabled: false },
+  // Same-origin assets need no CORS; Vary: Origin makes WebKit refetch preloaded fonts.
+  vite: { preview: { cors: false } },
   // Shiki emits inline styles, which the CSP blocks; code samples here are plain.
   markdown: { syntaxHighlight: false },
   integrations: [

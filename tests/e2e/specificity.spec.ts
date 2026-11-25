@@ -345,17 +345,21 @@ test.describe('site', () => {
     const moon = 'M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z';
     const sun =
       'M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z';
-    const outlineIsAccent = () =>
+    const outlineIsNeutral = () =>
       toggle.evaluate((el) => {
-        const accent = getComputedStyle(document.querySelector('.brand-slash') ?? el).color;
-        return getComputedStyle(el).borderTopColor === accent;
+        const probe = document.createElement('span');
+        probe.style.color = 'var(--border-strong)';
+        el.append(probe);
+        const matches = getComputedStyle(el).borderTopColor === getComputedStyle(probe).color;
+        probe.remove();
+        return matches;
       });
     await expect(toggle).not.toHaveAttribute('aria-pressed');
     await expect(toggle).toHaveAttribute('data-state', 'dark');
     await expect(toggle).toHaveAccessibleName('Dark theme (switch to light)');
     await expect(icon).toHaveAttribute('d', moon);
     await expect(icon).not.toHaveCSS('fill', 'none');
-    expect(await outlineIsAccent()).toBe(true);
+    expect(await outlineIsNeutral()).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('data-state', 'light');
@@ -369,7 +373,7 @@ test.describe('site', () => {
     await expect(icon).toHaveAttribute('stroke-linejoin', 'round');
     await page.mouse.move(0, 0);
     await expect(icon).toHaveCSS('fill', 'none');
-    expect(await outlineIsAccent()).toBe(false);
+    expect(await outlineIsNeutral()).toBe(true);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('data-state', 'light');
@@ -441,17 +445,24 @@ test.describe('site', () => {
     expect(problems).toEqual([]);
   });
 
-  for (const [theme, bg, accent] of [
-    ['dark', 'rgb(7, 12, 16)', 'rgb(255, 77, 42)'],
-    ['light', 'rgb(249, 250, 251)', 'rgb(180, 35, 0)'],
-  ] as const) {
+  for (const theme of ['dark', 'light'] as const) {
     test(`light-dark() tokens and container-query numerals resolve (${theme})`, async ({ page }) => {
       await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
       await page.goto('/specificity/');
       const html = page.locator('html');
-      await expect(html).toHaveCSS('background-color', bg);
+      await expect(html).toHaveCSS('color-scheme', theme);
+      const colors = await page.evaluate(() => {
+        const probe = document.createElement('span');
+        probe.style.cssText = 'background:var(--bg);color:var(--text)';
+        document.body.append(probe);
+        const style = getComputedStyle(probe);
+        const result = { bg: style.backgroundColor, text: style.color };
+        probe.remove();
+        return result;
+      });
+      await expect(html).toHaveCSS('background-color', colors.bg);
       const decided = page.locator('[data-score="0"] .numeral[data-decided]');
-      await expect(decided).toHaveCSS('color', accent);
+      await expect(decided).toHaveCSS('color', colors.text);
       const size = await decided.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(size).toBeGreaterThanOrEqual(64);
       expect(size).toBeLessThanOrEqual(176);

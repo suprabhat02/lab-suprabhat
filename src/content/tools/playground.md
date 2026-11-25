@@ -4,6 +4,11 @@ slug: playground
 summary: Type any CSS selector and instantly see every part, what it contributes to specificity, and warnings about deprecated or risky patterns.
 status: live
 category: CSS
+order: 2
+navLabel: Playground
+related:
+  - specificity
+  - stylesheet-audit
 keywords:
   - css selector analyzer
   - css specificity breakdown

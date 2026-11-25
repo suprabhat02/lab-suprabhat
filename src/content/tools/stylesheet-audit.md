@@ -4,6 +4,11 @@ slug: stylesheet-audit
 summary: Audit pasted CSS with a specificity graph, sortable selector table, layer order and findings. Spot ID weight, deep selectors and important declarations.
 status: live
 category: CSS
+order: 3
+navLabel: Audit
+related:
+  - specificity
+  - playground
 keywords:
   - CSS stylesheet audit
   - specificity graph

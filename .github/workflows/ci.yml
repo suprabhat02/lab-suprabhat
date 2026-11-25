@@ -38,6 +38,9 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Offline contrast checks
+        run: npm run contrast
+
       - name: Build (fails if a size budget is exceeded)
         run: npm run build
 

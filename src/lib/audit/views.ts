@@ -1,4 +1,5 @@
 import { h } from '../view/h';
+import { codeBlock } from '../view/code';
 import type { VNode } from '../view/h';
 import { compareEntries, displayValue } from './metrics';
 import { ISSUE_NAMES } from './issues';
@@ -29,17 +30,17 @@ export function summaryView(model: Audit): VNode[] {
       : null,
     h(
       'p',
-      { class: 'muted mt-s' },
+      { class: 'muted' },
       `First non-zero column: ID ${m.histogram.id}; class ${m.histogram.class}; type ${m.histogram.type}; zero ${m.histogram.zero}. The median is the lower middle triple when the count is even.`,
     ),
     model.truncated
       ? h(
           'p',
-          { class: 'notice mt-m', 'data-audit-truncated': true },
+          { class: 'notice', 'data-audit-truncated': true },
           'More than 5,000 selectors: only the first 5,000 are reported. Metrics, graph and findings describe that prefix.',
         )
       : null,
-    model.notes.map((note) => h('p', { class: 'notice mt-s' }, note)),
+    model.notes.map((note) => h('p', { class: 'notice' }, note)),
   ];
 }
 
@@ -55,7 +56,7 @@ export function graphView(model: Audit): VNode {
   );
   return h(
     'figure',
-    { class: 'mt-l' },
+    { class: 'flow' },
     h('h2', { id: 'audit-graph-title' }, 'Specificity in source order'),
     h(
       'svg',
@@ -93,7 +94,7 @@ export function graphView(model: Audit): VNode {
     ),
     h(
       'figcaption',
-      { class: 'muted mt-s' },
+      { class: 'muted' },
       'Display scale: min(A, 9) × 100 + min(B, 9) × 10 + min(C, 9). This is not the real ordering: compare the full columns from left to right. Squares mark !important; circles mark normal entries; dashed vertical lines mark changes of layer. Left to right is source order; height increases with the display value. Focus a point and use arrow keys to explore.',
     ),
   );
@@ -108,7 +109,7 @@ export function tableView(model: Audit, sort: Sort = 'none'): VNode {
     );
   return h(
     'div',
-    { class: 'audit-table-wrap mt-m', tabindex: 0, role: 'region', 'aria-label': 'Selector data table' },
+    { class: 'audit-table-wrap', tabindex: 0, role: 'region', 'aria-label': 'Selector data table' },
     h(
       'table',
       { class: 'audit-table', 'data-audit-table': true },
@@ -153,8 +154,8 @@ export function tableView(model: Audit, sort: Sort = 'none'): VNode {
             h(
               'td',
               {},
-              entry.layer ?? 'Unlayered',
-              entry.context.length ? h('p', {}, entry.context.join(' → ')) : null,
+              entry.layer ? h('code', {}, entry.layer) : 'Unlayered',
+              entry.context.length ? h('p', {}, h('code', {}, entry.context.join(' → '))) : null,
             ),
             h('td', {}, entry.important ? 'Yes' : 'No'),
           ),
@@ -168,16 +169,16 @@ export function detailsView(model: Audit): VNode[] {
   const codes = Object.keys(ISSUE_NAMES) as IssueCode[];
   const empty = codes.filter((code) => model.issues.counts[code] === 0);
   return [
-    h('h2', { class: 'mt-l', id: 'audit-findings' }, 'Findings and fixes'),
+    h('h2', { id: 'audit-findings' }, 'Findings and fixes'),
     h(
       'p',
-      { class: 'muted mt-s' },
+      { class: 'muted' },
       'Review signals, not a grade. A graph cannot prove that two declarations compete for the same element and property.',
     ),
     ...codes.map((code) =>
       h(
         'section',
-        { class: 'mt-m', 'aria-labelledby': `audit-${code}`, hidden: model.issues.counts[code] === 0 },
+        { class: 'flow', 'aria-labelledby': `audit-${code}`, hidden: model.issues.counts[code] === 0 },
         h('h3', { id: `audit-${code}` }, `${ISSUE_NAMES[code]}: ${model.issues.counts[code]}`),
         h(
           'ul',
@@ -190,7 +191,7 @@ export function detailsView(model: Audit): VNode[] {
                 { class: 'fix' },
                 h('p', {}, `Line ${finding.line}: ${finding.message}`),
                 h('p', {}, finding.fix),
-                h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
+                codeBlock(finding.snippet, `Line ${finding.line}: ${finding.message}`),
               ),
             ),
         ),
@@ -199,7 +200,7 @@ export function detailsView(model: Audit): VNode[] {
     empty.length
       ? h(
           'p',
-          { class: 'muted mt-m', 'data-audit-empty': true },
+          { class: 'muted', 'data-audit-empty': true },
           `No findings for: ${empty.map((code) => ISSUE_NAMES[code].toLowerCase()).join(', ')}.`,
         )
       : null,
@@ -210,10 +211,10 @@ export function detailsView(model: Audit): VNode[] {
           `${model.issues.omitted} more findings omitted; only the first 200 are shown. Group counts include omitted findings.`,
         )
       : null,
-    h('h2', { class: 'mt-l', id: 'audit-layers' }, 'Layers'),
+    h('h2', { id: 'audit-layers' }, 'Layers'),
     h(
       'p',
-      { class: 'mt-s' },
+      {},
       'Layer order beats specificity within the same origin and importance: later layers win for normal declarations, and unlayered normal declarations win over layered ones. Important declarations reverse that order. ',
       h(
         'a',
@@ -224,7 +225,7 @@ export function detailsView(model: Audit): VNode[] {
     ),
     h(
       'ol',
-      { class: 'audit-layers mt-m', 'data-audit-layers': true },
+      { class: 'audit-layers', 'data-audit-layers': true },
       model.layers.map((layer) =>
         h('li', {}, `${layer}: ${model.entries.filter((entry) => entry.layer === layer).length} entries`),
       ),
@@ -232,7 +233,7 @@ export function detailsView(model: Audit): VNode[] {
     h('p', {}, `Unlayered: ${model.entries.filter((entry) => entry.layer === null).length} entries.`),
     h(
       'p',
-      { class: 'muted mt-s' },
+      { class: 'muted' },
       'Nested paths are grouped under their parent in first-declared sibling order. A parent layer’s own declarations outrank its sublayers for normal declarations. Conditions are recorded, not evaluated. Imports and descriptor rules are not audited.',
     ),
   ];
@@ -253,7 +254,7 @@ export function auditView(model: Audit, sort: Sort = 'none'): VNode[] {
     ),
     summaryView(model),
     graphView(model),
-    h('h2', { class: 'mt-l', id: 'audit-selectors' }, 'Selectors'),
+    h('h2', { id: 'audit-selectors' }, 'Selectors'),
     h('div', { 'data-audit-table-slot': true }, tableView(model, sort)),
     detailsView(model),
   ];

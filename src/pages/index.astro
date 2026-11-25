@@ -1,16 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
+import { getTools } from '../lib/seo/tools';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const order: Readonly<Record<string, number>> = {
-  specificity: 0,
-  playground: 1,
-  'stylesheet-audit': 2,
-  'accessible-name': 3,
-};
-const tools = (await getCollection('tools')).sort(
-  (a, b) => (order[a.data.slug] ?? 4) - (order[b.data.slug] ?? 4) || a.data.title.localeCompare(b.data.title),
-);
+const tools = await getTools();
 const dateFormat = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   month: 'long',
@@ -27,8 +19,8 @@ const dateFormat = new Intl.DateTimeFormat('en', {
   ogAlt="Suprabhat's Lab: free frontend tools and explainers"
   breadcrumbs={[{ name: 'Lab', path: '/' }]}
 >
-  <section class="hub-hero" aria-labelledby="hub-title">
-    <div class="wrap">
+  <section class="hub-hero hub-hero-home" aria-labelledby="hub-title">
+    <div class="wrap flow">
       <h1 id="hub-title">Frontend tools that explain themselves</h1>
       <p class="tool-lead">
         Free tools and explainers for CSS and UI. No sign-up, no paywall, no tracking. They work on any device
@@ -38,9 +30,9 @@ const dateFormat = new Intl.DateTimeFormat('en', {
   </section>
 
   <section class="section" aria-labelledby="tools-title">
-    <div class="wrap">
+    <div class="wrap flow">
       <h2 id="tools-title">Tools</h2>
-      <ul class="tool-list mt-l" role="list">
+      <ul class="tool-list" role="list">
         {tools.map((tool) => (
           <li class="tool-item">
             <p class="tool-category">{tool.data.category}</p>
@@ -60,7 +52,7 @@ const dateFormat = new Intl.DateTimeFormat('en', {
           </li>
         ))}
       </ul>
-      <p class="mt-l prose">
+      <p class="prose">
         More tools are on the way. Each one gets the same treatment: a tool that answers the question, and an
         explainer that teaches the idea behind it. Read <a href="/about/">why this lab exists</a>, or see more
         work on

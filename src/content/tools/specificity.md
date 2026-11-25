@@ -4,6 +4,12 @@ slug: specificity
 summary: Compare CSS selectors, see each part's weight, expand nesting and walk the full cascade to find out which rule wins and why.
 status: live
 category: CSS
+order: 1
+navLabel: Specificity
+related:
+  - playground
+  - stylesheet-audit
+  - accessible-name
 keywords:
   - css specificity calculator
   - css cascade

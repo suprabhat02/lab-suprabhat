@@ -1,87 +1,119 @@
 ---
 import { getEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
+import ExplainerBand from '../../components/ExplainerBand.astro';
 import { analyze, DEFAULT_CSS } from '../../lib/audit/model';
 import { auditView } from '../../lib/audit/views';
 import { renderToString } from '../../lib/view/h';
-import { PERSON_ID, ref } from '../../lib/seo/entities';
 import '../../styles/stylesheet-audit.css';
 
 const tool = await getEntry('tools', 'stylesheet-audit');
 if (!tool) throw new Error('Missing tools/stylesheet-audit.md');
 const result = analyze(DEFAULT_CSS);
 if (!result.ok) throw new Error(result.error.message);
-const url = new URL('/stylesheet-audit/', Astro.site).href;
 const output = auditView(result.value).map(renderToString).join('');
-const jsonLd = [{
-  '@type': 'WebApplication', '@id': `${url}#app`, name: tool.data.title, url,
-  description: tool.data.summary, applicationCategory: 'DeveloperApplication', operatingSystem: 'Any',
-  browserRequirements: 'Requires a modern browser. Works without JavaScript as a read-only example.',
-  isAccessibleForFree: true, inLanguage: 'en',
-  datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
-  dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
-  keywords: tool.data.keywords.join(', '), offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-  author: ref(PERSON_ID),
-}];
 ---
 
-<BaseLayout
+<ToolLayout
+  tool={tool}
   title="Stylesheet Audit: CSS specificity, layers and findings"
-  description={tool.data.summary}
-  path="/stylesheet-audit/"
-  og="stylesheet-audit"
-  ogAlt={tool.data.ogTitle ?? tool.data.title}
-  breadcrumbs={[{ name: 'Lab', path: '/' }, { name: tool.data.title, path: '/stylesheet-audit/' }]}
-  jsonLd={jsonLd}
+  heading="See the shape of your CSS"
+  lead="Stylesheet Audit: follow specificity from the first selector to the last."
+  app="stylesheet-audit"
 >
-  <section class="tool-hero" aria-labelledby="tool-title" data-audit-app>
-    <div class="wrap">
-      <h1 id="tool-title">See the shape of your CSS</h1>
-      <p class="tool-lead">Stylesheet Audit: follow specificity from the first selector to the last.</p>
-      <noscript><p class="notice mt-m">JavaScript is off. This complete worked example will not update.</p></noscript>
-    </div>
-    <ToolWorkbench>
-      <Fragment slot="input">
-      <p class="notice mt-m" data-audit-notice role="status" hidden></p>
+  <ToolWorkbench inputLabel="CSS source">
+    <Fragment slot="input">
+      <p class="notice" data-audit-notice role="status" hidden></p>
       <div class="field">
-        <label class="label" for="audit-css">Your CSS</label>
-        <textarea class="input audit-css" id="audit-css" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="audit-help" data-audit-css>{DEFAULT_CSS}</textarea>
-        <p class="muted mt-s" id="audit-help">100 KB max; first 5,000 selectors. Share links: up to 8 KB.</p>
+        <label class="label" id="audit-input-label" for="audit-css">
+          Your CSS
+        </label>
+        <textarea
+          class="input audit-css"
+          id="audit-css"
+          rows="8"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          aria-describedby="audit-help"
+          data-audit-css
+        >{DEFAULT_CSS}</textarea>
+        <p class="input-help" id="audit-help">
+          100 KB max; first 5,000 selectors. Share links: up to 8 KB. Byte limits use UTF-8. Individual
+          selectors: 1,000 characters; nesting expansions: 2,000 characters; expanded layer paths: 100 KB. CSS
+          is parsed locally, never applied. Imports and resources are never fetched. No analytics or input
+          storage. Only Copy link puts CSS in a URL; links are not encrypted.
+        </p>
       </div>
-      <details class="as-css">
-        <summary>Input limits</summary>
-        <p class="muted">Limits count UTF-8 bytes. Individual selectors retain the engine's 1,000-character limit and nesting expansions its 2,000-character limit. Expanded layer paths are also capped at 100 KB.</p>
-      </details>
-      <p class="prose audit-privacy mt-s">CSS is parsed locally, never applied. Imports and resources are never fetched. No analytics or input storage. Only Copy link puts CSS in a URL; links are not encrypted.</p>
-      <div class="duel-actions mt-m js-only">
-        <button class="button" type="button" data-audit-copy aria-describedby="audit-copy-status">Copy link</button>
+      <div class="duel-actions js-only">
+        <button class="button" type="button" data-audit-copy aria-describedby="audit-copy-status">
+          Copy link
+        </button>
         <p class="status" id="audit-copy-status" data-audit-copy-status role="status"></p>
       </div>
-      <div class="field mt-s" data-audit-link-wrap hidden>
-        <label class="label" for="audit-link">Link to this audit</label>
+      <div class="field" data-audit-link-wrap hidden>
+        <label class="label" for="audit-link">
+          Link to this audit
+        </label>
         <input class="input" id="audit-link" type="text" readonly data-audit-link />
       </div>
-      <p class="status mt-s" aria-live="polite" aria-atomic="true" data-audit-live></p>
-      </Fragment>
-      <div slot="output" data-audit-output set:html={output} />
-    </ToolWorkbench>
-  </section>
-  <section class="section section-explainer" aria-labelledby="audit-explainer">
-    <div class="wrap stack">
+      <p class="status" aria-live="polite" aria-atomic="true" data-audit-live></p>
+    </Fragment>
+    <div slot="output" class="flow" data-audit-output set:html={output} />
+  </ToolWorkbench>
+  <ExplainerBand slot="explainer" labelledby="audit-explainer">
+    <div class="prose flow">
       <h2 id="audit-explainer">A map, not a verdict</h2>
-      <p class="prose">A specificity graph shows selector weight in source order. Peaks identify places to review, not guaranteed bugs. A higher-weight rule can resist later rules only when they compete in the same cascade context. Origin, importance and layers are considered before specificity. Read <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity">how specificity fits the cascade</a>.</p>
+      <p class="prose">
+        A specificity graph shows selector weight in source order. Peaks identify places to review, not
+        guaranteed bugs. A higher-weight rule can resist later rules only when they compete in the same
+        cascade context. Origin, importance and layers are considered before specificity. Read{' '}
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity">
+          how specificity fits the cascade
+        </a>
+        .
+      </p>
       <h3>Read the full triple</h3>
-      <p class="prose">Specificity compares ID, class and type columns from left to right. The graph caps each column at nine solely for display; sorting and findings use the full triple. A spike here means higher specificity than every available entry in the next ten positions, with at least one following entry. No stylesheet-wide score or grade is assigned.</p>
+      <p class="prose">
+        Specificity compares ID, class and type columns from left to right. The graph caps each column at nine
+        solely for display; sorting and findings use the full triple. A spike here means higher specificity
+        than every available entry in the next ten positions, with at least one following entry. No
+        stylesheet-wide score or grade is assigned.
+      </p>
       <h3>Lower weight deliberately</h3>
-      <p class="prose"><code>:where()</code> and its arguments add no specificity. <code>:is()</code>, <code>:not()</code> and <code>:has()</code> use their most specific argument. Nesting uses the maximum weight of the parent selector list, not necessarily the parent that matches. See <a href="https://www.w3.org/TR/selectors-4/#specificity-rules">Selectors Level 4</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Nesting/Nesting_and_specificity">nesting and specificity</a>. Removing weight changes the cascade; check the rendered page before applying a suggestion.</p>
+      <p class="prose">
+        <code>:where()</code> and its arguments add no specificity. <code>:is()</code>, <code>:not()</code>{' '}
+        and <code>:has()</code> use their most specific argument. Nesting uses the maximum weight of the
+        parent selector list, not necessarily the parent that matches. See{' '}
+        <a href="https://www.w3.org/TR/selectors-4/#specificity-rules">Selectors Level 4</a> and{' '}
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Nesting/Nesting_and_specificity">
+          nesting and specificity
+        </a>
+        . Removing weight changes the cascade; check the rendered page before applying a suggestion.
+      </p>
       <h3>Give layers a job</h3>
-      <p class="prose">Declare a layer order before adding rules. Later layers outrank earlier ones for normal declarations within the same origin; unlayered normal declarations take priority over layered ones. The order reverses for important declarations. Within a parent layer, its own normal declarations outrank its sublayers. See <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer">the layer rules</a>.</p>
+      <p class="prose">
+        Declare a layer order before adding rules. Later layers outrank earlier ones for normal declarations
+        within the same origin; unlayered normal declarations take priority over layered ones. The order
+        reverses for important declarations. Within a parent layer, its own normal declarations outrank its
+        sublayers. See{' '}
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@layer">
+          the layer rules
+        </a>
+        .
+      </p>
       <h3>What a pasted stylesheet cannot tell us</h3>
-      <p class="prose">This audit does not evaluate media conditions, match selectors against a document, expand imports, or compare property values. Keyframes, font descriptors and unsupported at-rule groups are not selector rules and are reported as excluded. Rules with declarations after nested rules appear as separate declaration runs to preserve source order. Empty rules remain visible. The report is a starting point for review, not a replacement for browser inspection.</p>
+      <p class="prose">
+        This audit does not evaluate media conditions, match selectors against a document, expand imports, or
+        compare property values. Keyframes, font descriptors and unsupported at-rule groups are not selector
+        rules and are reported as excluded. Rules with declarations after nested rules appear as separate
+        declaration runs to preserve source order. Empty rules remain visible. The report is a starting point
+        for review, not a replacement for browser inspection.
+      </p>
     </div>
-  </section>
-</BaseLayout>
+  </ExplainerBand>
+</ToolLayout>
 <script>
   import '../../scripts/stylesheet-audit';
 </script>

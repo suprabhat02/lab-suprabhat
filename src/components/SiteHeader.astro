@@ -1,15 +1,13 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
+import { getTools } from '../lib/seo/tools';
 
 interface Props {
   path: string;
 }
 const { path } = Astro.props;
 const links = [
-  ['/specificity/', 'Specificity'],
-  ['/playground/', 'Playground'],
-  ['/accessible-name/', 'Accessible name'],
-  ['/stylesheet-audit/', 'Audit'],
+  ...(await getTools()).map((tool) => [`/${tool.data.slug}/`, tool.data.navLabel]),
   ['/about/', 'About'],
 ];
 ---

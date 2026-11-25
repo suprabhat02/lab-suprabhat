@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -10,6 +10,9 @@ const tools = defineCollection({
     summary: z.string().max(160),
     status: z.enum(['live', 'in-progress']),
     category: z.string(),
+    order: z.number().int().nonnegative(),
+    navLabel: z.string().min(1),
+    related: z.array(reference('tools')).min(2).max(3),
     keywords: z.array(z.string()),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date(),

@@ -4,6 +4,8 @@ import NestingPanel from './NestingPanel.astro';
 import CascadeLadder from './CascadeLadder.astro';
 import ToolWorkbench from './ToolWorkbench.astro';
 import type { CascadeModel, DuelModel, NestingModel } from '../lib/app/model';
+import { suggestionsView } from '../lib/app/views';
+import { renderToString } from '../lib/view/h';
 
 interface Props {
   duel: DuelModel;
@@ -14,49 +16,62 @@ interface Props {
 const { duel, nestingCss, nesting, cascade } = Astro.props;
 ---
 
+<section class="section" aria-labelledby="fix-title">
+  <ToolWorkbench stacked>
+    <Fragment slot="output">
+      <h2 id="fix-title">Want a different winner?</h2>
+      <p class="panel-intro">
+        Ways to change the result, from the gentlest to the most heavy-handed. Read more in{' '}
+        <a href="#why-not-applying">why is my CSS not applying?</a>
+      </p>
+      <div class="flow" data-suggestions set:html={suggestionsView(duel).map(renderToString).join('')} />
+    </Fragment>
+  </ToolWorkbench>
+</section>
+
 <section class="section section-tools" aria-label="Inspect selectors and the cascade">
   <ToolWorkbench stacked>
-  <div slot="output" class="tabs" data-tabs>
-    <div class="tablist" role="tablist" aria-label="Inspect" data-tablist>
-      <button
-        class="tab"
-        type="button"
-        role="tab"
-        id="tab-anatomy"
-        aria-controls="panel-anatomy"
-        data-tab="anatomy"
-        aria-selected="true"
-      >
-        Anatomy
-      </button>
-      <button
-        class="tab"
-        type="button"
-        role="tab"
-        id="tab-nesting"
-        aria-controls="panel-nesting"
-        data-tab="nesting"
-        aria-selected="false"
-        tabindex="-1"
-      >
-        Nesting
-      </button>
-      <button
-        class="tab"
-        type="button"
-        role="tab"
-        id="tab-cascade"
-        aria-controls="panel-cascade"
-        data-tab="cascade"
-        aria-selected="false"
-        tabindex="-1"
-      >
-        Cascade
-      </button>
+    <div slot="output" class="tabs" data-tabs>
+      <div class="tablist" role="tablist" aria-label="Inspect" data-tablist>
+        <button
+          class="tab"
+          type="button"
+          role="tab"
+          id="tab-anatomy"
+          aria-controls="panel-anatomy"
+          data-tab="anatomy"
+          aria-selected="true"
+        >
+          Anatomy
+        </button>
+        <button
+          class="tab"
+          type="button"
+          role="tab"
+          id="tab-nesting"
+          aria-controls="panel-nesting"
+          data-tab="nesting"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Nesting
+        </button>
+        <button
+          class="tab"
+          type="button"
+          role="tab"
+          id="tab-cascade"
+          aria-controls="panel-cascade"
+          data-tab="cascade"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Cascade
+        </button>
+      </div>
+      <Anatomy duel={duel} />
+      <NestingPanel css={nestingCss} model={nesting} />
+      <CascadeLadder model={cascade} />
     </div>
-    <Anatomy duel={duel} />
-    <NestingPanel css={nestingCss} model={nesting} />
-    <CascadeLadder model={cascade} />
-  </div>
   </ToolWorkbench>
 </section>
