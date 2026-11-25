@@ -11,7 +11,7 @@ const triple = (value: readonly number[] | null): string => (value ? value.join(
 export function summaryView(model: Audit): VNode[] {
   const m = model.metrics;
   return [
-    h('h2', {}, 'The stylesheet in numbers'),
+    h('h2', { id: 'audit-numbers' }, 'The stylesheet in numbers'),
     h(
       'dl',
       { class: 'audit-metrics', 'data-audit-summary': true },
@@ -165,31 +165,41 @@ export function tableView(model: Audit, sort: Sort = 'none'): VNode {
 }
 
 export function detailsView(model: Audit): VNode[] {
+  const codes = Object.keys(ISSUE_NAMES) as IssueCode[];
+  const empty = codes.filter((code) => model.issues.counts[code] === 0);
   return [
-    h('h2', { class: 'mt-l' }, 'Findings and fixes'),
+    h('h2', { class: 'mt-l', id: 'audit-findings' }, 'Findings and fixes'),
     h(
       'p',
       { class: 'muted mt-s' },
       'Review signals, not a grade. A graph cannot prove that two declarations compete for the same element and property.',
     ),
-    ...(Object.keys(ISSUE_NAMES) as IssueCode[]).map((code) =>
+    ...codes.map((code) =>
       h(
         'section',
-        { class: 'mt-m', 'aria-labelledby': `audit-${code}` },
+        { class: 'mt-m', 'aria-labelledby': `audit-${code}`, hidden: model.issues.counts[code] === 0 },
         h('h3', { id: `audit-${code}` }, `${ISSUE_NAMES[code]}: ${model.issues.counts[code]}`),
         h(
           'ul',
           { class: 'fixes', role: 'list', 'data-audit-findings': code },
           model.issues.findings
             .filter((finding) => finding.code === code)
-            .map((finding) =>
-              h(
-                'li',
-                { class: 'fix' },
-                h('p', {}, `Line ${finding.line}: ${finding.message}`),
-                h('p', {}, finding.fix),
-                h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
-              ),
+            .map(
+              (finding) =>
+                h(
+                  'li',
+                  { class: 'fix' },
+                  h('p', {}, `Line ${finding.line}: ${finding.message}`),
+                  h('p', {}, finding.fix),
+                  h('pre', { class: 'code' }, h('code', {}, finding.snippet)),
+                ),
+              empty.length
+                ? h(
+                    'p',
+                    { class: 'muted mt-m', 'data-audit-empty': true },
+                    `No findings for: ${empty.map((code) => ISSUE_NAMES[code].toLowerCase()).join(', ')}.`,
+                  )
+                : null,
             ),
         ),
       ),
@@ -201,7 +211,7 @@ export function detailsView(model: Audit): VNode[] {
           `${model.issues.omitted} more findings omitted; only the first 200 are shown. Group counts include omitted findings.`,
         )
       : null,
-    h('h2', { class: 'mt-l' }, 'Layers'),
+    h('h2', { class: 'mt-l', id: 'audit-layers' }, 'Layers'),
     h(
       'p',
       { class: 'mt-s' },
@@ -226,5 +236,26 @@ export function detailsView(model: Audit): VNode[] {
       { class: 'muted mt-s' },
       'Nested paths are grouped under their parent in first-declared sibling order. A parent layer’s own declarations outrank its sublayers for normal declarations. Conditions are recorded, not evaluated. Imports and descriptor rules are not audited.',
     ),
+  ];
+}
+
+export function auditView(model: Audit, sort: Sort = 'none'): VNode[] {
+  return [
+    h(
+      'nav',
+      { class: 'results-nav', 'aria-label': 'Results sections' },
+      [
+        ['audit-numbers', 'Numbers'],
+        ['audit-graph-title', 'Graph'],
+        ['audit-selectors', 'Selectors'],
+        ['audit-findings', 'Findings'],
+        ['audit-layers', 'Layers'],
+      ].map(([id, label]) => h('a', { href: `#${id}` }, label)),
+    ),
+    summaryView(model),
+    graphView(model),
+    h('h2', { class: 'mt-l', id: 'audit-selectors' }, 'Selectors'),
+    h('div', { 'data-audit-table-slot': true }, tableView(model, sort)),
+    detailsView(model),
   ];
 }
