@@ -62,13 +62,13 @@
     font-family: var(--font-sans);
     line-height: var(--line-heading);
     letter-spacing: var(--tracking-heading);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
     text-wrap: balance;
   }
 
   :where(h1) {
     font-size: var(--step-4);
-    font-weight: var(--weight-bold);
+    font-weight: var(--weight-display);
     letter-spacing: var(--tracking-display);
     line-height: var(--line-display);
   }
@@ -134,13 +134,15 @@
   }
 
   :where(strong, b) {
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-heading);
   }
 
   :where(
     .brand,
     .input-selector,
     .input[spellcheck='false'],
+    /* Its options list selectors, and native options can't contain code markup. */
+    [data-fix-target],
     .textarea,
     .name-html,
     .audit-css,

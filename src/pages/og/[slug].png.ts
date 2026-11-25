@@ -30,7 +30,7 @@ for (const tool of tools) {
   pages[tool.data.slug] = { title: tool.data.ogTitle ?? tool.data.title, description: tool.data.summary };
 }
 
-const FONT = './node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2';
+const FONT = './node_modules/@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2';
 
 export const { getStaticPaths, GET } = await OGImageRoute({
   pages,

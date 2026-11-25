@@ -6,17 +6,19 @@ import courierNew from '@capsizecss/metrics/courierNew';
 import arial from '@capsizecss/metrics/arial';
 import segoeUI from '@capsizecss/metrics/segoeUI';
 import helvetica from '@capsizecss/metrics/helvetica';
+import figtree from '@capsizecss/metrics/figtree';
 
 const fontFile = new URL(
   '../node_modules/@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2',
   import.meta.url,
 );
 const geist = { ...(await fromBuffer(readFileSync(fontFile))), familyName: 'Geist Mono Variable' };
-const sansFile = new URL(
-  '../node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2',
-  import.meta.url,
-);
-const sans = { ...(await fromBuffer(readFileSync(sansFile))), familyName: 'Geist Variable' };
+// The variable file's default instance is Light (300), so measuring it would match fallbacks to the
+// wrong weight. Body text is Regular (400): use Capsize's Regular entry instead.
+if (figtree.fullName !== 'Figtree Regular' || figtree.unitsPerEm !== 1000 || figtree.xWidthAvg !== 449) {
+  throw new Error('Unexpected @capsizecss/metrics/figtree entry; re-check the Regular metrics.');
+}
+const sans = { ...figtree, familyName: 'Figtree Variable' };
 
 // Not in @capsizecss/metrics; read from the font files (Consolas 7.00, Menlo shares DejaVu Sans Mono's metrics).
 const consolas = {

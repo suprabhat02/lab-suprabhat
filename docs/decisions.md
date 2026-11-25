@@ -18,8 +18,9 @@ The parser loads on first interaction: about 19 KB gzipped, plus 14 KB for the t
 | astro                           | 7.4.10                                                                                    |                                                                                                                                                 |
 | @bramus/specificity             | 2.4.3                                                                                     |                                                                                                                                                 |
 | @astrojs/sitemap                | 3.7.4                                                                                     |                                                                                                                                                 |
-| astro-og-canvas                 | 0.13.3                                                                                    | Loads the Geist Mono `woff2` directly; no TTF needed.                                                                                           |
+| astro-og-canvas                 | 0.13.3                                                                                    | Loads the Latin Figtree `woff2` directly; no TTF needed.                                                                                        |
 | @fontsource-variable/geist-mono | 5.3.0                                                                                     |                                                                                                                                                 |
+| @fontsource-variable/figtree    | 5.3.0                                                                                     | Upright `wght` 300-900 only; italics are not copied.                                                                                            |
 | vitest                          | 5.1.0                                                                                     |                                                                                                                                                 |
 | @playwright/test                | 1.65.0                                                                                    |                                                                                                                                                 |
 | @axe-core/playwright            | 4.14.0                                                                                    |                                                                                                                                                 |
@@ -48,7 +49,7 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
 
-## Design-system font roles
+## Design-system font roles (historical, superseded by Figtree below)
 
 Geist Sans and Geist Mono are self-hosted from Fontsource 5.3.0 (OFL-1.1).
 Both served Latin files have unitsPerEm 1000, x-height 530, cap-height 710,
@@ -70,6 +71,31 @@ Use weights 400/500/600 for body/UI/headings and 700 only for display h1.
 Tabular figures are scoped to numeric data; Mono disables ligatures.
 The old font tokens remain aliases until the release after the design-system
 release, but new styles use `--font-sans` and `--font-mono`.
+
+## Figtree as the sans
+
+The owner chose Figtree (Fontsource 5.3.0, OFL-1.1) to replace Geist Sans; Geist
+Mono stays for code, selectors, numbers and the logo. It is a brand choice, not
+a legibility claim, and it saves about 9 KB: Latin Figtree is 20,156 bytes, so a
+fresh page loads 43,284 bytes of fonts instead of 52,528. The OG images use the
+same Latin file; they render the Bold and Regular instances correctly, so the
+Geist Sans package was removed.
+
+Verified in the installed files: one `wght` axis, 300-900, default instance
+Light (300); GSUB keeps `tnum`, `pnum`, `frac`, `numr`, `dnom` but not `ss01`,
+`ss02` or `case`; Latin and Latin-ext only. Because I and l look alike without
+`ss02`, identifiers and data values render in Geist Mono through `code` and
+`rich()`. Fallback overrides come from Capsize's Regular entry, since measuring
+the variable file would describe Light and put Arial's `size-adjust` about 1.1%
+off.
+
+Figtree is lighter at the same number, so sans roles use 400 body, 500 UI, 650
+headings and emphasis, and 750 display; Geist Mono keeps 600 for emphasis.
+`--step-0` is unchanged: at 16-18px Figtree body text renders clearly on
+Windows Chromium, and raising it would break the type ratios without
+measurable benefit. The 12px and 14px sub-body steps are now whole pixels.
+The prose measure moved from 66ch to 46ch after measuring characters per line.
+Italics are synthesised rather than downloaded.
 
 ## Design-system color gate
 
@@ -102,8 +128,8 @@ keeps its original white/dark colors.
 
 Type interpolates from 16px at 320px to 18px at 1280px, with ratios 1.2 and
 1.25. Section space now uses rem/vi pairs rather than viewport height.
-Only display h1 and headings have tightened tracking. Prose retains a 66ch
-measure; workbench panes do not inherit that constraint.
+Only display h1 and headings have tightened tracking. Prose originally kept a 66ch
+measure (now 46ch, see Figtree); workbench panes do not inherit that constraint.
 
 Zero-specificity flow, stack, cluster and region primitives live in the
 utilities layer so a parent can opt into a layout without specificity
