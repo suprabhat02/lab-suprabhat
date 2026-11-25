@@ -190,10 +190,15 @@ export function contenderView(
       autocapitalize: 'off',
       autocomplete: 'off',
       autocorrect: 'off',
-      'aria-describedby': `${id}-msg`,
+      'aria-describedby': `${id}-help ${id}-msg`,
       'aria-invalid': invalid ? 'true' : null,
       'data-selector': index,
     }),
+    h(
+      'p',
+      { class: 'input-help', id: `${id}-help` },
+      'Up to 1,000 characters. Local analysis; edits update the URL.',
+    ),
     h(
       'div',
       { class: 'field-messages', id: `${id}-msg`, 'data-messages': index },
@@ -374,7 +379,7 @@ export function anatomyView(contenders: ReadonlyArray<ContenderModel>): VNode[] 
 export function playgroundScoreView(contender: ContenderModel): VNode[] {
   if (!contender.parsed.ok) return [];
   return [
-    h('h2', {}, 'Specificity'),
+    h('h2', { id: 'playground-specificity' }, 'Specificity'),
     h(
       'dl',
       { class: 'selector-scores' },

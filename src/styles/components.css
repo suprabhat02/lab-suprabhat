@@ -323,6 +323,27 @@
     line-height: var(--line-body);
   }
 
+  .breadcrumbs,
+  .input-help {
+    color: var(--text-faint);
+    font-size: var(--step--1);
+  }
+
+  .breadcrumbs li {
+    display: inline-flex;
+    gap: var(--space-2xs);
+    align-items: baseline;
+  }
+
+  .breadcrumbs li + li::before {
+    content: '\203a';
+    color: var(--text-faint);
+  }
+
+  .related-tools {
+    --cluster-space: var(--space-m);
+  }
+
   .duel {
     display: grid;
     gap: var(--space-m-l);

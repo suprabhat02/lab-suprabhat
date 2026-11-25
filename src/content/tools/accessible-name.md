@@ -4,6 +4,11 @@ slug: accessible-name
 summary: Find which label names a button, link, input or image. Follow the accessible name algorithm, inspect competing sources, and fix common labeling mistakes.
 status: live
 category: Accessibility
+order: 4
+navLabel: Accessible name
+related:
+  - specificity
+  - playground
 keywords:
   - accessible name calculator
   - aria label debugger

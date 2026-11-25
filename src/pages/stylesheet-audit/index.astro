@@ -1,110 +1,67 @@
 ---
 import { getEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
 import { analyze, DEFAULT_CSS } from '../../lib/audit/model';
 import { auditView } from '../../lib/audit/views';
 import { renderToString } from '../../lib/view/h';
-import { PERSON_ID, ref } from '../../lib/seo/entities';
 import '../../styles/stylesheet-audit.css';
 
 const tool = await getEntry('tools', 'stylesheet-audit');
 if (!tool) throw new Error('Missing tools/stylesheet-audit.md');
 const result = analyze(DEFAULT_CSS);
 if (!result.ok) throw new Error(result.error.message);
-const url = new URL('/stylesheet-audit/', Astro.site).href;
 const output = auditView(result.value).map(renderToString).join('');
-const jsonLd = [
-  {
-    '@type': 'WebApplication',
-    '@id': `${url}#app`,
-    name: tool.data.title,
-    url,
-    description: tool.data.summary,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    browserRequirements: 'Requires a modern browser. Works without JavaScript as a read-only example.',
-    isAccessibleForFree: true,
-    inLanguage: 'en',
-    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
-    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
-    keywords: tool.data.keywords.join(', '),
-    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-    author: ref(PERSON_ID),
-  },
-];
 ---
 
-<BaseLayout
+<ToolLayout
+  tool={tool}
   title="Stylesheet Audit: CSS specificity, layers and findings"
-  description={tool.data.summary}
-  path="/stylesheet-audit/"
-  og="stylesheet-audit"
-  ogAlt={tool.data.ogTitle ?? tool.data.title}
-  breadcrumbs={[
-    { name: 'Lab', path: '/' },
-    { name: tool.data.title, path: '/stylesheet-audit/' },
-  ]}
-  jsonLd={jsonLd}
+  heading="See the shape of your CSS"
+  lead="Stylesheet Audit: follow specificity from the first selector to the last."
+  app="stylesheet-audit"
 >
-  <section class="tool-hero" aria-labelledby="tool-title" data-audit-app>
-    <div class="wrap flow">
-      <h1 id="tool-title">See the shape of your CSS</h1>
-      <p class="tool-lead">Stylesheet Audit: follow specificity from the first selector to the last.</p>
-      <noscript>
-        <p class="notice">JavaScript is off. This complete worked example will not update.</p>
-      </noscript>
-    </div>
-    <ToolWorkbench>
-      <Fragment slot="input">
-        <p class="notice" data-audit-notice role="status" hidden></p>
-        <div class="field">
-          <label class="label" for="audit-css">
-            Your CSS
-          </label>
-          <textarea
-            class="input audit-css"
-            id="audit-css"
-            rows="8"
-            spellcheck="false"
-            autocapitalize="off"
-            autocomplete="off"
-            aria-describedby="audit-help"
-            data-audit-css
-          >{DEFAULT_CSS}</textarea>
-          <p class="muted" id="audit-help">
-            100 KB max; first 5,000 selectors. Share links: up to 8 KB.
-          </p>
-        </div>
-        <details class="as-css">
-          <summary>Input limits</summary>
-          <p class="muted">
-            Limits count UTF-8 bytes. Individual selectors retain the engine's 1,000-character limit and
-            nesting expansions its 2,000-character limit. Expanded layer paths are also capped at 100 KB.
-          </p>
-        </details>
-        <p class="prose audit-privacy">
-          CSS is parsed locally, never applied. Imports and resources are never fetched. No analytics or input
+  <ToolWorkbench inputLabelledby="audit-input-label">
+    <Fragment slot="input">
+      <p class="notice" data-audit-notice role="status" hidden></p>
+      <div class="field">
+        <label class="label" id="audit-input-label" for="audit-css">
+          Your CSS
+        </label>
+        <textarea
+          class="input audit-css"
+          id="audit-css"
+          rows="8"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          aria-describedby="audit-help"
+          data-audit-css
+        >{DEFAULT_CSS}</textarea>
+        <p class="input-help" id="audit-help">
+          100 KB max; first 5,000 selectors. Share links: up to 8 KB. Byte limits use UTF-8. Individual
+          selectors: 1,000 characters; nesting expansions: 2,000 characters; expanded layer paths: 100 KB. CSS
+          is parsed locally, never applied. Imports and resources are never fetched. No analytics or input
           storage. Only Copy link puts CSS in a URL; links are not encrypted.
         </p>
-        <div class="duel-actions js-only">
-          <button class="button" type="button" data-audit-copy aria-describedby="audit-copy-status">
-            Copy link
-          </button>
-          <p class="status" id="audit-copy-status" data-audit-copy-status role="status"></p>
-        </div>
-        <div class="field" data-audit-link-wrap hidden>
-          <label class="label" for="audit-link">
-            Link to this audit
-          </label>
-          <input class="input" id="audit-link" type="text" readonly data-audit-link />
-        </div>
-        <p class="status" aria-live="polite" aria-atomic="true" data-audit-live></p>
-      </Fragment>
-      <div slot="output" class="flow" data-audit-output set:html={output} />
-    </ToolWorkbench>
-  </section>
-  <section class="section section-explainer" aria-labelledby="audit-explainer">
+      </div>
+      <div class="duel-actions js-only">
+        <button class="button" type="button" data-audit-copy aria-describedby="audit-copy-status">
+          Copy link
+        </button>
+        <p class="status" id="audit-copy-status" data-audit-copy-status role="status"></p>
+      </div>
+      <div class="field" data-audit-link-wrap hidden>
+        <label class="label" for="audit-link">
+          Link to this audit
+        </label>
+        <input class="input" id="audit-link" type="text" readonly data-audit-link />
+      </div>
+      <p class="status" aria-live="polite" aria-atomic="true" data-audit-live></p>
+    </Fragment>
+    <div slot="output" class="flow" data-audit-output set:html={output} />
+  </ToolWorkbench>
+  <section slot="explainer" class="section section-explainer" aria-labelledby="audit-explainer">
     <div class="wrap prose flow">
       <h2 id="audit-explainer">A map, not a verdict</h2>
       <p class="prose">
@@ -155,7 +112,7 @@ const jsonLd = [
       </p>
     </div>
   </section>
-</BaseLayout>
+</ToolLayout>
 <script>
   import '../../scripts/stylesheet-audit';
 </script>

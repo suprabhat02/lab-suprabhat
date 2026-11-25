@@ -1,16 +1,8 @@
 ---
-import { getCollection } from 'astro:content';
+import { getTools } from '../lib/seo/tools';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const order: Readonly<Record<string, number>> = {
-  specificity: 0,
-  playground: 1,
-  'stylesheet-audit': 2,
-  'accessible-name': 3,
-};
-const tools = (await getCollection('tools')).sort(
-  (a, b) => (order[a.data.slug] ?? 4) - (order[b.data.slug] ?? 4) || a.data.title.localeCompare(b.data.title),
-);
+const tools = await getTools();
 const dateFormat = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   month: 'long',

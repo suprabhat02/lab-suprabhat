@@ -1,13 +1,12 @@
 ---
 import { getEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolLayout from '../../layouts/ToolLayout.astro';
 import Duel from '../../components/Duel.astro';
 import ToolPanels from '../../components/ToolPanels.astro';
 import Explainer from '../../components/Explainer.astro';
 import { calculate } from '../../lib/cascade/specificity';
 import { DEFAULT_INPUTS } from '../../lib/app/defaults';
 import { buildCascade, buildDuel, buildNesting } from '../../lib/app/model';
-import { PERSON_ID, ref } from '../../lib/seo/entities';
 
 const tool = await getEntry('tools', 'specificity');
 if (!tool) throw new Error('Missing tools/specificity.md');
@@ -16,46 +15,25 @@ if (!tool) throw new Error('Missing tools/specificity.md');
 const duel = buildDuel(DEFAULT_INPUTS.selectors, calculate);
 const nesting = buildNesting(DEFAULT_INPUTS.nesting, calculate);
 const cascade = buildCascade(DEFAULT_INPUTS.cascade, calculate);
-
-const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
-const url = new URL('/specificity/', site).href;
-const jsonLd = [
-  {
-    '@type': 'WebApplication',
-    '@id': `${url}#app`,
-    name: 'CSS Specificity Wars',
-    url,
-    description: tool.data.summary,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    browserRequirements: 'Requires a modern web browser. Works without JavaScript as a read-only example.',
-    isAccessibleForFree: true,
-    inLanguage: 'en',
-    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
-    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
-    keywords: tool.data.keywords.join(', '),
-    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-    author: ref(PERSON_ID),
-  },
-];
 ---
 
-<BaseLayout
+<ToolLayout
+  tool={tool}
   title="CSS Specificity Calculator and Cascade Explainer"
-  description="Compare CSS selectors and see which one wins and why: specificity scores, a part-by-part breakdown and a cascade resolver for @layer and @scope."
-  path="/specificity/"
-  og="specificity"
-  ogAlt="CSS Specificity Wars: which CSS selector wins?"
-  breadcrumbs={[
-    { name: 'Lab', path: '/' },
-    { name: 'CSS Specificity Wars', path: '/specificity/' },
-  ]}
-  jsonLd={jsonLd}
+  heading="Which CSS selector wins?"
+  lead="Type two selectors. See the score, and exactly why."
+  app="specificity"
 >
   <Duel duel={duel} />
-  <ToolPanels duel={duel} nestingCss={DEFAULT_INPUTS.nesting} nesting={nesting} cascade={cascade} />
-  <Explainer />
-</BaseLayout>
+  <ToolPanels
+    slot="after-tool"
+    duel={duel}
+    nestingCss={DEFAULT_INPUTS.nesting}
+    nesting={nesting}
+    cascade={cascade}
+  />
+  <Explainer slot="explainer" />
+</ToolLayout>
 
 <script>
   import '../../scripts/specificity-app';

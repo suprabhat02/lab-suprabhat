@@ -1,0 +1,97 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import { getTools } from '../lib/seo/tools';
+import { PERSON_ID, ref } from '../lib/seo/entities';
+
+interface Props {
+  tool: CollectionEntry<'tools'>;
+  title: string;
+  heading: string;
+  lead: string;
+  app?: 'specificity' | 'accessible-name' | 'stylesheet-audit';
+}
+const { tool, title, heading, lead, app } = Astro.props;
+const path = `/${tool.data.slug}/`;
+const url = new URL(path, Astro.site).href;
+const breadcrumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Tools', path: '/#tools-title' },
+  { name: tool.data.title, path },
+];
+const relatedIds = new Set(tool.data.related.map((entry) => entry.id));
+const related = (await getTools()).filter((entry) => relatedIds.has(entry.id));
+const jsonLd = [
+  {
+    '@type': 'WebApplication',
+    '@id': `${url}#app`,
+    name: tool.data.title,
+    url,
+    description: tool.data.summary,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern browser. Works without JavaScript as a read-only example.',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
+    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
+    keywords: tool.data.keywords.join(', '),
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+    author: ref(PERSON_ID),
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={tool.data.summary}
+  path={path}
+  og={tool.data.slug}
+  ogAlt={tool.data.ogTitle ?? tool.data.title}
+  breadcrumbs={breadcrumbs}
+  jsonLd={jsonLd}
+>
+  <section
+    class="tool-hero"
+    aria-labelledby="tool-title"
+    data-app={app === 'specificity' || undefined}
+    data-name-app={app === 'accessible-name' || undefined}
+    data-audit-app={app === 'stylesheet-audit' || undefined}
+  >
+    <header class="wrap flow">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol class="cluster" role="list">
+          {breadcrumbs.map((crumb, index) => (
+            <li>
+              {index === breadcrumbs.length - 1 ? (
+                <span aria-current="page">{crumb.name}</span>
+              ) : (
+                <a href={crumb.path}>{crumb.name}</a>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <h1 id="tool-title">{heading}</h1>
+      <p class="tool-lead">{lead}</p>
+      <noscript>
+        <p class="notice">JavaScript is off. This complete worked example will not update.</p>
+      </noscript>
+    </header>
+    <slot />
+  </section>
+  <slot name="after-tool" />
+  <slot name="explainer" />
+  <aside class="region" aria-labelledby="related-title">
+    <div class="wrap flow">
+      <h2 id="related-title">Related tools</h2>
+      <ul class="cluster related-tools" role="list">
+        {related.map((entry) => (
+          <li>
+            <a href={`/${entry.data.slug}/`}>{entry.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+</BaseLayout>

@@ -1,11 +1,10 @@
 ---
 import { getEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
 import { buildContender } from '../../lib/app/model';
 import { anatomyView, playgroundScoreView } from '../../lib/app/views';
 import { calculate } from '../../lib/cascade/specificity';
-import { PERSON_ID, ref } from '../../lib/seo/entities';
 import { renderToString } from '../../lib/view/h';
 
 const tool = await getEntry('tools', 'playground');
@@ -14,87 +13,52 @@ if (!tool) throw new Error('Missing tools/playground.md');
 const selector = '#nav .link:hover > a::before';
 const contender = buildContender(selector, calculate);
 const anatomy = anatomyView([contender]).map(renderToString).join('');
-const site = Astro.site?.href ?? 'https://lab.suprabhat-dev.com/';
-const url = new URL('/playground/', site).href;
-const jsonLd = [
-  {
-    '@type': 'WebApplication',
-    '@id': `${url}#app`,
-    name: tool.data.title,
-    url,
-    description: tool.data.summary,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    browserRequirements: 'Requires a modern web browser. Works without JavaScript as a read-only example.',
-    isAccessibleForFree: true,
-    inLanguage: 'en',
-    datePublished: tool.data.publishedAt.toISOString().slice(0, 10),
-    dateModified: tool.data.updatedAt.toISOString().slice(0, 10),
-    keywords: tool.data.keywords.join(', '),
-    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
-    author: ref(PERSON_ID),
-  },
-];
 ---
 
-<BaseLayout
+<ToolLayout
+  tool={tool}
   title="Selector Playground: CSS Selector Analyzer"
-  description={tool.data.summary}
-  path="/playground/"
-  og="playground"
-  ogAlt={tool.data.ogTitle ?? tool.data.title}
-  breadcrumbs={[
-    { name: 'Lab', path: '/' },
-    { name: tool.data.title, path: '/playground/' },
-  ]}
-  jsonLd={jsonLd}
+  heading={tool.data.title}
+  lead="Type a CSS selector. See every part, its specificity, and what to watch out for."
 >
-  <section class="tool-hero" aria-labelledby="tool-title">
-    <div class="wrap flow">
-      <h1 id="tool-title">{tool.data.title}</h1>
-      <p class="tool-lead">
-        Type a CSS selector. See every part, its specificity, and what to watch out for.
-      </p>
-      <noscript>
-        <p class="notice">JavaScript is off, so this shows a worked example that won't update.</p>
-      </noscript>
-    </div>
-    <ToolWorkbench>
-      <Fragment slot="input">
-        <div class="field">
-          <label class="label" for="playground-selector">
-            CSS selector
-          </label>
-          <input
-            class="input input-selector"
-            id="playground-selector"
-            type="text"
-            value={selector}
-            spellcheck="false"
-            autocapitalize="off"
-            autocomplete="off"
-            autocorrect="off"
-            aria-describedby="playground-help playground-status"
-          />
-          <p class="muted" id="playground-help">
-            The breakdown updates as you type. No comparison needed.
-          </p>
-          <p class="status" id="playground-status" role="status" aria-atomic="true"></p>
-        </div>
-        <div
-          class="flow"
-          id="playground-score"
-          set:html={playgroundScoreView(contender).map(renderToString).join('')}
+  <ToolWorkbench inputLabelledby="playground-input-label">
+    <Fragment slot="input">
+      <div class="field">
+        <label class="label" id="playground-input-label" for="playground-selector">
+          CSS selector
+        </label>
+        <input
+          class="input input-selector"
+          id="playground-selector"
+          type="text"
+          value={selector}
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          aria-describedby="playground-help playground-status"
         />
-      </Fragment>
-      <Fragment slot="output">
-        <h2 id="anatomy-title">Selector anatomy</h2>
-        <div class="anatomy" id="playground-anatomy" set:html={anatomy} />
-      </Fragment>
-    </ToolWorkbench>
-  </section>
-
-  <section class="section section-explainer" aria-labelledby="playground-explainer">
+        <p class="input-help" id="playground-help">
+          Up to 1,000 characters. The breakdown updates locally as you type. No input is put in the URL.
+        </p>
+        <p class="status" id="playground-status" role="status" aria-atomic="true"></p>
+      </div>
+      <div
+        class="flow"
+        id="playground-score"
+        set:html={playgroundScoreView(contender).map(renderToString).join('')}
+      />
+    </Fragment>
+    <Fragment slot="output">
+      <nav class="results-nav" aria-label="Results sections">
+        <a href="#playground-specificity">Specificity</a>
+        <a href="#anatomy-title">Anatomy and warnings</a>
+      </nav>
+      <h2 id="anatomy-title">Selector anatomy</h2>
+      <div class="anatomy" id="playground-anatomy" set:html={anatomy} />
+    </Fragment>
+  </ToolWorkbench>
+  <section slot="explainer" class="section section-explainer" aria-labelledby="playground-explainer">
     <div class="wrap prose flow">
       <h2 id="playground-explainer">Read a selector</h2>
       <p class="prose">
@@ -104,7 +68,7 @@ const jsonLd = [
       </p>
     </div>
   </section>
-</BaseLayout>
+</ToolLayout>
 
 <script>
   const input = document.querySelector<HTMLInputElement>('#playground-selector');
