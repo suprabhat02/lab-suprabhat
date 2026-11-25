@@ -35,10 +35,9 @@
   :where(html) {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--font);
+    font-family: var(--font-sans);
     font-size: 100%;
     font-optical-sizing: auto;
-    font-variant-numeric: tabular-nums;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
     scroll-padding-block-start: calc(var(--header-height) + var(--space-s));
@@ -54,22 +53,22 @@
   :where(body) {
     min-block-size: 100dvh;
     font-size: var(--step-0);
-    font-weight: 400;
+    font-weight: var(--weight-regular);
     line-height: 1.5;
     text-rendering: optimizeLegibility;
   }
 
   :where(h1, h2, h3, h4) {
-    font-family: var(--font);
+    font-family: var(--font-sans);
     line-height: 1.1;
     letter-spacing: -0.03em;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     text-wrap: balance;
   }
 
   :where(h1) {
     font-size: var(--step-4);
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     letter-spacing: -0.045em;
     line-height: 1.05;
   }
@@ -94,7 +93,7 @@
   }
 
   :where(p, figcaption, .prose li, .explainer li, .fix, .ladder-text) {
-    font-family: var(--font-prose);
+    font-family: var(--font-sans);
     line-height: 1.6;
   }
 
@@ -116,7 +115,8 @@
   }
 
   :where(code, kbd, samp, pre) {
-    font-family: var(--font);
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
     font-size: 0.95em;
   }
 
@@ -134,7 +134,32 @@
   }
 
   :where(strong, b) {
-    font-weight: 650;
+    font-weight: var(--weight-semibold);
+  }
+
+  :where(
+    .brand,
+    .input-selector,
+    .textarea,
+    .name-html,
+    .audit-css,
+    .parts,
+    .numeral,
+    .selector-scores dd,
+    .audit-metrics dd,
+    .table .num,
+    .audit-table td:not(:nth-child(2))
+  ) {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+  }
+
+  :where(.numeral, .selector-scores dd, .audit-metrics dd, .table .num, .audit-table td:not(:nth-child(2))) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(button, label, summary, select, .nav-link) {
+    font-weight: var(--weight-medium);
   }
 
   :where(hr) {

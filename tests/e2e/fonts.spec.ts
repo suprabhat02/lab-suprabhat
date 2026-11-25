@@ -15,7 +15,7 @@ test.describe('font loading', () => {
         span.remove();
         return width;
       };
-      const stack = getComputedStyle(document.documentElement).getPropertyValue('--font');
+      const stack = getComputedStyle(document.documentElement).getPropertyValue('--font-mono');
       return {
         geist: measure(stack),
         fallback: measure(stack.replace(/'Geist Mono Variable',\s*'Geist Mono',/, '')),
