@@ -231,7 +231,8 @@
   }
 
   .site-footer {
-    padding-block: var(--space-2xl) var(--space-l);
+    padding-block: var(--space-l);
+    background: var(--surface-1);
     border-block-start: 1px solid var(--line);
   }
 
@@ -239,7 +240,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-m);
-    margin-block-start: var(--space-xl);
+    margin-block-start: var(--space-m);
     color: var(--text-2);
     font-size: var(--step--1);
   }

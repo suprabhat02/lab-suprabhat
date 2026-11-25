@@ -30,14 +30,17 @@
     color-scheme: dark;
 
     /* Ratios below are light/dark; text covers --text / --text-2 / --text-3.
-       Page: 17.28/17.98, 9.58/11.27, 6.28/7.62; accent/focus 6.32/5.94; line 4.10/6.29. */
+       Page: 17.28/17.98, 9.58/11.27, 6.28/7.62; accent/focus 6.32/5.94; line 4.10/6.29.
+       Accent-strong 8.03/11.68; success 6.21/10.48; danger 6.40/6.76; control-border 3.72/4.08. */
     --surface-0: light-dark(#f9fafb, #070c10);
-    /* Band: text 14.93/16.36, 8.28/10.25, 5.43/6.93; accent/focus 5.46/5.40; line 3.54/5.72. */
+    /* Band: text 14.93/16.36, 8.28/10.25, 5.43/6.93; accent/focus 5.46/5.40; line 3.54/5.72.
+       Accent-strong 6.94/10.62; success 5.37/9.53; danger 5.53/6.15; control-border 3.22/3.71. */
     --surface-1: light-dark(#e6eaee, #111820);
-    /* Panel: text 18.05/14.37, 10.02/9.00, 6.57/6.08; accent/focus 6.60/4.74; line 4.28/5.02. */
+    /* Panel: text 18.05/14.37, 10.02/9.00, 6.57/6.08; accent/focus 6.60/4.74; line 4.28/5.02.
+       Accent-strong 8.40/9.33; success 6.49/8.37; danger 6.69/5.40; control-border 3.89/3.26. */
     --surface-2: light-dark(#ffffff, #1b242e);
     /* Inset: text 16.36/17.64, 9.07/11.05, 5.95/7.47; accent/focus 5.98/5.82; line 3.88/6.17.
-       Other text/control pairs for all surfaces are recorded in docs/decisions.md. */
+       Accent-strong 7.61/11.45; success 5.88/10.28; danger 6.06/6.63; control-border 3.52/4.00. */
     --surface-3: light-dark(#f1f4f7, #080f16);
     --bg: var(--surface-0);
     --bg-2: var(--surface-1);
@@ -74,6 +77,7 @@
     --step-2: clamp(1.66rem, 1.52rem + 0.6vw, 1.95rem);
     --step-3: clamp(2.07rem, 1.8rem + 1.2vw, 2.75rem);
     --step-4: clamp(2.6rem, 2.05rem + 2.6vw, 4.3rem);
+    --footer-display: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
 
     --space-3xs: clamp(0.25rem, 0.23rem + 0.1vw, 0.3rem);
     --space-2xs: clamp(0.5rem, 0.47rem + 0.12vw, 0.6rem);

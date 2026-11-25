@@ -112,10 +112,14 @@
   .footer-slogan {
     font-family: var(--font);
     max-inline-size: 16ch;
-    font-size: clamp(2.6rem, 1.4rem + 6vw, 7.5rem);
+    font-size: var(--step-4);
     font-weight: 700;
     line-height: 1;
     letter-spacing: -0.06em;
+  }
+
+  .site-footer-home .footer-slogan {
+    font-size: var(--footer-display);
   }
 
   /* ---------- Controls ---------- */
@@ -564,7 +568,7 @@
 
   /* Panels end at their content; only a short gap separates them from the explainer, whichever tab is open. */
   .section-tools {
-    padding-block-end: var(--space-xl);
+    padding-block-end: var(--space-l);
   }
 
   .panel-intro {
@@ -640,6 +644,20 @@
     display: grid;
     gap: var(--space-2xl);
     max-inline-size: 60rem;
+
+    & .table {
+      min-inline-size: 40rem;
+      overflow-wrap: normal;
+    }
+
+    & thead th {
+      white-space: nowrap;
+    }
+
+    & td:last-child:not(.num) {
+      font-family: var(--font-prose);
+      line-height: 1.6;
+    }
   }
 
   .selector-scores {
