@@ -71,6 +71,33 @@ Tabular figures are scoped to numeric data; Mono disables ligatures.
 The old font tokens remain aliases until the release after the design-system
 release, but new styles use `--font-sans` and `--font-mono`.
 
+## Design-system color gate
+
+The warm OKLCH ramp uses hue 35 and chroma at most .010. Components consume
+semantic tokens, not numbered grays. In light mode the page is a step-2 band
+with step-1 paper panels; dark elevation runs from step 1 to 2 to 3.
+This implements the light/dark elevation asymmetry without shadows.
+Step 6 is decorative only. Required controls on filled surfaces use step 9,
+not step 8, whose light inset contrast is below 3:1.
+
+`npm run contrast` reads the actual token declarations, resolves both themes
+and increased-contrast overrides, and checks 264 WCAG pairs offline. It runs
+in CI and prebuild. Invalid colors, unresolved tokens, cycles, out-of-gamut
+values and failed ratios are errors, not fallback values. The warning chroma
+is .08 in light mode so it remains in sRGB.
+
+Minimum normal-theme text contrast is 4.77:1 light / 5.01:1 dark across the
+documented text roles and their allowed surfaces. Required borders are at
+least 3.14:1 light / 3.37:1 dark. Focus reaches 4.89:1 / 4.49:1 even on active
+fills. APCA Lc uses the verified 0.0.98G-4g equations as informational output,
+never as a WCAG conformance rule.
+
+Accent is reserved for links, focus, current navigation and primary actions.
+Scores, syntax underlines and graph marks are neutral; their weights,
+underline styles, labels and selected point shapes still convey meaning.
+The fixed LiveExample canvas is demonstration content and intentionally
+keeps its original white/dark colors.
+
 ## Workbench surfaces and type (historical baseline)
 
 The elevation scale separates page (`--surface-0`), explainer/footer bands

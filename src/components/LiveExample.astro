@@ -25,6 +25,7 @@ const withWinner = (source: string, quote: string) =>
   });
 
 // The demo runs in its own shadow tree, so its layers and selectors can't touch the page.
+// This fixed white/dark canvas is the CSS demonstration, not site chrome; changing it would change the example.
 const base = `:host { display: block; }
 .canvas { padding: 1rem 1.25rem; border-radius: 6px; background: #ffffff; color: #11171c; font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
 .canvas p { margin: 0; }

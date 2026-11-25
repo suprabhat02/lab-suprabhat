@@ -35,9 +35,9 @@
   .workbench-output {
     min-inline-size: 0;
     padding: var(--space-s);
-    border: 1px solid var(--line);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-shell);
-    background: var(--surface-2);
+    background: var(--surface);
     overflow-wrap: anywhere;
   }
 
@@ -57,7 +57,7 @@
     gap: var(--space-2xs) var(--space-s);
     padding-block-end: var(--space-s);
     margin-block-end: var(--space-s);
-    border-block-end: 1px solid var(--line);
+    border-block-end: 1px solid var(--border-subtle);
     font-size: var(--step--1);
 
     & a {
@@ -68,8 +68,8 @@
   }
 
   .section-explainer {
-    background: var(--surface-1);
-    border-block-start: 1px solid var(--line);
+    background: var(--surface);
+    border-block-start: 1px solid var(--border-subtle);
   }
 
   .span-all {
@@ -97,7 +97,7 @@
   }
 
   .section + .section {
-    border-block-start: 1px solid var(--line);
+    border-block-start: 1px solid var(--border-subtle);
   }
 
   /* A hero already ends with space; don't stack a full section gap on top of it. */
@@ -157,7 +157,7 @@
     inset-block-start: 0;
     z-index: 10;
     background: var(--bg);
-    border-block-end: 1px solid var(--line);
+    border-block-end: 1px solid var(--border-subtle);
 
     /* At high zoom levels a sticky bar would cover too much of the page. */
     @media (height < 32rem) {
@@ -189,9 +189,9 @@
     min-block-size: 44px;
     align-content: center;
     padding-inline: var(--space-xs);
-    border: 1px solid var(--control-border);
+    border: 1px solid var(--border-control-on-fill);
     border-radius: var(--radius-control);
-    background: var(--surface-2);
+    background: var(--fill);
     cursor: pointer;
   }
 
@@ -207,9 +207,9 @@
       flex-direction: column;
       align-items: stretch;
       padding: var(--space-xs);
-      border: 1px solid var(--line);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-control);
-      background: var(--surface-2);
+      background: var(--surface-overlay);
     }
   }
 
@@ -232,8 +232,8 @@
 
   .site-footer {
     padding-block: var(--space-l);
-    background: var(--surface-1);
-    border-block-start: 1px solid var(--line);
+    background: var(--surface);
+    border-block-start: 1px solid var(--border-subtle);
   }
 
   .site-footer-meta {
@@ -241,7 +241,7 @@
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-m);
     margin-block-start: var(--space-m);
-    color: var(--text-2);
+    color: var(--text-muted);
     font-size: var(--step--1);
   }
 }

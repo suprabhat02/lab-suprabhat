@@ -19,7 +19,7 @@
   }
 
   .audit-metrics dt {
-    color: var(--text-2);
+    color: var(--text-muted);
     font-size: var(--step--1);
   }
 
@@ -34,15 +34,15 @@
     block-size: auto;
     min-block-size: 12rem;
     margin-block: var(--space-m);
-    background: var(--bg-2);
-    border-block-end: 1px solid var(--control-border);
+    background: var(--surface-inset);
+    border-block-end: 1px solid var(--border-control-on-fill);
   }
 
   .audit-line,
   .audit-axis,
   .audit-boundary {
     fill: none;
-    stroke: var(--text-2);
+    stroke: var(--text-muted);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
   }
@@ -53,14 +53,14 @@
 
   .audit-point {
     fill: var(--bg);
-    stroke: var(--accent);
+    stroke: var(--text-muted);
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
   }
 
   .audit-point[data-active],
   .audit-point:focus {
-    fill: var(--accent);
+    fill: var(--text);
     stroke: var(--text);
     stroke-width: 4;
   }
@@ -80,7 +80,7 @@
   .audit-table caption {
     text-align: start;
     padding-block: var(--space-s);
-    color: var(--text-2);
+    color: var(--text-muted);
   }
 
   .audit-table th,
@@ -88,7 +88,7 @@
     text-align: start;
     vertical-align: top;
     padding: var(--space-xs);
-    border-block-end: 1px solid var(--line);
+    border-block-end: 1px solid var(--border-subtle);
     overflow-wrap: anywhere;
   }
 
@@ -97,13 +97,13 @@
   }
 
   .audit-table thead {
-    background: var(--surface-3);
+    background: var(--surface-inset);
   }
 
   .audit-table tr[data-active],
   .audit-table tr:focus {
-    background: var(--bg-3);
-    outline: var(--focus-ring);
+    background: var(--fill-active);
+    outline: var(--focus-outline);
     outline-offset: -3px;
   }
 

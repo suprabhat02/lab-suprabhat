@@ -51,36 +51,62 @@
   :root {
     color-scheme: dark;
 
-    /* Ratios below are light/dark; text covers --text / --text-2 / --text-3.
-       Page: 17.28/17.98, 9.58/11.27, 6.28/7.62; accent/focus 6.32/5.94; line 4.10/6.29.
-       Accent-strong 8.03/11.68; success 6.21/10.48; danger 6.40/6.76; control-border 3.72/4.08. */
-    --surface-0: light-dark(#f9fafb, #070c10);
-    /* Band: text 14.93/16.36, 8.28/10.25, 5.43/6.93; accent/focus 5.46/5.40; line 3.54/5.72.
-       Accent-strong 6.94/10.62; success 5.37/9.53; danger 5.53/6.15; control-border 3.22/3.71. */
-    --surface-1: light-dark(#e6eaee, #111820);
-    /* Panel: text 18.05/14.37, 10.02/9.00, 6.57/6.08; accent/focus 6.60/4.74; line 4.28/5.02.
-       Accent-strong 8.40/9.33; success 6.49/8.37; danger 6.69/5.40; control-border 3.89/3.26. */
-    --surface-2: light-dark(#ffffff, #1b242e);
-    /* Inset: text 16.36/17.64, 9.07/11.05, 5.95/7.47; accent/focus 5.98/5.82; line 3.88/6.17.
-       Accent-strong 7.61/11.45; success 5.88/10.28; danger 6.06/6.63; control-border 3.52/4.00. */
-    --surface-3: light-dark(#f1f4f7, #080f16);
-    --bg: var(--surface-0);
-    --bg-2: var(--surface-1);
-    --bg-3: var(--surface-3);
-    --surface: var(--surface-2);
-    --text: light-dark(#11171c, #f3f5f8);
-    --text-2: light-dark(#3c434b, #bec5cc);
-    --text-3: light-dark(#575e66, #9ba2aa);
+    --gray-1: light-dark(oklch(99% 0.002 35), oklch(15.5% 0.004 35));
+    --gray-2: light-dark(oklch(97.5% 0.003 35), oklch(18.5% 0.005 35));
+    --gray-3: light-dark(oklch(95% 0.004 35), oklch(21.5% 0.006 35));
+    --gray-4: light-dark(oklch(92.5% 0.005 35), oklch(24.5% 0.007 35));
+    --gray-5: light-dark(oklch(90% 0.006 35), oklch(27.5% 0.008 35));
+    --gray-6: light-dark(oklch(87% 0.007 35), oklch(31% 0.008 35));
+    --gray-7: light-dark(oklch(82% 0.008 35), oklch(37% 0.009 35));
+    --gray-8: light-dark(oklch(64% 0.009 35), oklch(52% 0.01 35));
+    --gray-9: light-dark(oklch(52% 0.009 35), oklch(64% 0.008 35));
+    --gray-10: light-dark(oklch(47% 0.009 35), oklch(68% 0.008 35));
+    --gray-11: light-dark(oklch(43% 0.008 35), oklch(80% 0.006 35));
+    --gray-12: light-dark(oklch(20.5% 0.005 35), oklch(95.5% 0.003 35));
+
+    /* Light: paper (1) rises above a page band (2) with a step-6 hairline.
+       Dark: elevation gets lighter, page (1) -> panel (2) -> inset/overlay (3). */
+    --bg: light-dark(var(--gray-2), var(--gray-1));
+    --surface: light-dark(var(--gray-1), var(--gray-2));
+    --surface-overlay: var(--gray-3);
+    --surface-inset: var(--gray-3);
+    --fill: var(--gray-3);
+    --fill-hover: var(--gray-4);
+    --fill-active: var(--gray-5);
+    --border-subtle: var(--gray-6);
+    --border: var(--gray-7);
+    --border-strong: var(--gray-8);
+    /* Step 8 fails 3:1 on the light inset; filled controls need step 9. */
+    --border-control-on-fill: var(--gray-9);
+    --text: var(--gray-12);
+    --text-muted: var(--gray-11);
+    --text-faint: var(--gray-9);
     --accent: light-dark(#b42300, #ff4d2a);
-    --accent-strong: light-dark(#981c00, #ffb6a5);
-    --accent-dim: light-dark(#f03200, #772c1e);
-    --on-accent: light-dark(#ffffff, #06090d);
-    --success: light-dark(#106c3e, #4ed589);
-    --danger: light-dark(#b4144a, #f86685);
-    /* At least 3.54:1 light / 5.02:1 dark against all four surfaces. */
-    --line: light-dark(#747b83, #89939d);
-    /* Form control borders need 3:1 against the page (WCAG 1.4.11). */
-    --control-border: light-dark(#7b828a, #6b737b);
+    --accent-hover: light-dark(oklch(44% 0.15 33), oklch(78% 0.12 33));
+    --accent-subtle: light-dark(oklch(95% 0.02 33), oklch(24% 0.03 33));
+    --on-accent: light-dark(#ffffff, var(--gray-1));
+    --focus-ring: var(--accent);
+    --success: light-dark(oklch(45% 0.1 155), oklch(78% 0.12 155));
+    --success-subtle: light-dark(oklch(95% 0.02 155), oklch(24% 0.03 155));
+    --warning: light-dark(oklch(45% 0.08 80), oklch(80% 0.11 80));
+    --warning-subtle: light-dark(oklch(95% 0.02 80), oklch(24% 0.03 80));
+    --danger: light-dark(oklch(45% 0.16 10), oklch(77% 0.13 10));
+    --danger-subtle: light-dark(oklch(95% 0.02 10), oklch(24% 0.03 10));
+    --info: light-dark(oklch(45% 0.13 255), oklch(78% 0.11 255));
+    --info-subtle: light-dark(oklch(95% 0.02 255), oklch(24% 0.03 255));
+
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --surface-0: var(--bg);
+    --surface-1: var(--surface);
+    --surface-2: var(--surface);
+    --surface-3: var(--surface-inset);
+    --bg-2: var(--surface);
+    --bg-3: var(--surface-inset);
+    --text-2: var(--text-muted);
+    --text-3: var(--text-faint);
+    --line: var(--border-subtle);
+    --control-border: var(--border-strong);
+    --accent-strong: var(--accent-hover);
 
     --radius-control: 6px;
     --radius-card: 10px;
@@ -126,7 +152,7 @@
     --gutter: clamp(1rem, 0.5rem + 3vw, 4rem);
     --max-width: 90rem;
     --header-height: 4rem;
-    --focus-ring: 3px solid var(--accent);
+    --focus-outline: 3px solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
@@ -146,9 +172,11 @@
 
   @media (prefers-contrast: more) {
     :root {
-      --text-2: var(--text);
-      --text-3: var(--text);
-      --line: light-dark(#5c636b, #8d959d);
+      --text-muted: var(--text);
+      --text-faint: var(--text);
+      --border-strong: var(--gray-9);
+      --border-subtle: var(--border-strong);
+      --border: var(--border-strong);
     }
   }
 }

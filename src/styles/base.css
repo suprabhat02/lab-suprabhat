@@ -104,12 +104,12 @@
   }
 
   :where(a:hover) {
-    color: var(--accent-strong);
+    color: var(--accent-hover);
     text-decoration-thickness: 2px;
   }
 
   :where(:focus-visible) {
-    outline: var(--focus-ring);
+    outline: var(--focus-outline);
     outline-offset: 3px;
     border-radius: 2px;
   }
@@ -123,7 +123,7 @@
   :where(:not(pre) > code) {
     padding: 0.05em 0.3em;
     border-radius: 4px;
-    background: var(--bg-3);
+    background: var(--surface-inset);
     color: var(--text);
     overflow-wrap: anywhere;
   }
@@ -164,16 +164,21 @@
 
   :where(hr) {
     border: 0;
-    border-block-start: 1px solid var(--line);
+    border-block-start: 1px solid var(--border-subtle);
   }
 
   :where(::selection) {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--fill-active);
+    color: var(--text);
   }
 
   :where(th) {
     text-align: start;
+  }
+
+  :where(input, textarea)::placeholder {
+    color: var(--text-faint);
+    opacity: 1;
   }
 
   @media (forced-colors: active) {
