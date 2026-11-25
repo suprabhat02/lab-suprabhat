@@ -340,25 +340,57 @@ test.describe('site', () => {
   test('theme toggle switches and persists', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/');
-    const toggle = page.getByRole('button', { name: 'Dark theme' });
-    const icon = toggle.locator('svg path');
+    const toggle = page.locator('[data-theme-toggle]');
+    const icon = toggle.locator('[data-theme-icon]');
+    const moon = 'M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z';
+    const sun =
+      'M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z';
     const outlineIsAccent = () =>
       toggle.evaluate((el) => {
         const accent = getComputedStyle(document.querySelector('.brand-slash') ?? el).color;
         return getComputedStyle(el).borderTopColor === accent;
       });
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAccessibleName('Dark theme');
+    await expect(icon).toHaveAttribute('d', moon);
     await expect(icon).not.toHaveCSS('fill', 'none');
     expect(await outlineIsAccent()).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle.locator('[data-theme-label]')).toHaveText('Light theme');
+    await expect(icon).toHaveAttribute('d', sun);
+    await expect(icon).toHaveAttribute('fill', 'none');
+    await expect(icon).toHaveAttribute('stroke-linecap', 'round');
+    await expect(icon).toHaveAttribute('stroke', 'currentColor');
+    await expect(icon).toHaveAttribute('stroke-width', '1.5');
+    await expect(icon).toHaveAttribute('stroke-linejoin', 'round');
     await page.mouse.move(0, 0);
     await expect(icon).toHaveCSS('fill', 'none');
     expect(await outlineIsAccent()).toBe(false);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await expect(page.getByRole('button', { name: 'Dark theme' })).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAccessibleName('Light theme');
+    await expect(icon).toHaveAttribute('d', sun);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle.locator('[data-theme-label]')).toHaveText('Dark theme');
+    await expect(icon).toHaveAttribute('d', moon);
+    await expect(icon).not.toHaveCSS('fill', 'none');
+    await page.reload();
+    await expect(toggle).toHaveAccessibleName('Dark theme');
+    await expect(icon).toHaveAttribute('d', moon);
+  });
+
+  test('theme toggle initializes from the light system preference', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/');
+    const toggle = page.getByRole('button', { name: 'Light theme' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle.locator('[data-theme-icon]')).toHaveAttribute('fill', 'none');
+    await toggle.click();
+    await expect(page.getByRole('button', { name: 'Dark theme' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('home and about ship no JavaScript besides the theme script', async ({ page }) => {
@@ -374,10 +406,13 @@ test.describe('site', () => {
       if (m.type() === 'error') problems.push(m.text());
     });
     page.on('pageerror', (e) => problems.push(e.message));
-    for (const route of ['/', '/about/', '/specificity/']) {
+    for (const route of ['/', '/about/', '/specificity/', '/playground/']) {
       await page.goto(route);
       await page.waitForLoadState('networkidle');
     }
+    await page.getByRole('textbox', { name: 'CSS selector' }).fill('#hero');
+    await expect(page.locator('#playground-anatomy .anatomy-title')).toContainText('#hero (1,0,0)');
+    await page.goto('/specificity/');
     await page.getByLabel('Selector 1', { exact: true }).fill('#a');
     await expect(verdict(page)).toContainText('#a');
     expect(problems).toEqual([]);

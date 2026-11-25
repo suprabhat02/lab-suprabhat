@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 const PERSON_ID = 'https://suprabhat-dev.com/#person';
-const ROUTES = ['/', '/specificity/', '/about/'] as const;
+const ROUTES = ['/', '/specificity/', '/playground/', '/about/'] as const;
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type Obj = Record<string, Json>;
