@@ -42,7 +42,14 @@ test.describe('font loading', () => {
           .evaluateAll((elements) =>
             elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
           );
-        for (const item of sans) expect(item.family, item.tag).toMatch(/^["']?Figtree Variable["']?,/);
+        for (const item of sans) expect(item.family, item.tag).toMatch(/^["']?Inter Variable["']?,/);
+        const settings = await page.locator('body').evaluate((body) => {
+          const style = getComputedStyle(body);
+          return { features: style.fontFeatureSettings, variations: style.fontVariationSettings };
+        });
+        expect(settings.features).toContain('"cv11"');
+        expect(settings.features).toContain('"ss01"');
+        expect(settings.variations).toBe('"opsz" 32');
         const mono = await page
           .locator(
             'code, textarea, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd, [data-fix-target]',
@@ -51,14 +58,11 @@ test.describe('font loading', () => {
             elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
           );
         for (const item of mono) expect(item.family, item.tag).toMatch(/^["']?Geist Mono Variable["']?,/);
-        const expected = [
-          '/fonts/figtree-latin-wght-normal.woff2',
-          '/fonts/geist-mono-latin-wght-normal.woff2',
-        ];
         const preloads = page.locator('link[rel="preload"][as="font"]');
-        expect(await preloads.evaluateAll((els) => els.map((el) => el.getAttribute('href')).sort())).toEqual(
-          expected,
-        );
+        const expected = await preloads.evaluateAll((els) => els.map((el) => el.getAttribute('href') ?? ''));
+        expect(expected).toHaveLength(2);
+        expect(expected[0]).toMatch(/inter-latin-opsz-normal.*\.woff2$/);
+        expect(expected[1]).toBe('/fonts/geist-mono-latin-wght-normal.woff2');
         for (const preload of await preloads.all()) await expect(preload).toHaveAttribute('crossorigin');
         // Each preload must be byte-for-byte the URL its @font-face requests, or the file downloads twice.
         const faces = await page.evaluate(() =>
@@ -72,10 +76,10 @@ test.describe('font loading', () => {
           ),
         );
         expect(faces.filter((face) => expected.includes(face.url))).toEqual([
-          { family: 'Figtree Variable', url: expected[0] },
+          { family: 'Inter Variable', url: expected[0] },
           { family: 'Geist Mono Variable', url: expected[1] },
         ]);
-        expect(requests.map((url) => new URL(url).pathname).sort()).toEqual(expected);
+        expect(requests.map((url) => new URL(url).pathname).sort()).toEqual([...expected].sort());
         expect(new Set(requests).size).toBe(requests.length);
       } finally {
         await page.goto('about:blank');
@@ -86,6 +90,19 @@ test.describe('font loading', () => {
       }
     });
   }
+
+  test('Arabic and RTL roots use the system font stack', async ({ page }) => {
+    await page.goto('/');
+    for (const attributes of [{ lang: 'ar', dir: 'ltr' }, { lang: 'en', dir: 'rtl' }]) {
+      const family = await page.evaluate(({ lang, dir }) => {
+        document.documentElement.lang = lang;
+        document.documentElement.dir = dir;
+        return getComputedStyle(document.body).fontFamily;
+      }, attributes);
+      expect(family).not.toContain('Inter Variable');
+      expect(family).toContain('Noto Sans Arabic');
+    }
+  });
 
   test('the fallback stack matches Geist Mono widths closely', async ({ page }) => {
     await page.goto('/specificity/');
@@ -110,7 +127,7 @@ test.describe('font loading', () => {
     expect(Math.abs(widths.fallback - widths.geist) / widths.geist).toBeLessThan(0.02);
   });
 
-  test('the sans fallback stack matches Figtree widths closely', async ({ page }) => {
+  test('the sans fallback stack matches Inter widths closely', async ({ page }) => {
     await page.goto('/about/');
     await page.evaluate(() => document.fonts.ready);
     const widths = await page.evaluate(() => {
@@ -125,9 +142,9 @@ test.describe('font loading', () => {
         return width;
       };
       const stack = getComputedStyle(document.documentElement).getPropertyValue('--font-sans');
-      return { figtree: measure(stack), fallback: measure(stack.replace(/'Figtree Variable',/, '')) };
+      return { inter: measure(stack), fallback: measure(stack.replace(/'Inter Variable',/, '')) };
     });
-    expect(Math.abs(widths.fallback - widths.figtree) / widths.figtree).toBeLessThan(0.02);
+    expect(Math.abs(widths.fallback - widths.inter) / widths.inter).toBeLessThan(0.02);
   });
 
   test('swapping in the web font causes no layout shift', async ({ page, browserName }) => {

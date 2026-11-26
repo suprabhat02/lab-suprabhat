@@ -21,6 +21,7 @@ The parser loads on first interaction: about 19 KB gzipped, plus 14 KB for the t
 | astro-og-canvas                 | 0.13.3                                                                                    | Loads the Latin Figtree `woff2` directly; no TTF needed.                                                                                        |
 | @fontsource-variable/geist-mono | 5.3.0                                                                                     |                                                                                                                                                 |
 | @fontsource-variable/figtree    | 5.3.0                                                                                     | Upright `wght` 300-900 only; italics are not copied.                                                                                            |
+| @fontsource-variable/inter      | 5.3.0                                                                                     | UI uses `opsz.css`, with weight and optical-size axes.                                                                                          |
 | vitest                          | 5.1.0                                                                                     |                                                                                                                                                 |
 | @playwright/test                | 1.65.0                                                                                    |                                                                                                                                                 |
 | @axe-core/playwright            | 4.14.0                                                                                    |                                                                                                                                                 |
@@ -44,7 +45,7 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 
 - **Numerals** use `clamp(4rem, 30cqi, 11rem)` instead of `14vw`: the selector cards sit side by side and can number up to eight, so sizing against the card (container query units) keeps three huge digits inside it at every width.
 - **Fallback fonts** are generated, not hand-tuned. `scripts/font-fallbacks.mjs` (run by `npm run fonts` before `dev` and `build`) reads Geist Mono's metrics from the served woff2 with `@capsizecss/unpack` and writes `src/styles/fonts.generated.css` with Capsize's `createFontStack`: `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override` for Consolas, Menlo (also matching DejaVu Sans Mono) and Courier New (also matching the metric-compatible Liberation Mono and Cousine). Courier New's metrics come from `@capsizecss/metrics`; Consolas and Menlo aren't in that collection, so their metrics are written into the script from the font files. `ui-monospace` can't be referenced from `@font-face`, so it stays in the stack after the adjusted faces. An e2e test checks fallback widths stay within 2% of Geist Mono, and that delaying the web font by 1.5 s causes no layout shift.
-- **Fonts** are copied from the npm package into `public/fonts/` by `scripts/copy-fonts.mjs` (run before `dev` and `build`) so they're served from `/fonts/` with long-lived caching. Only Latin (preloaded) and Latin Extended are used.
+- **Fonts:** Mono subsets are copied to `public/fonts/` by `scripts/copy-fonts.mjs`. Inter's `opsz.css` is bundled by Vite; its Latin file is preloaded and other subsets load on demand.
 - **`[hidden]`** lives in the `utilities` layer. In `reset` it lost to components that set `display`, which is exactly the kind of layer-order surprise the tool explains.
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
@@ -72,7 +73,7 @@ Tabular figures are scoped to numeric data; Mono disables ligatures.
 The old font tokens remain aliases until the release after the design-system
 release, but new styles use `--font-sans` and `--font-mono`.
 
-## Figtree as the sans
+## Figtree as the sans (historical)
 
 The owner chose Figtree (Fontsource 5.3.0, OFL-1.1) to replace Geist Sans; Geist
 Mono stays for code, selectors, numbers and the logo. It is a brand choice, not

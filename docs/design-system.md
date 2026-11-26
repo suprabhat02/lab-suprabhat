@@ -8,42 +8,35 @@ progressively enhanced. No decorative motion, shadows or gradients are required.
 
 | Role                                                                           | Family / token             | Weight token                              |
 | ------------------------------------------------------------------------------ | -------------------------- | ----------------------------------------- |
-| Body, explanations, prose                                                      | Figtree / `--font-sans`    | `--weight-regular` 400                    |
-| Labels, buttons, navigation, summaries, table headers                          | Figtree / `--font-sans`    | `--weight-medium` 500                     |
-| Headings, verdicts, `strong`, current/selected states                          | Figtree / `--font-sans`    | `--weight-heading` 650                    |
-| Display h1                                                                     | Figtree / `--font-sans`    | `--weight-display` 750                    |
-| Footer slogan                                                                  | Figtree / `--font-sans`    | `--weight-heading` 650, display tracking  |
+| Body, explanations, prose                                                      | Inter / `--font-sans`      | `--weight-regular` 400                    |
+| Labels, buttons, navigation, summaries, table headers                          | Inter / `--font-sans`      | `--weight-medium` 500                     |
+| Headings, verdicts, `strong`, current/selected states                          | Inter / `--font-sans`      | `--weight-heading` 650                    |
+| Display h1                                                                     | Inter / `--font-sans`      | `--weight-display` 750                    |
+| Footer slogan                                                                  | Inter / `--font-sans`      | `--weight-heading` 650, display tracking  |
 | Code, CSS/HTML inputs, selectors, specificity triples, numeric data, lab/ logo | Geist Mono / `--font-mono` | 400; `--weight-semibold` 600 for emphasis |
 
-Figtree is lighter than Geist at the same number (about 665 matches Geist 600),
-so sans roles use 650 and 750 rather than 600 and 700. `--weight-semibold` is
-for Geist Mono only. Tabular numerals belong on numeric data, not all prose.
-Mono ligatures are disabled. Do not add `-webkit-font-smoothing`: it is
-macOS-only and thins light text on dark backgrounds.
+Sans roles retain the existing 650 and 750 weights; `--weight-semibold` is for
+Geist Mono only. Tabular numerals belong on numeric data, not all prose. Mono
+ligatures are disabled. Font smoothing uses antialiasing on macOS.
 
-**Identifiers are always mono.** The Fontsource build of Figtree removes `ss01`,
-`ss02` (the alternate that separates capital I from lowercase l) and `case`; only
-`tnum`, `pnum`, fractions and kerning remain. Any string where I, l, 1, 0 and O
+**Identifiers are always mono.** Any string where I, l, 1, 0 and O
 must be told apart (selectors, IDs, class names, at-rules, ARIA attributes,
 specificity triples and data values) goes in `code` or another mono element.
 `rich()` in [h.ts](../src/lib/view/h.ts) wraps backticked text and recognisable
 identifiers and triples in `code`, so engine messages need no markup. Native
 `<option>` text can't contain markup, so selects that list selectors use mono.
 
-Figtree ships no italic here: italics are separate files, and the lab doesn't
+Inter ships no italic here: italics are separate files, and the lab doesn't
 load them. The browser synthesises an oblique for `em` and `i`; the site has no
 long italic passages, so a separate download isn't justified.
 
 Both Fontsource variable families are self-hosted, OFL-1.1, with `font-display:
-swap` and separate Latin/Latin-ext unicode ranges. Never use a font CDN: it adds a
-connection and a third-party request. Latin Figtree is **20,156 bytes** (axis
-`wght` 300-900); Latin Geist Mono is **23,128 bytes**. Together they cost
-**43,284 bytes** on a fresh load. Latin-ext (10,280 bytes for Figtree) is
-demand-loaded, never preloaded. Figtree covers Latin and Latin-ext only:
-Cyrillic, Greek, Arabic and Devanagari fall back to system fonts. The site is
-English-only today.
+swap` and separate unicode ranges. Never use a font CDN. Inter's `opsz.css`
+provides weight and optical-size axes and loads subsets on demand; only Latin
+is preloaded. Inter does not cover Arabic; Arabic and RTL roots use a system
+font stack. The site is English-only today.
 
-All pages preload exactly the two Latin files: Figtree for prose and Mono for
+All pages preload exactly the two Latin files: Inter for prose and Mono for
 the above-fold logo/data. Match the font-face URL and anonymous `crossorigin`
 so preload and CSS share one request. The same-origin preview disables Vite's
 CORS middleware: its `Vary: Origin` header otherwise makes WebKit refetch an
@@ -51,27 +44,18 @@ anonymous preload as a CSS font request. Font tests count requests at a local
 forwarding origin, because WebKit's automation events also report memory-cache
 reads as transfers.
 
-Run `npm run fonts` to copy assets (stale files in `public/fonts/` are removed)
-and regenerate [fonts.generated.css](../src/styles/fonts.generated.css); do not
-hand-edit generated adjustments. Figtree's metrics per 1000 em: x-height 500,
-cap height 700, ascent 950, descent 250, line gap 0. The variable file's default
-instance is Light (300), so the fallback script uses the **Regular** entry from
-`@capsizecss/metrics/figtree` instead of measuring the file. That gives Arial
-ascent 94.32%, descent 24.82%, line gap 0% and size-adjust 100.72%; Segoe UI
-and Helvetica get matching faces, and Liberation Sans shares Arial's. Geist Mono
-(x-height 530, cap 710, ascent 1005, descent 295) still measures its own file
-and uses Consolas, Menlo and Courier New. Inline code stays at `0.95em`, which
-puts its x-height (503) within 1% of Figtree's (500).
+Run `npm run fonts` to copy Mono assets (stale files in `public/fonts/` are
+removed) and regenerate [fonts.generated.css](../src/styles/fonts.generated.css);
+do not hand-edit generated adjustments. Inter's fallback metrics are measured
+from the installed Latin file at weight 400 and optical size 32, rather than
+the default optical size 14. The generator checks the file hash so an updated
+font must be remeasured. Arial, Segoe UI and Helvetica get matching faces, with
+Liberation Sans sharing Arial's. Geist Mono uses Consolas, Menlo and Courier
+New. Matching metrics reduces layout shifts but does not guarantee zero shift.
 
-The lead measure is 48rem: tested fallback/web-font line counts remain stable
-there. Prose uses `--measure: 46ch`. Figtree's `0` is wide for its average
-letter, so the old 66ch gave a median of 96 characters per full line; 46ch
-measures a median of 65, p90 74 and max 77.
-
-Figtree is a brand choice: a friendlier, rounder geometric sans that saves
-about 9 KB on the Latin file compared with Geist. It is not sharper than Geist,
-and no published comparison shows it to be more legible. Reverting is one
-token plus the font files, the fallback entry and the preload.
+The body requests `cv11`, `ss01`, and optical size 32. The installed Fontsource
+Inter subset has an `opsz` axis but lacks the `cv11` and `ss01` OpenType
+features, so those two requests have no effect. Prose uses `--measure: 46ch`.
 
 ## Colour
 
@@ -244,7 +228,7 @@ Do not use them for new work.
 
 | Alias                                  | Replacement                                                       |
 | -------------------------------------- | ----------------------------------------------------------------- |
-| `--font`                               | `--font-mono`                                                     |
+| `--font`                               | `--font-sans`                                                     |
 | `--font-prose`                         | `--font-sans`                                                     |
 | `--surface-0`                          | `--bg`                                                            |
 | `--surface-1`, `--surface-2`, `--bg-2` | `--surface`                                                       |
