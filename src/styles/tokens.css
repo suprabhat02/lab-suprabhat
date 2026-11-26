@@ -2,28 +2,6 @@
 
 /* Self-hosted, upright only: only the subsets a page uses are downloaded. Italics are synthesized. */
 @font-face {
-  font-family: 'Figtree Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 300 900;
-  src: url('/fonts/figtree-latin-wght-normal.woff2') format('woff2-variations');
-  unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Figtree Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 300 900;
-  src: url('/fonts/figtree-latin-ext-wght-normal.woff2') format('woff2-variations');
-  unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
-    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-
-@font-face {
   font-family: 'Geist Mono Variable';
   font-style: normal;
   font-display: swap;
@@ -122,16 +100,15 @@
     --inline-icon-offset: 0.15em;
 
     --font-sans:
-      'Figtree Variable', 'Figtree Variable Fallback: Arial', 'Figtree Variable Fallback: Segoe UI',
-      'Figtree Variable Fallback: Helvetica', system-ui, sans-serif;
+      'Inter Variable', 'Inter Variable Fallback: Arial', 'Inter Variable Fallback: Segoe UI',
+      'Inter Variable Fallback: Helvetica', system-ui, sans-serif;
     --font-mono:
       'Geist Mono Variable', 'Geist Mono', 'Geist Mono Variable Fallback: Consolas',
       'Geist Mono Variable Fallback: Menlo', 'Geist Mono Variable Fallback: Courier New', ui-monospace,
       monospace;
     /* Deprecated for one release; remove in the release after the design-system release. */
-    --font: var(--font-mono);
+    --font: var(--font-sans);
     --font-prose: var(--font-sans);
-    /* Figtree is lighter than Geist at the same number; sans roles are tuned for it. */
     --weight-regular: 400;
     --weight-medium: 500;
     --weight-heading: 650;
@@ -173,7 +150,6 @@
     --space-xl-2xl: clamp(3rem, 2.5rem + 2.5vi, 4.5rem);
     --space-section: var(--space-xl-2xl);
 
-    /* About 65 characters per full line in Figtree (p90 74); 66ch measured a median of 96. */
     --measure: 46ch;
     /* Stable while proportional fallback glyph widths change during font swap. */
     --measure-lead: 48rem;
@@ -218,6 +194,11 @@
     --font-og-family: Figtree;
     --focus-outline: var(--stroke-focus) solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  :root:lang(ar),
+  :root[dir='rtl'] {
+    --font-sans: ui-sans-serif, 'Segoe UI', 'Noto Sans Arabic', 'Arabic Typesetting', system-ui, sans-serif;
   }
 
   @media (prefers-color-scheme: light) {

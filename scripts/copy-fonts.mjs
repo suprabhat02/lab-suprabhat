@@ -2,7 +2,7 @@
 import { copyFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 
 const to = new URL('../public/fonts/', import.meta.url);
-const families = ['figtree', 'geist-mono'];
+const families = ['geist-mono'];
 const served = new Set();
 
 mkdirSync(to, { recursive: true });

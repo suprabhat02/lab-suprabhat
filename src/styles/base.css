@@ -52,6 +52,11 @@
 
   :where(body) {
     min-block-size: 100dvh;
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     font-size: var(--step-0);
     font-weight: var(--weight-regular);
     line-height: var(--line-body);
