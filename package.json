@@ -30,12 +30,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/sitemap": "^3.7.6",
     "@bramus/specificity": "^2.4.3",
     "@fontsource-variable/figtree": "^5.3.0",
     "@ibm/plex-mono": "2.5.0",
     "@lucide/astro": "1.82.0",
-    "astro": "^7.4.10",
+    "astro": "^7.4.13",
     "astro-og-canvas": "^0.13.3",
     "css-tree": "^3.2.1",
     "inter-ui": "4.1.1",
