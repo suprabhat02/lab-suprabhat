@@ -79,9 +79,14 @@ if (!result.ok) throw new Error(result.error.message);
       set:html={analysisView(result.value).map(renderToString).join('')}
     />
   </ToolWorkbench>
-  <ExplainerBand slot="explainer" labelledby="name-explainer">
+  <ExplainerBand
+    slot="explainer"
+    labelledby="name-explainer"
+    title="A label, not everything on screen"
+    tool={tool}
+    tone="tint"
+  >
     <div class="prose flow">
-      <h2 id="name-explainer">A label, not everything on screen</h2>
       <p class="prose">
         An accessible name identifies an element; a description adds context. A screen reader can combine the
         name with its role and state. The wording depends on the reader and platform, not just the HTML. See{' '}

@@ -17,9 +17,10 @@ test.describe('explainer navigation, wide screens', () => {
     await expect(nav(page).locator('ol')).toHaveCount(1);
     await expect(links.first()).toBeVisible();
 
+    // The 4/8 split puts the list in the left column, beside the body.
     const navBox = await nav(page).boundingBox();
     const bodyBox = await page.locator('.explainer-body').boundingBox();
-    expect(navBox && bodyBox && navBox.x > bodyBox.x).toBe(true);
+    expect(navBox && bodyBox && navBox.x + navBox.width <= bodyBox.x).toBe(true);
 
     await page.locator('#layers').scrollIntoViewIfNeeded();
     await page.evaluate(() =>

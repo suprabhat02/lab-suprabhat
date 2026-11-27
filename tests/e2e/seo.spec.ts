@@ -227,7 +227,7 @@ test('every tool appears on /tools/, in the sitemap and in llms.txt', async ({ p
 test('methodology covers every live tool with versions from the lockfile', async ({ page }) => {
   await page.goto('/methodology/');
   for (const tool of tools.filter((entry) => entry.status === 'live')) {
-    const section = page.locator(`section:has(> .wrap h2#${tool.slug})`);
+    const section = page.locator(`.split-block:has(h2#${tool.slug})`);
     await expect(section.getByRole('heading', { level: 3 })).toHaveText([
       'How it is checked',
       'Known limits',
@@ -235,7 +235,7 @@ test('methodology covers every live tool with versions from the lockfile', async
     await expect(section.locator('li')).not.toHaveCount(0);
   }
   await expect(page.locator('a[href="/about/"]', { hasText: 'Suprabhat Kumar' })).toBeVisible();
-  await expect(page.locator(`#report ~ p a[href="${REPORT_URL}"]`)).toBeVisible();
+  await expect(page.locator(`.split-block:has(#report) p a[href="${REPORT_URL}"]`)).toBeVisible();
   const lock = JSON.parse(readFileSync(new URL('../../package-lock.json', import.meta.url), 'utf8')) as {
     packages: Record<string, { version: string }>;
   };

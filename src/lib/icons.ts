@@ -8,13 +8,23 @@ import type { CollectionEntry } from 'astro:content';
 export const ICON_NAMES = [
   'accessibility',
   'arrow-up-right',
+  'book-open',
   'braces',
   'check',
   'chevron-right',
   'copy',
+  'flag',
+  'flask-conical',
+  'hammer',
+  'layout-grid',
+  'link',
+  'list-checks',
   'moon',
+  'package',
   'plus',
+  'shield-check',
   'sun',
+  'user',
 ] as const;
 
 export type IconName = (typeof ICON_NAMES)[number];

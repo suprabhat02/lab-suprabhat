@@ -286,13 +286,17 @@
     --space-section: calc(var(--spacing) * 20);
 
     --measure: 68ch;
-    /* Stable while proportional fallback glyph widths change during font swap. */
-    --measure-lead: 48rem;
+    /* Stable while proportional fallback glyph widths change during font swap; at 16px it is
+       about 73ch of Inter, under the 75-character ceiling. */
+    --measure-lead: 46rem;
     --gutter: clamp(1rem, 4vw, 2.5rem);
     --container-wide: 90rem;
-    --container-page: 64rem;
     --rail: 2.5rem;
     --section-space: clamp(4rem, 8vw, 8rem);
+    /* The hatched strip between tone bands. */
+    --seam: 1.5rem;
+    /* Dot grid behind card previews. */
+    --dots: radial-gradient(var(--pattern-fg) 1px, transparent 1px);
     /* Deprecated for one release; use --container-wide. */
     --max-width: var(--container-wide);
     --header-height: 4rem;
@@ -313,8 +317,6 @@
     --graph-min: 12rem;
     --anatomy-max: 60rem;
     --layer-order-max: 36rem;
-    --explainer-max: 54rem;
-    --aside-width: 15rem;
     --deferred-block: 100rem;
     --measure-slogan: 16ch;
     --measure-callout: 60ch;

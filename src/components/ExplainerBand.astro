@@ -1,17 +1,36 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+import SectionHeader from './SectionHeader.astro';
+import ToolAside from './ToolAside.astro';
+import type { IconName } from '../lib/icons';
+
 interface Props {
+  /** Id of the explainer's h2, which also labels the section. */
   labelledby: string;
+  title: string;
+  lead?: string;
+  icon?: IconName;
+  tool: CollectionEntry<'tools'>;
+  tone: 'plain' | 'tint';
   deferred?: boolean;
 }
-const { labelledby, deferred = false } = Astro.props;
+const { labelledby, title, lead, icon = 'book-open', tool, tone, deferred = false } = Astro.props;
 ---
 
 <section
   class:list={['section', 'section-explainer', { 'section-deferred': deferred }]}
   aria-labelledby={labelledby}
+  data-tone={tone}
   data-explainer={deferred || undefined}
 >
-  <div class="wrap">
-    <slot />
+  <div class="wrap section-split">
+    <div class="split-head">
+      <SectionHeader id={labelledby} title={title} lead={lead} icon={icon} eyebrow="Explainer" />
+      <slot name="nav" />
+      <ToolAside tool={tool} />
+    </div>
+    <div class="split-body">
+      <slot />
+    </div>
   </div>
 </section>

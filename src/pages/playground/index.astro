@@ -6,12 +6,13 @@ import ExplainerBand from '../../components/ExplainerBand.astro';
 import { buildContender } from '../../lib/app/model';
 import { anatomyView, playgroundScoreView } from '../../lib/app/views';
 import { calculate } from '../../lib/cascade/specificity';
+import { PLAYGROUND_SELECTOR } from '../../lib/app/defaults';
 import { renderToString } from '../../lib/view/h';
 
 const tool = await getEntry('tools', 'playground');
 if (!tool) throw new Error('Missing tools/playground.md');
 
-const selector = '#nav .link:hover > a::before';
+const selector = PLAYGROUND_SELECTOR;
 const contender = buildContender(selector, calculate);
 const anatomy = anatomyView([contender]).map(renderToString).join('');
 ---
@@ -59,9 +60,14 @@ const anatomy = anatomyView([contender]).map(renderToString).join('');
       <div class="anatomy" id="playground-anatomy" set:html={anatomy} />
     </Fragment>
   </ToolWorkbench>
-  <ExplainerBand slot="explainer" labelledby="playground-explainer">
+  <ExplainerBand
+    slot="explainer"
+    labelledby="playground-explainer"
+    title="Read a selector"
+    tool={tool}
+    tone="tint"
+  >
     <div class="prose flow">
-      <h2 id="playground-explainer">Read a selector</h2>
       <p class="prose">
         Underlines show the column: solid for IDs, dashed for the class column, dotted for the type column,
         double for functional pseudo-classes. Read{' '}

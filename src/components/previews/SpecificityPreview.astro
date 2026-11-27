@@ -1,0 +1,21 @@
+---
+// The same buildDuel call as the home hero, so the card can't disagree with it.
+import { buildDuel } from '../../lib/app/model';
+import { HERO_SELECTORS } from '../../lib/app/defaults';
+import { calculate } from '../../lib/cascade/specificity';
+import { formatSpecificity } from '../../lib/cascade/math';
+
+const duel = buildDuel(HERO_SELECTORS, calculate);
+if (!duel.comparison) throw new Error('The specificity preview needs two valid selectors.');
+const winner = duel.comparison.effectiveWinner;
+---
+
+<div class="preview-rows">
+  {duel.contenders.map((contender, index) => (
+    <div class="preview-row" data-current={index === winner || undefined}>
+      <code class="preview-chip">{contender.input}</code>
+      <span class="preview-score">{contender.best ? formatSpecificity(contender.best.value) : ''}</span>
+      {index === winner && <span class="preview-label">Wins</span>}
+    </div>
+  ))}
+</div>
