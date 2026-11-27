@@ -127,7 +127,7 @@ export function tableView(model: Audit, sort: Sort = 'none'): VNode {
             { scope: 'col', 'aria-sort': sort },
             h(
               'button',
-              { type: 'button', class: 'button js-only', 'data-audit-sort': true },
+              { type: 'button', class: 'button button-ghost button-sm js-only', 'data-audit-sort': true },
               'Sort by specificity',
             ),
             h('span', { class: 'audit-nojs' }, 'Specificity'),

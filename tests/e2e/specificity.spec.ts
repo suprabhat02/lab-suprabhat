@@ -373,52 +373,50 @@ test.describe('site', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/');
     const toggle = page.locator('[data-theme-toggle]');
-    const icon = toggle.locator('[data-theme-icon]');
-    const moon = 'M13.5 10.2A6 6 0 0 1 5.8 2.5a6 6 0 1 0 7.7 7.7z';
-    const sun =
-      'M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z';
-    const outlineIsNeutral = () =>
+    const moon = toggle.locator('svg.lucide-moon');
+    const sun = toggle.locator('svg.lucide-sun');
+    // The toggle is a secondary pill button: its resting ring is the neutral --border.
+    const ringIsNeutral = () =>
       toggle.evaluate((el) => {
         const probe = document.createElement('span');
-        probe.style.color = 'var(--border-strong)';
+        probe.style.color = 'var(--border)';
         el.append(probe);
-        const matches = getComputedStyle(el).borderTopColor === getComputedStyle(probe).color;
+        const matches = getComputedStyle(el).boxShadow.includes(getComputedStyle(probe).color);
         probe.remove();
         return matches;
       });
     await expect(toggle).not.toHaveAttribute('aria-pressed');
     await expect(toggle).toHaveAttribute('data-state', 'dark');
     await expect(toggle).toHaveAccessibleName('Dark theme (switch to light)');
-    await expect(icon).toHaveAttribute('d', moon);
-    await expect(icon).not.toHaveCSS('fill', 'none');
-    expect(await outlineIsNeutral()).toBe(true);
+    await expect(moon).toBeVisible();
+    await expect(sun).toBeHidden();
+    for (const icon of [moon, sun]) await expect(icon).toHaveAttribute('aria-hidden', 'true');
+    await page.mouse.move(0, 0);
+    await expect.poll(ringIsNeutral).toBe(true);
     await toggle.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('data-state', 'light');
     await expect(toggle.locator('[data-theme-label]')).toHaveText('Light theme');
     await expect(toggle).toHaveAccessibleName('Light theme (switch to dark)');
-    await expect(icon).toHaveAttribute('d', sun);
-    await expect(icon).toHaveAttribute('fill', 'none');
-    await expect(icon).toHaveAttribute('stroke-linecap', 'round');
-    await expect(icon).toHaveAttribute('stroke', 'currentColor');
-    await expect(icon).toHaveAttribute('stroke-width', '1.5');
-    await expect(icon).toHaveAttribute('stroke-linejoin', 'round');
+    await expect(sun).toBeVisible();
+    await expect(moon).toBeHidden();
+    await expect(sun).toHaveAttribute('stroke', 'currentColor');
+    await expect(sun).toHaveAttribute('stroke-width', '1.75');
     await page.mouse.move(0, 0);
-    await expect(icon).toHaveCSS('fill', 'none');
-    expect(await outlineIsNeutral()).toBe(true);
+    await expect.poll(ringIsNeutral).toBe(true);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     await expect(toggle).toHaveAttribute('data-state', 'light');
     await expect(toggle).toHaveAccessibleName('Light theme (switch to dark)');
-    await expect(icon).toHaveAttribute('d', sun);
+    await expect(sun).toBeVisible();
     await toggle.click();
     await expect(toggle).toHaveAttribute('data-state', 'dark');
     await expect(toggle.locator('[data-theme-label]')).toHaveText('Dark theme');
-    await expect(icon).toHaveAttribute('d', moon);
-    await expect(icon).not.toHaveCSS('fill', 'none');
+    await expect(moon).toBeVisible();
+    await expect(sun).toBeHidden();
     await page.reload();
     await expect(toggle).toHaveAccessibleName('Dark theme (switch to light)');
-    await expect(icon).toHaveAttribute('d', moon);
+    await expect(moon).toBeVisible();
   });
 
   test('theme toggle initializes from the light system preference', async ({ page }) => {
@@ -426,7 +424,7 @@ test.describe('site', () => {
     await page.goto('/');
     const toggle = page.getByRole('button', { name: 'Light theme (switch to dark)' });
     await expect(toggle).toHaveAttribute('data-state', 'light');
-    await expect(toggle.locator('[data-theme-icon]')).toHaveAttribute('fill', 'none');
+    await expect(toggle.locator('svg.lucide-sun')).toBeVisible();
     await toggle.click();
     await expect(page.getByRole('button', { name: 'Dark theme (switch to light)' })).toHaveAttribute(
       'data-state',
@@ -504,7 +502,12 @@ test.describe('site', () => {
   test('prose has no stray spaces before punctuation', async ({ page }) => {
     for (const route of ['/', '/specificity/', '/about/']) {
       await page.goto(route);
-      const text = await page.locator('main').evaluate((el) => el.textContent ?? '');
+      // SVG icons carry whitespace text nodes from their template; they're never rendered or read.
+      const text = await page.locator('main').evaluate((el) => {
+        const copy = el.cloneNode(true) as Element;
+        for (const svg of copy.querySelectorAll('svg')) svg.remove();
+        return copy.textContent ?? '';
+      });
       expect(text.match(/[\w)\]`]\s+[.,;!?](?=\s|$)/g) ?? []).toEqual([]);
     }
   });

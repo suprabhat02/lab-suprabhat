@@ -1,9 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { CATEGORY_ICONS } from '../lib/icons';
 
 interface Props {
   tool: CollectionEntry<'tools'>;
-  /** The tools index groups by category, so it shows status instead of a category label. */
+  /** The tools index groups by category, so its chip is the icon alone and the card shows status. */
   variant?: 'home' | 'index';
 }
 const { tool, variant = 'home' } = Astro.props;
@@ -17,7 +19,13 @@ const status = tool.data.status === 'live' ? 'Live' : 'In progress';
 ---
 
 <li class="tool-item">
-  {variant === 'home' && <p class="tool-category">{tool.data.category}</p>}
+  <div class="tool-head">
+    <p class="tool-category" aria-hidden={variant === 'index' ? 'true' : undefined}>
+      <Icon name={CATEGORY_ICONS[tool.data.category]} size={16} />
+      {variant === 'home' && tool.data.category}
+    </p>
+    <Icon name="arrow-up-right" size={20} class="tool-arrow" />
+  </div>
   <h3 class="tool-title">
     <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
   </h3>

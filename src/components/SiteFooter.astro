@@ -1,5 +1,6 @@
 ---
 import { REPORT_URL } from '../lib/seo/links';
+import Icon from './Icon.astro';
 
 interface Props {
   home?: boolean;
@@ -26,7 +27,8 @@ const year = new Date().getFullYear();
         <a href="/about/">About this lab</a>
       </p>
       <p>
-        <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>
+        <!-- prettier-ignore -->
+        <a href="https://suprabhat-dev.com">suprabhat-dev.com<Icon name="arrow-up-right" size={16} class="icon-external" /></a>
       </p>
       <p>&copy; {year} Suprabhat Kumar. Code under the MIT license.</p>
     </div>

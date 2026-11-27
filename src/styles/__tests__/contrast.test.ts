@@ -6,6 +6,7 @@ import {
   contrastReport,
   readTokens,
   resolveToken,
+  surfaceColor,
   toSrgb,
   wcagContrast,
 } from '../../../scripts/contrast.mjs';
@@ -30,6 +31,16 @@ describe('offline token contrast', () => {
     expect(() => resolveToken(new Map([['--loop', 'var(--loop)']]), '--loop', 'dark')).toThrow(
       'Cyclic token',
     );
+  });
+
+  it('composites translucent washes over their backdrop and rejects a wash without one', () => {
+    const tokens = readTokens();
+    const tint = surfaceColor(tokens, 'link-tint/bg', 'light');
+    const white = 1;
+    const vivid = toSrgb('#ff4d2a');
+    expect(tint[1]).toBeCloseTo((vivid[1] ?? 0) * 0.16 + white * 0.84, 6);
+    expect(() => surfaceColor(tokens, 'link-tint', 'light')).toThrow('needs a backdrop');
+    expect(() => surfaceColor(tokens, 'bg/surface', 'light')).toThrow('is opaque');
   });
 
   it('passes actual tokens but fails a contrast regression in the source stylesheet', () => {

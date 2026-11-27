@@ -173,7 +173,7 @@ export function contenderView(
             'button',
             {
               type: 'button',
-              class: 'button-quiet',
+              class: 'button button-ghost button-sm',
               'data-remove': index,
               'aria-label': `Remove selector ${index + 1}`,
             },
@@ -492,7 +492,7 @@ export function cascadeRowView(
           'button',
           {
             type: 'button',
-            class: 'button-quiet decl-remove',
+            class: 'button button-ghost button-sm decl-remove',
             'data-remove-row': index,
             'aria-label': `Remove declaration ${index + 1}`,
           },

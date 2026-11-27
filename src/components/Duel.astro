@@ -3,6 +3,7 @@ import { renderToString } from '../lib/view/h';
 import type { VNode } from '../lib/view/h';
 import { contenderView, verdictView } from '../lib/app/views';
 import type { DuelModel } from '../lib/app/model';
+import Icon from './Icon.astro';
 
 interface Props {
   duel: DuelModel;
@@ -22,10 +23,12 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
       <button class="button button-primary js-only" type="submit">
         Compare selectors
       </button>
-      <button class="button js-only" type="button" data-add>
+      <button class="button button-secondary js-only" type="button" data-add>
+        <Icon name="plus" size={16} />
         Add selector
       </button>
-      <button class="button js-only" type="button" data-copy>
+      <button class="button button-secondary js-only" type="button" data-copy>
+        <Icon name="copy" size={16} />
         Copy link
       </button>
       <p class="status" data-copy-status role="status"></p>

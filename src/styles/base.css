@@ -100,7 +100,8 @@
     line-height: var(--line-body);
   }
 
-  /* Running-text links keep a permanent underline: the accent against body text is only about 2.7:1.
+  /* Running-text links keep a permanent underline (WCAG 1.4.1): the accent against body text is only
+     about 2.7:1. On hover a tint fills up from the underline; the underline and text colour stay put.
      Navigation, TOC, buttons, breadcrumbs and footer links opt out in components.css. */
   :where(a) {
     color: var(--text);
@@ -109,16 +110,29 @@
     text-decoration-thickness: var(--stroke-hairline);
     text-decoration-color: var(--accent-vivid);
     text-underline-offset: var(--link-underline-offset);
+    background-image: linear-gradient(var(--link-tint), var(--link-tint));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 0%;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   :where(a:hover) {
-    text-decoration-thickness: var(--stroke-emphasis);
+    background-size: 100% 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where(a) {
+      transition: background-size var(--duration-fast) var(--ease-standard);
+    }
   }
 
   :where(h1, h2, h3, h4) :where(a) {
     color: inherit;
     font-weight: inherit;
     text-decoration: none;
+    background-image: none;
   }
 
   /* An outline, not a box-shadow, so forced-colors mode still draws it. */
@@ -216,6 +230,12 @@
   @media (forced-colors: active) {
     :where(:focus-visible) {
       outline-color: Highlight;
+    }
+
+    :where(a) {
+      color: LinkText;
+      text-decoration-color: LinkText;
+      background-image: none;
     }
   }
 }

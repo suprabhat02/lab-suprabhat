@@ -142,6 +142,11 @@
     --accent-border: light-dark(#ee4b2b, #b94129);
     --glow: light-dark(#ffe0d8, #521a0f);
     --selection-bg: light-dark(#ffd1c6, #642114);
+    /* Translucent accent washes; the contrast gate composites them over the surfaces they sit on. */
+    --link-tint: color-mix(in oklab, var(--accent-vivid) 16%, transparent);
+    --shadow-card-hover: 0 12px 32px -14px color-mix(in oklab, var(--accent-vivid) 35%, transparent);
+    --shadow-primary: inset 0 1px 0 color-mix(in oklab, white 25%, transparent), 0 1px 2px rgb(0 0 0 / 0.2);
+    --glow-primary: 0 8px 24px -8px color-mix(in oklab, var(--accent-vivid) 55%, transparent);
     /* Never #ff4d2a in light mode: 2.92:1 on the tints. */
     --focus-ring: light-dark(#b42300, #ff4d2a);
     --accent: var(--accent-solid);
@@ -295,6 +300,7 @@
     --input-size: 3rem;
     --selector-size: 3.5rem;
     --control-compact: 2rem;
+    --control-large: 3.25rem;
     --check-size: 1.25rem;
     --target-min: 1.5rem;
     --textarea-min: 16rem;
@@ -329,6 +335,8 @@
     --font-og-family: Figtree;
     --focus-outline: var(--stroke-emphasis) solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --duration-fast: 150ms;
   }
 
   @media (width >= 40rem) {

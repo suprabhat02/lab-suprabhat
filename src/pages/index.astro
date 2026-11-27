@@ -3,6 +3,7 @@ import { getTools } from '../lib/seo/tools';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ToolCard from '../components/ToolCard.astro';
 import HeroDuel from '../components/HeroDuel.astro';
+import Icon from '../components/Icon.astro';
 
 const tools = await getTools();
 ---
@@ -42,11 +43,12 @@ const tools = await getTools();
           <ToolCard tool={tool} />
         ))}
       </ul>
+      <!-- prettier-ignore -->
       <p class="prose home-body">
         <a href="/tools/">Browse all tools by topic</a>. More tools are on the way. Each one gets the same
         treatment: a tool that answers the question, and an explainer that teaches the idea behind it. Read
         <a href="/about/">why this lab exists</a>, or see more work on
-        <a href="https://suprabhat-dev.com">suprabhat-dev.com</a>.
+        <a href="https://suprabhat-dev.com">suprabhat-dev.com<Icon name="arrow-up-right" size={16} class="icon-external" /></a>.
       </p>
     </div>
   </section>

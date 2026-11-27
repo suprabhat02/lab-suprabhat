@@ -3,6 +3,7 @@ import { renderToString } from '../lib/view/h';
 import { cascadeResultView, cascadeRowView } from '../lib/app/views';
 import { LIMITS } from '../lib/cascade/share';
 import type { CascadeModel } from '../lib/app/model';
+import Icon from './Icon.astro';
 
 interface Props {
   model: CascadeModel;
@@ -65,7 +66,8 @@ const result = cascadeResultView(model).map(renderToString).join('');
         />
       </div>
       <div class="decls" data-decls set:html={rows} />
-      <button class="button js-only" type="button" data-add-row>
+      <button class="button button-secondary js-only" type="button" data-add-row>
+        <Icon name="plus" size={16} />
         Add declaration
       </button>
     </div>

@@ -119,6 +119,7 @@
       min-block-size: var(--target-min);
       font-weight: var(--weight-medium);
       text-decoration-line: none;
+      background-image: none;
 
       &:hover {
         text-decoration-line: underline;
@@ -309,6 +310,7 @@
       color: var(--text-muted);
       font-weight: var(--weight-regular);
       text-decoration-line: none;
+      background-image: none;
 
       &:hover {
         color: var(--text);
