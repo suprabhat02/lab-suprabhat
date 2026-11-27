@@ -11,7 +11,9 @@ export function readTokens(source = readFileSync(tokenFile, 'utf8'), moreContras
   if (moreContrast && !more) throw new Error('Missing increased-contrast tokens.');
   /** @type {Map<string, string>} */
   const tokens = new Map();
-  for (const [, name, value] of `${root}\n${moreContrast ? more : ''}`.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+  for (const [, name, value] of `${root}\n${moreContrast ? more : ''}`.matchAll(
+    /(--[\w-]+)\s*:\s*([^;]+);/g,
+  )) {
     if (!name || !value) throw new Error('Invalid token declaration.');
     tokens.set(name, value.trim());
   }
@@ -117,20 +119,26 @@ export const contrastGroups = [
     minimum: 4.5,
   })),
   { fg: 'text-body', backgrounds: surfaces, minimum: 4.5 },
-  // Faint text never sits on the inset surface; text inputs use --bg so placeholders pass.
-  { fg: 'text-faint', backgrounds: ['bg', 'surface', 'surface-overlay'], minimum: 4.5 },
+  { fg: 'text-faint', backgrounds: surfaces, minimum: 4.5 },
   // Accent text is limited to these surfaces; elsewhere accent is an underline or the focus ring.
   ...['accent', 'accent-hover'].map((fg) => ({
     fg,
     backgrounds: ['bg', 'surface', 'accent-subtle'],
     minimum: 4.5,
   })),
+  { fg: 'accent-text', backgrounds: ['bg', 'surface', 'accent-tint'], minimum: 4.5 },
+  { fg: 'accent-border', backgrounds: ['bg', 'surface'], minimum: 3 },
+  { fg: 'text', backgrounds: ['selection-bg'], minimum: 4.5 },
   ...['success', 'warning', 'danger', 'info'].map((fg) => ({
     fg,
     backgrounds: [...surfaces, `${fg}-subtle`],
     minimum: 4.5,
   })),
-  { fg: 'on-accent', backgrounds: ['accent', 'accent-hover'], minimum: 4.5 },
+  {
+    fg: 'on-accent',
+    backgrounds: ['accent', 'accent-hover', 'accent-solid', 'accent-solid-hover'],
+    minimum: 4.5,
+  },
   { fg: 'on-primary', backgrounds: ['primary', 'primary-hover'], minimum: 4.5 },
   { fg: 'border-strong', backgrounds: ['bg', 'surface'], minimum: 3 },
   {

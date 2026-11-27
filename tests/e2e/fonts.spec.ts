@@ -116,7 +116,8 @@ test.describe('font loading', () => {
     expect(code.features).toBe('"ss02", "zero"');
   });
 
-  test('only running-text links are underlined at rest', async ({ page }) => {
+  test('only running-text links are underlined, at rest and on hover', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     const decoration = (selector: string) =>
       page
@@ -127,6 +128,12 @@ test.describe('font loading', () => {
     expect(await decoration('.nav-link')).toBe('none');
     expect(await decoration('.site-footer a')).toBe('none');
     expect(await decoration('.tool-title a')).toBe('none');
+    for (const selector of ['.nav-link', '.site-footer a']) {
+      await page.locator(selector).first().hover();
+      expect(await decoration(selector), `${selector}:hover`).toBe('none');
+    }
+    await page.locator('main p a').first().hover();
+    expect(await decoration('main p a')).toBe('underline');
   });
 
   test('Arabic and RTL roots use the system font stack', async ({ page }) => {

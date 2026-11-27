@@ -1,0 +1,42 @@
+---
+import { renderToString } from '../lib/view/h';
+import type { VNode } from '../lib/view/h';
+import { scoreView, verdictView } from '../lib/app/views';
+import { buildDuel } from '../lib/app/model';
+import { calculate } from '../lib/cascade/specificity';
+
+interface Props {
+  selectors: readonly [string, string];
+}
+const { selectors } = Astro.props;
+// The real engine, at build time: the numbers on the home page can't drift from the tool's.
+const duel = buildDuel(selectors, calculate);
+if (!duel.comparison) throw new Error(`Hero duel needs two valid selectors: ${selectors.join(' vs ')}`);
+const winner = duel.comparison.effectiveWinner;
+const html = (nodes: VNode[]) => nodes.map(renderToString).join('');
+---
+
+<div class="hero-demo">
+  <figure class="hero-duel" data-hero-duel>
+    <div class="hero-stage">
+      <div class="hero-panel">
+        <div class="contenders hero-contenders">
+          {duel.contenders.map((contender, index) => (
+            <div class="contender hero-contender" data-winner={index === winner || undefined}>
+              <p class="label">Selector {index + 1}</p>
+              <p>
+                <code class="hero-selector">{contender.input}</code>
+              </p>
+              <div class="score" set:html={html(scoreView(contender, index, duel))} />
+            </div>
+          ))}
+        </div>
+        <p class="hero-verdict" set:html={html(verdictView(duel))} />
+      </div>
+    </div>
+    <figcaption>Which selector wins? Computed at build time.</figcaption>
+  </figure>
+  <p class="hero-demo-link">
+    <a href="/specificity/">View the full tool</a>
+  </p>
+</div>

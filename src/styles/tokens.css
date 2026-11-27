@@ -99,50 +99,54 @@
   :root {
     color-scheme: dark;
 
-    /* Tailwind gray, read from tailwindcss.com's production CSS. */
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5dc;
-    --gray-400: #99a1af;
-    --gray-500: #6a7282;
-    --gray-600: #4a5565;
-    --gray-700: #364153;
-    --gray-800: #1e2939;
-    --gray-900: #101828;
-    --gray-950: #030712;
-
-    --bg: light-dark(#ffffff, var(--gray-950));
-    --surface: light-dark(var(--gray-50), var(--gray-900));
-    --surface-overlay: light-dark(#ffffff, var(--gray-900));
-    --surface-inset: light-dark(var(--gray-100), var(--gray-800));
-    /* Dark gray-700 fails muted text and control borders, so dark hover and active share gray-800;
-       pressed and selected states always add a non-colour indicator. */
-    --fill: light-dark(var(--gray-100), var(--gray-900));
-    --fill-hover: light-dark(var(--gray-200), var(--gray-800));
-    --fill-active: light-dark(var(--gray-300), var(--gray-800));
-    --border-subtle: light-dark(
-      color-mix(in oklab, var(--gray-950) 5%, transparent),
-      color-mix(in oklab, #ffffff 10%, transparent)
+    /* Warm greys at hue 55 replace Tailwind's blue-tinted gray; pairs are checked by scripts/contrast.mjs. */
+    --bg: light-dark(#ffffff, #0c0a09);
+    --surface: light-dark(#fbf8f7, #13100f);
+    --surface-overlay: light-dark(#ffffff, #13100f);
+    --surface-inset: light-dark(#f6f1ef, #1b1816);
+    /* Pressed and selected states always add a non-colour indicator, not just a fill. */
+    --fill: light-dark(#f6f1ef, #1b1816);
+    --fill-hover: light-dark(#eee9e6, #221f1d);
+    --fill-active: light-dark(#e5dfdb, #2a2624);
+    /* Decorative: hatched rails, full-bleed hairlines and the hero stage outline. */
+    --pattern-fg: light-dark(
+      color-mix(in oklab, #1c1714 5%, transparent),
+      color-mix(in oklab, white 10%, transparent)
     );
-    --border: light-dark(var(--gray-200), var(--gray-800));
-    --border-strong: var(--gray-500);
-    --border-control-on-fill: var(--gray-500);
-    --text: light-dark(var(--gray-950), #ffffff);
-    --text-body: light-dark(var(--gray-700), var(--gray-300));
-    --text-muted: light-dark(var(--gray-600), var(--gray-400));
-    /* Dark gray-500 is 4.16:1 on gray-950, so dark faint text shares gray-400 with muted. */
-    --text-faint: light-dark(var(--gray-500), var(--gray-400));
+    --border-subtle: var(--pattern-fg);
+    --hatch: repeating-linear-gradient(
+      315deg,
+      var(--pattern-fg) 0,
+      var(--pattern-fg) 1px,
+      transparent 0,
+      transparent 50%
+    );
+    --border: light-dark(#d2cbc6, #403b37);
+    --border-strong: light-dark(#78706a, #8c847f);
+    --border-control-on-fill: light-dark(#78706a, #8c847f);
+    --text: light-dark(#1c1714, #f0ecea);
+    --text-body: light-dark(#3d3631, #d6d0cc);
+    --text-muted: light-dark(#58514c, #bbb4b0);
+    /* Light #78706a is 4.34:1 on the inset surface, so faint text is one step darker. */
+    --text-faint: light-dark(#706862, #8c847f);
     --marker: color-mix(in oklab, var(--text-body) 25%, transparent);
-    /* Accent marks running-text underlines and focus; it is not used for link or nav text. */
-    --accent: light-dark(#b42300, #ff4d2a);
+
+    /* Vermilion. #ff4d2a is never small text in light mode, and white never sits on it. */
+    --accent-solid: light-dark(#b42300, #ff4d2a);
+    --accent-solid-hover: light-dark(#981c00, #ff6e4a);
+    --on-accent: light-dark(#ffffff, #0c0a09);
+    --accent-text: light-dark(#b42300, #ff9874);
+    /* Decorative only: underlines, glows and large display. */
+    --accent-vivid: #ff4d2a;
+    --accent-tint: light-dark(#fff7f4, #1c0f0c);
+    --accent-border: light-dark(#ee4b2b, #b94129);
+    --glow: light-dark(#ffe0d8, #521a0f);
+    --selection-bg: light-dark(#ffd1c6, #642114);
+    /* Never #ff4d2a in light mode: 2.92:1 on the tints. */
+    --focus-ring: light-dark(#b42300, #ff4d2a);
+    --accent: var(--accent-solid);
     --accent-hover: light-dark(oklch(44% 0.15 33), oklch(78% 0.12 33));
     --accent-subtle: light-dark(oklch(95% 0.02 33), oklch(24% 0.03 33));
-    --on-accent: light-dark(#ffffff, var(--gray-950));
-    --primary: light-dark(#000000, var(--gray-700));
-    --primary-hover: light-dark(var(--gray-800), var(--gray-600));
-    --on-primary: #ffffff;
-    --focus-ring: var(--accent);
     --success: light-dark(oklch(45% 0.1 155), oklch(78% 0.12 155));
     --success-subtle: light-dark(oklch(95% 0.02 155), oklch(24% 0.03 155));
     --warning: light-dark(oklch(45% 0.08 80), oklch(80% 0.11 80));
@@ -164,6 +168,9 @@
     --line: var(--border-subtle);
     --control-border: var(--border-strong);
     --accent-strong: var(--accent-hover);
+    --primary: var(--accent-solid);
+    --primary-hover: var(--accent-solid-hover);
+    --on-primary: var(--on-accent);
 
     --radius-control: 6px;
     --radius-card: 10px;
@@ -222,6 +229,8 @@
     --text-5xl--line-height: 1;
     --text-6xl: 3.75rem;
     --text-6xl--line-height: 1;
+    --text-7xl: 4.5rem;
+    --text-7xl--line-height: 1;
     --text-8xl: 6rem;
     --text-8xl--line-height: 1;
     /* Deprecated for one release; remove in the release after the design-system release. */
@@ -271,11 +280,16 @@
     --space-xl-2xl: var(--space-xl);
     --space-section: calc(var(--spacing) * 20);
 
-    --measure: 46ch;
+    --measure: 68ch;
     /* Stable while proportional fallback glyph widths change during font swap. */
     --measure-lead: 48rem;
-    --gutter: var(--space-s);
-    --max-width: 90rem;
+    --gutter: clamp(1rem, 4vw, 2.5rem);
+    --container-wide: 90rem;
+    --container-page: 64rem;
+    --rail: 2.5rem;
+    --section-space: clamp(4rem, 8vw, 8rem);
+    /* Deprecated for one release; use --container-wide. */
+    --max-width: var(--container-wide);
     --header-height: 4rem;
     --control-size: 2.75rem;
     --input-size: 3rem;
@@ -313,7 +327,7 @@
     --og-padding: 80;
     --og-border-width: 12;
     --font-og-family: Figtree;
-    --focus-outline: var(--stroke-focus) solid var(--focus-ring);
+    --focus-outline: var(--stroke-emphasis) solid var(--focus-ring);
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
@@ -323,13 +337,6 @@
       --space-m-l: var(--space-l);
       --space-l-xl: var(--space-xl);
       --space-xl-2xl: var(--space-2xl);
-      --gutter: var(--space-m);
-    }
-  }
-
-  @media (width >= 64rem) {
-    :root {
-      --gutter: var(--space-l);
     }
   }
 
@@ -357,8 +364,8 @@
       --text-body: var(--text);
       --text-muted: var(--text);
       --text-faint: var(--text);
-      --border-strong: light-dark(var(--gray-700), var(--gray-300));
-      --border-control-on-fill: light-dark(var(--gray-700), var(--gray-300));
+      --border-strong: light-dark(#3d3631, #d6d0cc);
+      --border-control-on-fill: light-dark(#3d3631, #d6d0cc);
       --border-subtle: var(--border-strong);
       --border: var(--border-strong);
     }

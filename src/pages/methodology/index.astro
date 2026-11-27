@@ -92,7 +92,7 @@ const roles: Record<string, string> = {
   ]}
 >
   <section class="hub-hero" aria-labelledby="methodology-title">
-    <div class="wrap flow">
+    <div class="wrap wrap-page hairlines flow">
       <h1 id="methodology-title">How the tools are checked</h1>
       <p class="tool-lead">
         What each tool is tested against, what it can't know, and how to report a mistake.
@@ -104,9 +104,11 @@ const roles: Record<string, string> = {
   </section>
 
   <section class="section" aria-labelledby="principles">
-    <div class="wrap">
+    <div class="wrap wrap-page">
       <div class="prose flow">
-        <h2 id="principles">Principles</h2>
+        <h2 id="principles" class="section-heading hairlines">
+          Principles
+        </h2>
         <ul>
           <li>
             <strong>Client-side only.</strong> Every tool runs in your browser. Pasted CSS, HTML and selectors
@@ -135,9 +137,9 @@ const roles: Record<string, string> = {
     const method = methods[tool.id];
     return (
       <section class="section" aria-labelledby={tool.data.slug}>
-        <div class="wrap">
+        <div class="wrap wrap-page">
           <div class="prose flow">
-            <h2 id={tool.data.slug}>
+            <h2 id={tool.data.slug} class="section-heading hairlines">
               <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
             </h2>
             <h3>How it is checked</h3>
@@ -159,9 +161,11 @@ const roles: Record<string, string> = {
   })}
 
   <section class="section" aria-labelledby="site-checks">
-    <div class="wrap">
+    <div class="wrap wrap-page">
       <div class="prose flow">
-        <h2 id="site-checks">How the site is checked</h2>
+        <h2 id="site-checks" class="section-heading hairlines">
+          How the site is checked
+        </h2>
         <p>
           Every pull request runs the unit tests and the browser tests in Chromium, Firefox and WebKit. Every
           page is scanned with axe-core in the light and dark themes, and the colour tokens are checked
@@ -198,9 +202,11 @@ const roles: Record<string, string> = {
   </section>
 
   <section class="section" aria-labelledby="report">
-    <div class="wrap">
+    <div class="wrap wrap-page">
       <div class="prose flow">
-        <h2 id="report">Report a wrong result</h2>
+        <h2 id="report" class="section-heading hairlines">
+          Report a wrong result
+        </h2>
         <p>
           If a tool gives an answer you think is wrong, <a href={REPORT_URL}>open a wrong-result report</a> on
           GitHub with the input, what you expected and what the tool said. Reports are public, so don't paste

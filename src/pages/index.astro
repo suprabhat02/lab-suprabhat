@@ -2,6 +2,7 @@
 import { getTools } from '../lib/seo/tools';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ToolCard from '../components/ToolCard.astro';
+import HeroDuel from '../components/HeroDuel.astro';
 
 const tools = await getTools();
 ---
@@ -15,18 +16,27 @@ const tools = await getTools();
   breadcrumbs={[{ name: 'Lab', path: '/' }]}
 >
   <section class="hub-hero hub-hero-home" aria-labelledby="hub-title">
-    <div class="wrap flow">
-      <h1 id="hub-title">Frontend tools that explain themselves</h1>
-      <p class="tool-lead">
-        Free tools and explainers for CSS and UI. No sign-up, no paywall, no tracking. They work on any device
-        and with any assistive technology.
-      </p>
+    <div class="wrap hairlines hero-grid">
+      <div class="hero-copy flow">
+        <h1 id="hub-title">
+          <span class="hero-line">Frontend tools</span>
+          <span class="hero-line">that explain</span>
+          <span class="hero-line">themselves</span>
+        </h1>
+        <p class="tool-lead">
+          Free tools and explainers for CSS and UI. No sign-up, no paywall, no tracking. They work on any
+          device and with any assistive technology.
+        </p>
+      </div>
+      <HeroDuel selectors={['#nav .link', 'nav ul li a:hover']} />
     </div>
   </section>
 
   <section class="section" aria-labelledby="tools-title">
     <div class="wrap flow">
-      <h2 id="tools-title" class="home-heading">Tools</h2>
+      <h2 id="tools-title" class="home-heading section-heading hairlines">
+        Tools
+      </h2>
       <ul class="tool-list" role="list">
         {tools.map((tool) => (
           <ToolCard tool={tool} />

@@ -3,7 +3,7 @@
 ## No React, no shadcn, no Tailwind
 
 - **React and shadcn** would hydrate a framework runtime on a page that needs one small island. The whole interactive part ships about 1.7 KB of gzipped JS before interaction; React alone is several times the 15 KB budget.
-- **Tailwind** would hide the cascade behind utility classes. This site teaches specificity and layers, so its CSS is written by hand to show the approach: declared `@layer` order, `:where()` for zero-specificity base styles, no IDs in selectors, no `!important` except inside `prefers-reduced-motion`. The typography, type scale, spacing and gray palette copy tailwindcss.com's values as plain CSS tokens; the Tailwind package is still not a dependency.
+- **Tailwind** would hide the cascade behind utility classes. This site teaches specificity and layers, so its CSS is written by hand to show the approach: declared `@layer` order, `:where()` for zero-specificity base styles, no IDs in selectors, no `!important` except inside `prefers-reduced-motion`. The typography, type scale and spacing copy tailwindcss.com's values as plain CSS tokens (the neutrals are a warm grey instead of Tailwind's gray; see "Warm page shell" below); the Tailwind package is still not a dependency.
 
 ## Specificity library
 
@@ -395,3 +395,13 @@ Accessibility, Best Practices, and SEO scored 100 in every measured run. Home an
 ## Scaffold clean-up
 
 The Astro template's `AGENTS.md` and `favicon.ico` were removed, and the template's initial commit was re-attributed to the repository author before anything was pushed.
+
+## Warm page shell (2026-11-27)
+
+Step 1 of the warm redesign: hatched rails, full-bleed hairlines, a hero with a real duel, warm greys and a defined accent. Values come from reading tailwindcss.com's live CSS on 2026-11-27; every colour pair is in the contrast gate.
+
+- **Warm hue-55 greys replace Tailwind gray.** Tailwind's gray ramp is tinted blue (hue about 260), and on a mostly white and near-black site that tint is what made the pages feel cold. A warm grey at hue 55 sits next to the vermilion accent instead of fighting it. The semantic token names didn't change, so no component did either, and the `--gray-*` primitives are gone. Light faint text is `#706862`, not the more obvious `#78706a`, because `#78706a` measures 4.34:1 on the inset surface; with the darker value `--text-faint` passes on every surface, so the contrast gate checks it on `surface-inset` again.
+- **No animation library.** The only motion is the nav links' 150ms colour and background transition, under `prefers-reduced-motion: no-preference`. CSS does that with no runtime, no extra JS and nothing that can shift layout. Scroll and page-transition motion is a later step, and CSS (`@view-transition`, scroll-driven animations) comes before any dependency.
+- **`overflow-x: clip`, not `hidden`, on `.page-shell`.** The hairlines are `200vw` wide and must not widen the page at 320px. `overflow: hidden` would contain them too, but it makes the wrapper a scroll container, and a sticky element sticks to its nearest scroll container, so `.site-header` would stop sticking to the viewport. `clip` clips without creating a scroll container. Note that `content-visibility: auto` also clips paint, so a `.section-deferred` can't carry full-bleed hairlines.
+- **The hero duel is computed, not typed.** `HeroDuel.astro` runs `buildDuel` with the real `calculate` at build time and renders it with the tool's own `scoreView` and `verdictView`. `Duel.astro` itself wasn't reused: it's the editable form, with inputs, ids and buttons that belong on the tool page. An e2e test reads the selectors from the page, runs `buildDuel` again and compares every numeral.
+- **The hero h1 is three fixed lines, with caps in em.** The metric-matched Inter fallback is up to 11% wider at display sizes, so with free wrapping the swap changed the line count at many widths (2 to 3 lines at 320px, 3 to 4 at 1280px) and shifted the page by 0.02 to 0.04. With fixed lines, and sizes stepped (`5xl` → `6xl` at 80rem → `7xl` at 90rem) so the widest line still fits the 5/12 column in the fallback, CLS is 0 from 320 to 1720px. The "about 18ch / 50ch" caps are written as 11em / 32em: `ch` is measured from the current font's "0", so a `ch` cap also changes width during the swap.
