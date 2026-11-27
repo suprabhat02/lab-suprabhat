@@ -1,5 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageToc from '../../components/PageToc.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { CATEGORY_ICONS } from '../../lib/icons';
 import { getTools } from '../../lib/seo/tools';
 import { lockedVersions } from '../../lib/seo/versions';
 import { REPORT_URL } from '../../lib/seo/links';
@@ -78,6 +81,19 @@ const roles: Record<string, string> = {
   'axe-core': 'Accessibility scans, in browser tests',
   '@playwright/test': 'Browser tests in Chromium, Firefox and WebKit',
 };
+
+// One list drives both the headings and the "On this page" links.
+const principles = { id: 'principles', title: 'Principles', icon: 'list-checks' } as const;
+const siteChecks = { id: 'site-checks', title: 'How the site is checked', icon: 'flask-conical' } as const;
+const versionsHeading = { id: 'versions', title: 'Tested versions', icon: 'package' } as const;
+const report = { id: 'report', title: 'Report a wrong result', icon: 'flag' } as const;
+const contents = [
+  principles,
+  ...tools.map((tool) => ({ id: tool.data.slug, title: tool.data.title })),
+  siteChecks,
+  versionsHeading,
+  report,
+];
 ---
 
 <BaseLayout
@@ -91,8 +107,8 @@ const roles: Record<string, string> = {
     { name: 'Methodology', path: '/methodology/' },
   ]}
 >
-  <section class="hub-hero" aria-labelledby="methodology-title">
-    <div class="wrap wrap-page hairlines flow">
+  <section class="hub-hero" aria-labelledby="methodology-title" data-tone="plain">
+    <div class="wrap hairlines flow">
       <h1 id="methodology-title">How the tools are checked</h1>
       <p class="tool-lead">
         What each tool is tested against, what it can't know, and how to report a mistake.
@@ -103,115 +119,119 @@ const roles: Record<string, string> = {
     </div>
   </section>
 
-  <section class="section" aria-labelledby="principles">
-    <div class="wrap wrap-page">
-      <div class="prose flow">
-        <h2 id="principles" class="section-heading hairlines">
-          Principles
-        </h2>
-        <ul>
-          <li>
-            <strong>Client-side only.</strong> Every tool runs in your browser. Pasted CSS, HTML and selectors
-            are analysed on your device and never sent to a server.
-          </li>
-          <li>
-            <strong>Nothing stored.</strong> No cookies, no analytics and no account. The only thing kept is
-            your theme choice, in your browser's local storage.
-          </li>
-          <li>
-            <strong>Links only carry what you share.</strong> Stylesheet Audit and Accessible Name Wars put
-            your input in a link only when you press Copy link, and Selector Playground never does. CSS
-            Specificity Wars keeps its selectors in the address bar as you edit, so the page can be
-            bookmarked; that address stays in your browser unless you send it.
-          </li>
-          <li>
-            <strong>Same answer without JavaScript.</strong> Each tool page includes a pre-calculated example
-            from the same engine the live tool uses.
-          </li>
-        </ul>
+  <section class="section" aria-label="Methods" data-tone="tint">
+    <div class="wrap section-split">
+      <div class="split-head split-head-toc">
+        <PageToc items={contents} />
       </div>
-    </div>
-  </section>
-
-  {tools.map((tool) => {
-    const method = methods[tool.id];
-    return (
-      <section class="section" aria-labelledby={tool.data.slug}>
-        <div class="wrap wrap-page">
+      <div class="split-body split-blocks">
+        <div class="split-block">
+          <SectionHeader {...principles} />
           <div class="prose flow">
-            <h2 id={tool.data.slug} class="section-heading hairlines">
-              <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
-            </h2>
-            <h3>How it is checked</h3>
             <ul>
-              {method?.checked.map((item) => (
-                <li set:html={html(item)} />
-              ))}
-            </ul>
-            <h3>Known limits</h3>
-            <ul>
-              {method?.limits.map((item) => (
-                <li set:html={html(item)} />
-              ))}
+              <li>
+                <strong>Client-side only.</strong> Every tool runs in your browser. Pasted CSS, HTML and
+                selectors are analysed on your device and never sent to a server.
+              </li>
+              <li>
+                <strong>Nothing stored.</strong> No cookies, no analytics and no account. The only thing kept
+                is your theme choice, in your browser's local storage.
+              </li>
+              <li>
+                <strong>Links only carry what you share.</strong> Stylesheet Audit and Accessible Name Wars
+                put your input in a link only when you press Copy link, and Selector Playground never does.
+                CSS Specificity Wars keeps its selectors in the address bar as you edit, so the page can be
+                bookmarked; that address stays in your browser unless you send it.
+              </li>
+              <li>
+                <strong>Same answer without JavaScript.</strong> Each tool page includes a pre-calculated
+                example from the same engine the live tool uses.
+              </li>
             </ul>
           </div>
         </div>
-      </section>
-    );
-  })}
 
-  <section class="section" aria-labelledby="site-checks">
-    <div class="wrap wrap-page">
-      <div class="prose flow">
-        <h2 id="site-checks" class="section-heading hairlines">
-          How the site is checked
-        </h2>
-        <p>
-          Every pull request runs the unit tests and the browser tests in Chromium, Firefox and WebKit. Every
-          page is scanned with axe-core in the light and dark themes, and the colour tokens are checked
-          against WCAG contrast ratios offline.
-        </p>
-        <h2 id="versions">Tested versions</h2>
-        <p>Read from the lockfile when the site is built.</p>
-      </div>
-      <div class="table-wrap" tabindex="0" role="region" aria-label="Tested package versions">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Package</th>
-              <th scope="col">Version</th>
-              <th scope="col">Used for</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(versions).map(([name, version]) => (
-              <tr>
-                <th scope="row">
-                  <code>{name}</code>
-                </th>
-                <td>
-                  <code>{version}</code>
-                </td>
-                <td>{roles[name]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+        {tools.map((tool) => {
+          const method = methods[tool.id];
+          return (
+            <div class="split-block">
+              <SectionHeader
+                id={tool.data.slug}
+                icon={CATEGORY_ICONS[tool.data.category]}
+                eyebrow={tool.data.category}
+              >
+                <a href={`/${tool.data.slug}/`}>{tool.data.title}</a>
+              </SectionHeader>
+              <div class="prose flow">
+                <h3>How it is checked</h3>
+                <ul>
+                  {method?.checked.map((item) => (
+                    <li set:html={html(item)} />
+                  ))}
+                </ul>
+                <h3>Known limits</h3>
+                <ul>
+                  {method?.limits.map((item) => (
+                    <li set:html={html(item)} />
+                  ))}
+                </ul>
+              </div>
+            </div>
+          );
+        })}
 
-  <section class="section" aria-labelledby="report">
-    <div class="wrap wrap-page">
-      <div class="prose flow">
-        <h2 id="report" class="section-heading hairlines">
-          Report a wrong result
-        </h2>
-        <p>
-          If a tool gives an answer you think is wrong, <a href={REPORT_URL}>open a wrong-result report</a> on
-          GitHub with the input, what you expected and what the tool said. Reports are public, so don't paste
-          private code.
-        </p>
+        <div class="split-block">
+          <SectionHeader {...siteChecks} />
+          <div class="prose flow">
+            <p>
+              Every pull request runs the unit tests and the browser tests in Chromium, Firefox and WebKit.
+              Every page is scanned with axe-core in the light and dark themes, and the colour tokens are
+              checked against WCAG contrast ratios offline.
+            </p>
+          </div>
+        </div>
+
+        <div class="split-block">
+          <SectionHeader {...versionsHeading} />
+          <div class="prose flow">
+            <p>Read from the lockfile when the site is built.</p>
+          </div>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="Tested package versions">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Package</th>
+                  <th scope="col">Version</th>
+                  <th scope="col">Used for</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(versions).map(([name, version]) => (
+                  <tr>
+                    <th scope="row">
+                      <code>{name}</code>
+                    </th>
+                    <td>
+                      <code>{version}</code>
+                    </td>
+                    <td>{roles[name]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="split-block">
+          <SectionHeader {...report} />
+          <div class="prose flow">
+            <p>
+              If a tool gives an answer you think is wrong,{' '}
+              <a href={REPORT_URL}>open a wrong-result report</a> on GitHub with the input, what you expected
+              and what the tool said. Reports are public, so don't paste private code.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </section>

@@ -126,7 +126,7 @@ export const contrastGroups = [
     backgrounds: ['bg', 'surface', 'accent-subtle'],
     minimum: 4.5,
   })),
-  { fg: 'accent-text', backgrounds: ['bg', 'surface', 'accent-tint'], minimum: 4.5 },
+  { fg: 'accent-text', backgrounds: ['bg', 'surface', 'accent-tint', 'surface-inset'], minimum: 4.5 },
   { fg: 'accent-border', backgrounds: ['bg', 'surface'], minimum: 3 },
   { fg: 'text', backgrounds: ['selection-bg'], minimum: 4.5 },
   ...['success', 'warning', 'danger', 'info'].map((fg) => ({

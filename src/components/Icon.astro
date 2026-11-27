@@ -1,13 +1,23 @@
 ---
 import Accessibility from '@lucide/astro/icons/accessibility';
 import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import BookOpen from '@lucide/astro/icons/book-open';
 import Braces from '@lucide/astro/icons/braces';
 import Check from '@lucide/astro/icons/check';
 import ChevronRight from '@lucide/astro/icons/chevron-right';
 import Copy from '@lucide/astro/icons/copy';
+import Flag from '@lucide/astro/icons/flag';
+import FlaskConical from '@lucide/astro/icons/flask-conical';
+import Hammer from '@lucide/astro/icons/hammer';
+import LayoutGrid from '@lucide/astro/icons/layout-grid';
+import Link from '@lucide/astro/icons/link';
+import ListChecks from '@lucide/astro/icons/list-checks';
 import Moon from '@lucide/astro/icons/moon';
+import Package from '@lucide/astro/icons/package';
 import Plus from '@lucide/astro/icons/plus';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
 import Sun from '@lucide/astro/icons/sun';
+import User from '@lucide/astro/icons/user';
 import type { IconName } from '../lib/icons';
 
 interface Props {
@@ -22,13 +32,23 @@ interface Props {
 const ICONS = {
   accessibility: Accessibility,
   'arrow-up-right': ArrowUpRight,
+  'book-open': BookOpen,
   braces: Braces,
   check: Check,
   'chevron-right': ChevronRight,
   copy: Copy,
+  flag: Flag,
+  'flask-conical': FlaskConical,
+  hammer: Hammer,
+  'layout-grid': LayoutGrid,
+  link: Link,
+  'list-checks': ListChecks,
   moon: Moon,
+  package: Package,
   plus: Plus,
+  'shield-check': ShieldCheck,
   sun: Sun,
+  user: User,
 } satisfies Record<IconName, typeof Sun>;
 
 const { name, size = 20, label, class: className } = Astro.props;

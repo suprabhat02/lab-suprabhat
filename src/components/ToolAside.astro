@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import SectionHeader from './SectionHeader.astro';
+import { getTools } from '../lib/seo/tools';
+import { REPORT_URL } from '../lib/seo/links';
+
+interface Props {
+  tool: CollectionEntry<'tools'>;
+}
+const { tool } = Astro.props;
+const relatedIds = new Set(tool.data.related.map((entry) => entry.id));
+const related = (await getTools()).filter((entry) => relatedIds.has(entry.id));
+---
+
+<div class="tool-aside">
+  <div class="tool-trust">
+    <p>
+      By <a href="/about/">Suprabhat Kumar</a>
+    </p>
+    <ul class="link-rows" role="list">
+      <li>
+        <a class="button button-link" href={`/methodology/#${tool.data.slug}`}>
+          How this tool is checked
+          <Icon name="chevron-right" size={16} />
+        </a>
+      </li>
+      <li>
+        <a class="button button-link" href={REPORT_URL}>
+          Report a wrong result
+          <Icon name="arrow-up-right" size={16} />
+        </a>
+      </li>
+    </ul>
+  </div>
+  <aside class="tool-related" aria-labelledby="related-title">
+    <SectionHeader id="related-title" title="Related tools" icon="link" size="compact" level={3} />
+    <ul class="link-rows related-tools" role="list">
+      {related.map((entry) => (
+        <li>
+          <a class="button button-link" href={`/${entry.data.slug}/`}>
+            {entry.data.title}
+            <Icon name="chevron-right" size={16} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  </aside>
+</div>

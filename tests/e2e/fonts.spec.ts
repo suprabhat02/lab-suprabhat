@@ -39,7 +39,9 @@ test.describe('font loading', () => {
         await page.evaluate(() => document.fonts.ready);
         expect(await page.evaluate(() => document.fonts.check('16px "Inter Variable"'))).toBe(true);
         const sans = await page
-          .locator('body, h1, h2, .site-nav a, button, p:not(.parts, .tool-category, .toc-title)')
+          .locator(
+            'body, h1, h2, .site-nav a, button, p:not(.parts, .tool-category, .toc-title, .section-eyebrow)',
+          )
           .evaluateAll((elements) =>
             elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
           );
@@ -53,7 +55,7 @@ test.describe('font loading', () => {
         expect(settings.variations).toBe('normal');
         const mono = await page
           .locator(
-            'code, textarea, .brand, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd, [data-fix-target]',
+            'code, textarea, .brand, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd, [data-fix-target], .section-eyebrow',
           )
           .evaluateAll((elements) =>
             elements.map((el) => {

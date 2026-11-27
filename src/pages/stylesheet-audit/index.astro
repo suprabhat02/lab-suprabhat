@@ -69,9 +69,14 @@ const output = auditView(result.value).map(renderToString).join('');
     </Fragment>
     <div slot="output" class="flow" data-audit-output set:html={output} />
   </ToolWorkbench>
-  <ExplainerBand slot="explainer" labelledby="audit-explainer">
+  <ExplainerBand
+    slot="explainer"
+    labelledby="audit-explainer"
+    title="A map, not a verdict"
+    tool={tool}
+    tone="tint"
+  >
     <div class="prose flow">
-      <h2 id="audit-explainer">A map, not a verdict</h2>
       <p class="prose">
         A specificity graph shows selector weight in source order. Peaks identify places to review, not
         guaranteed bugs. A higher-weight rule can resist later rules only when they compete in the same

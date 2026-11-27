@@ -11,6 +11,12 @@ import type { CascadeRow } from '../lib/cascade/share';
 import { DEFAULT_INPUTS } from '../lib/app/defaults';
 import { formatSpecificity } from '../lib/cascade/math';
 import { rich, renderToString } from '../lib/view/h';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  tool: CollectionEntry<'tools'>;
+}
+const { tool } = Astro.props;
 
 const row = (selector: string, value: string, extra: Partial<CascadeRow> = {}): CascadeRow => ({
   selector,
@@ -55,34 +61,31 @@ const nestingState = encodeState({ v: 1, mode: 'nesting', inputs: { ...DEFAULT_I
 const nestingHref = nestingState.ok ? `/specificity/?s=${nestingState.value}` : null;
 ---
 
-<ExplainerBand labelledby="explainer-title" deferred>
-  <div class="explainer">
-    <header class="explainer-head prose flow">
-      <h2 id="explainer-title">Specificity and the cascade, explained</h2>
-      <p>
-        When two rules set the same property on the same element, the browser has to pick one. Most people learn
-        that "the more specific selector wins". That's true, but it's only one step of a longer process called the
-        cascade. This guide covers both, with examples you can load straight into the tool above.
-      </p>
-    </header>
+<ExplainerBand
+  labelledby="explainer-title"
+  title="Specificity and the cascade, explained"
+  lead={'When two rules set the same property on the same element, the browser has to pick one. Most people learn that "the more specific selector wins". That\'s true, but it\'s only one step of a longer process called the cascade. This guide covers both, with examples you can load straight into the tool above.'}
+  tool={tool}
+  tone="tint"
+  deferred
+>
+  <nav class="toc flow" slot="nav" aria-label="On this page" data-toc>
+    <p class="toc-title" aria-hidden="true">On this page</p>
+    <details class="toc-details">
+      <summary class="toc-summary">On this page</summary>
+      <ol class="toc-list" role="list">
+        {
+          sections.map(([id, title]) => (
+            <li>
+              <a class="toc-link" href={`#${id}`} set:html={rich(title).map(renderToString).join('')} />
+            </li>
+          ))
+        }
+      </ol>
+    </details>
+  </nav>
 
-    <nav class="toc flow" aria-label="On this page" data-toc>
-      <p class="toc-title" aria-hidden="true">On this page</p>
-      <details class="toc-details">
-        <summary class="toc-summary">On this page</summary>
-        <ol class="toc-list" role="list">
-          {
-            sections.map(([id, title]) => (
-              <li>
-                <a class="toc-link" href={`#${id}`} set:html={rich(title).map(renderToString).join('')} />
-              </li>
-            ))
-          }
-        </ol>
-      </details>
-    </nav>
-
-    <article class="explainer-body prose prose-wide flow">
+  <article class="explainer-body prose prose-wide flow">
       <h2 id="how-calculated">How is CSS specificity calculated?</h2>
       <p>
         Specificity is three separate counts, written <code>(A, B, C)</code>. Look at every simple selector in the
@@ -326,5 +329,4 @@ p { color: crimson; }`}
         More from the same author on <a href="https://suprabhat-dev.com">suprabhat-dev.com<Icon name="arrow-up-right" size={16} class="icon-external" /></a>.
       </p>
     </article>
-  </div>
 </ExplainerBand>

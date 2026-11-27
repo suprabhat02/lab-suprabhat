@@ -1,14 +1,19 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
+import ToolPreview from './previews/ToolPreview.astro';
 import { CATEGORY_ICONS } from '../lib/icons';
+import { previewFor } from '../lib/previews';
 
 interface Props {
   tool: CollectionEntry<'tools'>;
-  /** The tools index groups by category, so its chip is the icon alone and the card shows status. */
+  /** The tools index groups by category, so its chip is the icon alone and the card shows status.
+   *  Only home cards carry a preview. */
   variant?: 'home' | 'index';
 }
 const { tool, variant = 'home' } = Astro.props;
+// Fails the build for a tool without a preview, even on pages that don't show one.
+const preview = previewFor(tool.data.slug);
 const dateFormat = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   month: 'long',
@@ -31,6 +36,7 @@ const status = tool.data.status === 'live' ? 'Live' : 'In progress';
   </h3>
   {(variant === 'index' || tool.data.status === 'in-progress') && <p class="tool-status">{status}</p>}
   <p class="prose">{tool.data.summary}</p>
+  {variant === 'home' && <ToolPreview slug={preview} />}
   <p class="muted">
     <small>
       Updated{' '}

@@ -1,5 +1,11 @@
 import type { AppInputs, ShareState } from '../cascade/share';
 
+/** The home hero duel and the Specificity card preview: one call, the same numbers. */
+export const HERO_SELECTORS = ['#nav .link', 'nav ul li a:hover'] as const;
+
+/** Selector Playground's starting selector, also split into parts by its card preview. */
+export const PLAYGROUND_SELECTOR = '#nav .link:hover > a::before';
+
 export const DEFAULT_INPUTS: AppInputs = {
   selectors: ['#nav a', '.menu .link:hover'],
   nesting: `.card, #promo {

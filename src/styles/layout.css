@@ -55,11 +55,6 @@
     margin-inline: auto;
   }
 
-  /* About, Methodology and the Tools index. */
-  .wrap-page {
-    inline-size: min(100% - 2 * var(--gutter), var(--container-page));
-  }
-
   .grid {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -101,6 +96,11 @@
     & :is(h2, h3, section) {
       scroll-margin-block-start: calc(var(--header-height) + var(--space-s));
     }
+
+    /* Workbenches keep their full width, but their paragraphs keep the reading measure. */
+    & p {
+      max-inline-size: var(--measure);
+    }
   }
 
   .results-nav {
@@ -128,11 +128,6 @@
     }
   }
 
-  .section-explainer {
-    background: var(--surface);
-    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
-  }
-
   .span-all {
     grid-column: 1 / -1;
   }
@@ -153,18 +148,108 @@
     }
   }
 
-  /* Half the space on each side, so adjacent sections sit --section-space apart. */
   .section {
-    padding-block: calc(var(--section-space) / 2);
+    padding-block: var(--section-space);
   }
 
-  /* A heading row's own top hairline already separates it from the section above. */
-  .section + .section:not(:has(.section-heading)) {
-    border-block-start: var(--stroke-hairline) solid var(--border-subtle);
+  /* ---------- Tone bands ---------- */
+
+  /* Top-level sections alternate plain and tint in DOM order; tint runs the full column width. */
+  [data-tone='plain'] {
+    background: var(--bg);
   }
 
-  .section-heading {
-    padding-block: var(--space-xs);
+  [data-tone='tint'] {
+    background: var(--surface);
+  }
+
+  /* Panels on a tint band step back to --bg, so they stay separate from it (cards: components.css). */
+  [data-tone='tint'] :is(.workbench-input, .workbench-output) {
+    background: var(--bg);
+  }
+
+  /* The seam: a hatched strip with hairlines, drawn at the foot of every band that has a band after
+     it. It is full bleed (.page-shell clips it) and sits inside the band's own end padding, so it
+     never covers content and adds no DOM. It hangs off the earlier band because a deferred
+     (content-visibility) band would clip its own top edge. */
+  [data-tone]:has(+ [data-tone]) {
+    position: relative;
+    padding-block-end: calc(var(--section-space) + var(--seam));
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset-block-end: 0;
+      inset-inline-start: -100vw;
+      inline-size: 200vw;
+      block-size: var(--seam);
+      border-block: var(--stroke-hairline) solid var(--pattern-fg);
+      background-image: var(--hatch);
+      background-size: 10px 10px;
+      pointer-events: none;
+    }
+  }
+
+  /* ---------- Split layout ---------- */
+
+  /* A header (or contents) column beside the body, from lg. DOM order is visual order. */
+  .section-split {
+    display: grid;
+    gap: var(--space-m) var(--space-l);
+
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      align-items: start;
+
+      /* Sticky for sections taller than the viewport; scrolls itself if it's taller still. The
+         padding keeps focus outlines inside the scroll box. */
+      & > .split-head {
+        position: sticky;
+        inset-block-start: calc(var(--header-height) + var(--space-m));
+        max-block-size: calc(100dvh - var(--header-height) - 2 * var(--space-m));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: var(--space-3xs);
+        margin: calc(-1 * var(--space-3xs));
+      }
+    }
+
+    @media (height < 32rem) {
+      & > .split-head {
+        position: static;
+        max-block-size: none;
+      }
+    }
+  }
+
+  .split-head {
+    display: grid;
+    align-content: start;
+    gap: var(--space-l);
+    min-inline-size: 0;
+  }
+
+  /* The contents column only exists from lg; below it the page reads straight down. */
+  .split-head-toc {
+    @media (width < 64rem) {
+      display: none;
+    }
+  }
+
+  .split-body {
+    min-inline-size: 0;
+  }
+
+  .split-blocks {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .split-block {
+    display: grid;
+    gap: var(--space-m);
+    align-content: start;
+    min-inline-size: 0;
   }
 
   .hub-hero > .hairlines {
@@ -179,6 +264,15 @@
     .hairlines::before,
     .hairlines::after {
       display: none;
+    }
+
+    /* The seam becomes a real rule. */
+    [data-tone]:has(+ [data-tone]) {
+      border-block-end: var(--stroke-hairline) solid CanvasText;
+
+      &::after {
+        display: none;
+      }
     }
   }
 

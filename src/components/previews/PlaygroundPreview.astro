@@ -1,0 +1,55 @@
+---
+// Playground's starting selector, split into parts by the same parser the tool runs.
+import { PLAYGROUND_SELECTOR } from '../../lib/app/defaults';
+import { calculate } from '../../lib/cascade/specificity';
+import type { PartKind } from '../../lib/cascade/types';
+
+const result = calculate(PLAYGROUND_SELECTOR);
+const first = result.ok ? result.value[0] : undefined;
+if (!first) throw new Error('The playground preview selector must parse.');
+
+// Gaps between parts (spaces) stay as plain text, so the selector reads exactly as typed.
+const pieces: { text: string; kind: PartKind | null }[] = [];
+let cursor = 0;
+for (const part of first.parts) {
+  if (part.start > cursor) pieces.push({ text: PLAYGROUND_SELECTOR.slice(cursor, part.start), kind: null });
+  pieces.push({ text: part.text, kind: part.kind });
+  cursor = part.end;
+}
+if (cursor < PLAYGROUND_SELECTOR.length) pieces.push({ text: PLAYGROUND_SELECTOR.slice(cursor), kind: null });
+const kinds = new Set(first.parts.map((part) => part.kind));
+const legend = [
+  { kind: 'id', label: 'ID', show: kinds.has('id') },
+  {
+    kind: 'class',
+    label: 'Class',
+    show: ['class', 'attribute', 'pseudo-class'].some((kind) => kinds.has(kind as PartKind)),
+  },
+  {
+    kind: 'type',
+    label: 'Type',
+    show: ['type', 'pseudo-element'].some((kind) => kinds.has(kind as PartKind)),
+  },
+].filter((entry) => entry.show);
+---
+
+<div class="preview-parts">
+  <code class="preview-selector">
+    {pieces.map((piece) =>
+      piece.kind ? (
+        <span class="part" data-kind={piece.kind}>
+          {piece.text}
+        </span>
+      ) : (
+        piece.text
+      ),
+    )}
+  </code>
+  <span class="preview-legend">
+    {legend.map((entry) => (
+      <span class="preview-key" data-key={entry.kind}>
+        {entry.label}
+      </span>
+    ))}
+  </span>
+</div>

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ToolCard from '../../components/ToolCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { CATEGORY_ICONS } from '../../lib/icons';
 import { getTools } from '../../lib/seo/tools';
 import { WEBSITE_ID, ref } from '../../lib/seo/entities';
 
@@ -46,8 +48,8 @@ const jsonLd = [
   ]}
   jsonLd={jsonLd}
 >
-  <section class="hub-hero" aria-labelledby="tools-page-title">
-    <div class="wrap wrap-page hairlines flow">
+  <section class="hub-hero" aria-labelledby="tools-page-title" data-tone="plain">
+    <div class="wrap hairlines flow">
       <h1 id="tools-page-title">All tools</h1>
       <p class="tool-lead">
         Each tool answers one question and explains the answer. Read{' '}
@@ -57,13 +59,18 @@ const jsonLd = [
     </div>
   </section>
 
-  {categories.map((category) => (
-    <section class="section" aria-labelledby={category.id}>
-      <div class="wrap wrap-page flow">
-        <h2 id={category.id} class="section-heading hairlines">
-          {category.name}
-        </h2>
-        <ul class="tool-list" role="list">
+  {categories.map((category, index) => (
+    <section class="section" aria-labelledby={category.id} data-tone={index % 2 === 0 ? 'tint' : 'plain'}>
+      <div class="wrap section-split">
+        <div class="split-head">
+          <SectionHeader
+            id={category.id}
+            title={category.name}
+            icon={CATEGORY_ICONS[category.name]}
+            eyebrow={`${category.tools.length} ${category.tools.length === 1 ? 'tool' : 'tools'}`}
+          />
+        </div>
+        <ul class="tool-list split-body" role="list">
           {category.tools.map((tool) => (
             <ToolCard tool={tool} variant="index" />
           ))}

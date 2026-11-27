@@ -4,6 +4,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ToolCard from '../components/ToolCard.astro';
 import HeroDuel from '../components/HeroDuel.astro';
 import Icon from '../components/Icon.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { HERO_SELECTORS } from '../lib/app/defaults';
 
 const tools = await getTools();
 ---
@@ -16,7 +18,7 @@ const tools = await getTools();
   ogAlt="Suprabhat's Lab: free frontend tools and explainers"
   breadcrumbs={[{ name: 'Lab', path: '/' }]}
 >
-  <section class="hub-hero hub-hero-home" aria-labelledby="hub-title">
+  <section class="hub-hero hub-hero-home" aria-labelledby="hub-title" data-tone="plain">
     <div class="wrap hairlines hero-grid">
       <div class="hero-copy flow">
         <h1 id="hub-title">
@@ -29,27 +31,44 @@ const tools = await getTools();
           device and with any assistive technology.
         </p>
       </div>
-      <HeroDuel selectors={['#nav .link', 'nav ul li a:hover']} />
+      <HeroDuel selectors={HERO_SELECTORS} />
     </div>
   </section>
 
-  <section class="section" aria-labelledby="tools-title">
+  <section class="section section-deferred" aria-labelledby="tools-title" data-tone="tint">
     <div class="wrap flow">
-      <h2 id="tools-title" class="home-heading section-heading hairlines">
-        Tools
-      </h2>
-      <ul class="tool-list" role="list">
+      <SectionHeader id="tools-title" title="Tools" icon="layout-grid" size="display" />
+      <ul class="tool-list tool-list-bento" role="list">
         {tools.map((tool) => (
           <ToolCard tool={tool} />
         ))}
       </ul>
-      <!-- prettier-ignore -->
-      <p class="prose home-body">
-        <a href="/tools/">Browse all tools by topic</a>. More tools are on the way. Each one gets the same
-        treatment: a tool that answers the question, and an explainer that teaches the idea behind it. Read
-        <a href="/about/">why this lab exists</a>, or see more work on
-        <a href="https://suprabhat-dev.com">suprabhat-dev.com<Icon name="arrow-up-right" size={16} class="icon-external" /></a>.
-      </p>
+      <div class="link-strip">
+        <p class="link-strip-lead">
+          More tools are on the way. Each one gets the same treatment: a tool that answers the question, and
+          an explainer that teaches the idea behind it.
+        </p>
+        <ul class="link-strip-list" role="list">
+          <li>
+            <a class="button button-outline" href="/tools/">
+              Browse all tools by topic
+              <Icon name="chevron-right" size={16} />
+            </a>
+          </li>
+          <li>
+            <a class="button button-outline" href="/about/">
+              Why this lab exists
+              <Icon name="chevron-right" size={16} />
+            </a>
+          </li>
+          <li>
+            <a class="button button-outline" href="https://suprabhat-dev.com">
+              More work on suprabhat-dev.com
+              <Icon name="arrow-up-right" size={16} />
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </BaseLayout>

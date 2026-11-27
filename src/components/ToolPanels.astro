@@ -16,7 +16,7 @@ interface Props {
 const { duel, nestingCss, nesting, cascade } = Astro.props;
 ---
 
-<section class="section" aria-labelledby="fix-title">
+<section class="section" aria-labelledby="fix-title" data-tone="tint">
   <ToolWorkbench stacked>
     <Fragment slot="output">
       <h2 id="fix-title">Want a different winner?</h2>
@@ -29,7 +29,7 @@ const { duel, nestingCss, nesting, cascade } = Astro.props;
   </ToolWorkbench>
 </section>
 
-<section class="section section-tools" aria-label="Inspect selectors and the cascade">
+<section class="section section-tools" aria-label="Inspect selectors and the cascade" data-tone="plain">
   <ToolWorkbench stacked>
     <div slot="output" class="tabs" data-tabs>
       <div class="tablist" role="tablist" aria-label="Inspect" data-tablist>

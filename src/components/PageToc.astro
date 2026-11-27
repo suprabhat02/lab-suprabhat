@@ -1,0 +1,23 @@
+---
+/** A static "On this page" list for long hub pages. The page renders its h2s from the same
+ *  items, so the links can't drift from the headings. Current-section highlighting is not wired. */
+interface Props {
+  items: ReadonlyArray<{ readonly id: string; readonly title: string }>;
+}
+const { items } = Astro.props;
+---
+
+<nav class="page-toc" aria-label="On this page">
+  <p class="toc-title" aria-hidden="true">
+    On this page
+  </p>
+  <ol class="toc-list" role="list">
+    {items.map((item) => (
+      <li>
+        <a class="toc-link" href={`#${item.id}`}>
+          {item.title}
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>

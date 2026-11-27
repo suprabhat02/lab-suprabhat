@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+interface Props {
+  /** Plain-text heading; use the default slot instead when the heading holds markup (a link). */
+  title?: string | undefined;
+  eyebrow?: string | undefined;
+  lead?: string | undefined;
+  id: string;
+  icon: IconName;
+  level?: 2 | 3;
+  /** `compact` for a header inside a side column, such as Related tools. */
+  size?: 'default' | 'compact' | 'display';
+}
+const { title, eyebrow, lead, id, icon, level = 2, size = 'default' } = Astro.props;
+const Heading = `h${level}` as const;
+---
+
+<header class:list={['section-header', `section-header-${size}`]}>
+  <div class="section-header-top">
+    <span class="section-chip">
+      <Icon name={icon} size={size === 'compact' ? 16 : 20} />
+    </span>
+    {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+  </div>
+  <Heading id={id} class="section-title">
+    {title}
+    <slot />
+  </Heading>
+  {lead && <p class="section-lead">{lead}</p>}
+</header>

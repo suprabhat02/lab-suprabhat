@@ -1,0 +1,33 @@
+---
+// The tool's own default stylesheet, audited at build time. Bar heights are the real triples,
+// each column capped at nine as the tool's graph does, in a few steps; the peak is labelled.
+import { analyze, DEFAULT_CSS } from '../../lib/audit/model';
+import { formatSpecificity } from '../../lib/cascade/math';
+
+const audit = analyze(DEFAULT_CSS);
+if (!audit.ok || audit.value.entries.length === 0)
+  throw new Error('The audit preview stylesheet must parse.');
+const { entries, metrics } = audit.value;
+const weight = ([a, b, c]: readonly [number, number, number]) =>
+  Math.min(a, 9) * 100 + Math.min(b, 9) * 10 + Math.min(c, 9);
+const top = Math.max(...entries.map((entry) => weight(entry.specificity)), 1);
+const peak = metrics.maximum;
+const bars = entries.map((entry) => ({
+  level: Math.max(1, Math.round((weight(entry.specificity) / top) * 6)),
+  peak: peak !== null && entry.index === peak.index,
+}));
+---
+
+<div class="preview-graph">
+  <span class="preview-bars">
+    {bars.map((bar) => (
+      <span class="preview-bar" data-level={bar.level} data-current={bar.peak || undefined} />
+    ))}
+  </span>
+  {peak && (
+    <span class="preview-row" data-current>
+      <span class="preview-label">Peak</span>
+      <code class="preview-score">{formatSpecificity(peak.specificity)}</code>
+    </span>
+  )}
+</div>

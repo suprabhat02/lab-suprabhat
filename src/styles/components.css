@@ -389,6 +389,7 @@
     display: flex;
     gap: var(--space-2xs);
     align-items: baseline;
+    max-inline-size: var(--measure);
     font-size: var(--text-sm);
     line-height: var(--line-code);
 
@@ -447,6 +448,17 @@
     padding-block: var(--space-xl-2xl);
   }
 
+  /* Heroes keep their own padding, plus room for the seam to the band after them (layout.css). */
+  :is(.hub-hero, .tool-hero):has(+ [data-tone]) {
+    padding-block-end: calc(var(--space-xl-2xl) + var(--seam));
+  }
+
+  /* The inspect panels end close to their content, whichever tab is open (tests/e2e/specificity.spec.ts),
+     so this band keeps a short end gap, plus the seam. */
+  .section-tools:has(+ [data-tone]) {
+    padding-block-end: calc(var(--space-l) + var(--seam));
+  }
+
   /* Tool and inner page intro, from tailwindcss.com's docs. The home page overrides it. */
   .tool-lead {
     --flow-heading-space: var(--space-m);
@@ -495,10 +507,6 @@
     &:dir(rtl) {
       transform: scaleX(-1);
     }
-  }
-
-  .related-tools {
-    --cluster-space: var(--space-m);
   }
 
   .duel {
@@ -728,11 +736,6 @@
   /* With tabs, the tab list already separates the panel from what's above it. */
   :root[data-js] .panel {
     padding-block-start: var(--space-l);
-  }
-
-  /* Panels end at their content; only a short gap separates them from the explainer, whichever tab is open. */
-  .section-tools {
-    padding-block-end: var(--space-l);
   }
 
   .panel-intro {
@@ -1067,22 +1070,6 @@
 
   /* ---------- Explainer: long-form prose, from tailwindcss.com's .prose ---------- */
 
-  .explainer-head {
-    & h2 {
-      font-size: var(--text-3xl);
-      line-height: var(--text-3xl--line-height);
-      font-weight: var(--weight-medium);
-      letter-spacing: var(--tracking-tight);
-    }
-
-    & p {
-      --flow-heading-space: var(--space-m);
-      color: var(--text-body);
-      font-size: var(--text-base);
-      line-height: 1.75rem;
-    }
-  }
-
   .explainer-body {
     color: var(--text-body);
     font-size: var(--text-sm);
@@ -1168,39 +1155,10 @@
     }
   }
 
-  .explainer {
-    display: grid;
-    gap: var(--space-l) var(--space-2xl);
-
-    @media (width >= 64rem) {
-      grid-template-columns: minmax(0, var(--explainer-max)) var(--aside-width);
-      grid-template-areas:
-        'head nav'
-        'body nav';
-      justify-content: start;
-      align-items: start;
-
-      & > .explainer-head {
-        grid-area: head;
-      }
-
-      & > .explainer-body {
-        grid-area: body;
-      }
-    }
-  }
-
+  /* In a split layout the column is already sticky, so the list itself doesn't stick. */
   .toc {
     font-size: var(--text-sm);
     line-height: var(--text-base--line-height);
-
-    @media (width >= 64rem) {
-      grid-area: nav;
-      position: sticky;
-      inset-block-start: calc(var(--header-height) + var(--space-m));
-      max-block-size: calc(100dvh - var(--header-height) - 2 * var(--space-m));
-      overflow-y: auto;
-    }
   }
 
   .toc-summary {
@@ -1226,6 +1184,18 @@
 
   .toc-title {
     display: none;
+  }
+
+  /* The static "On this page" list on hub pages: always open, its title always shown. */
+  .page-toc {
+    display: grid;
+    gap: var(--space-2xs);
+    font-size: var(--text-sm);
+    line-height: var(--text-base--line-height);
+
+    & .toc-title {
+      display: block;
+    }
   }
 
   /* Tailwind's docs sidebar: a hairline rail, with the current link drawing over it. */
@@ -1288,7 +1258,7 @@
   /* Home page hero, from tailwindcss.com's home page. The h1 is three fixed lines, so the swap
      from the metric-matched fallback can't change the line count (the fallback is up to 11% wider
      at display sizes). Each step keeps the widest line, 6.35em in the fallback, inside the column.
-     The caps are about 18ch and 50ch of Inter, in em because ch follows the fallback's "0". */
+     The h1 cap is about 18ch of Inter, in em because ch follows the fallback's "0". */
   .hub-hero-home {
     & h1 {
       max-inline-size: 11em;
@@ -1322,8 +1292,10 @@
       display: block;
     }
 
+    /* Up to about 75ch of Inter at 18px (48em; em, not ch, for the font swap). In two columns the
+       5/12 column is narrower than that, so the column sets the width. */
     & .tool-lead {
-      max-inline-size: 32em;
+      max-inline-size: 48em;
       color: var(--text-muted);
       font-size: var(--text-lg);
       line-height: 1.75rem;
@@ -1429,18 +1401,143 @@
     line-height: var(--text-sm--line-height);
   }
 
-  .home-heading {
-    font-size: 2.5rem;
-    line-height: 2.5rem;
+  /* ---------- Section header ---------- */
+
+  .section-header {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+  }
+
+  /* The header sits --space-m from its content in a .flow column. */
+  .section-header + * {
+    --flow-space: var(--space-m);
+  }
+
+  .section-header-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .section-chip {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: var(--radius-control);
+    background: var(--accent-tint);
+    box-shadow: inset 0 0 0 var(--stroke-hairline) color-mix(in oklab, var(--accent-border) 30%, transparent);
+    color: var(--accent-text);
+  }
+
+  /* Mono and small like the card eyebrows, but in sentence case. */
+  .section-eyebrow {
+    color: var(--accent-text);
+    font-family: var(--font-mono);
+    font-feature-settings: var(--font-features-mono);
+    font-variant-ligatures: none;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
     font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-tighter);
+  }
+
+  .section-title {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
     text-wrap: balance;
   }
 
-  .home-body {
+  .section-header-display .section-title {
+    font-size: 2.5rem;
+    line-height: 2.5rem;
+    letter-spacing: var(--tracking-tighter);
+  }
+
+  .section-header-compact {
+    gap: var(--space-2xs);
+
+    & .section-chip {
+      inline-size: 1.75rem;
+      block-size: 1.75rem;
+    }
+
+    & .section-title {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-tight);
+    }
+  }
+
+  .section-lead {
+    max-inline-size: var(--measure);
     color: var(--text-muted);
     font-size: var(--text-base);
     line-height: 1.75rem;
+  }
+
+  /* ---------- Link rows, the tool aside and the home link strip ---------- */
+
+  .link-rows {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3xs);
+
+    & .button {
+      min-block-size: var(--control-compact);
+      text-align: start;
+    }
+  }
+
+  .tool-aside {
+    display: grid;
+    align-content: start;
+    gap: var(--space-l);
+  }
+
+  .tool-trust {
+    display: grid;
+    gap: var(--space-2xs);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .tool-related {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .link-strip {
+    --flow-space: var(--space-xl);
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  .link-strip-lead {
+    max-inline-size: var(--measure);
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    line-height: 1.75rem;
+  }
+
+  .link-strip-list {
+    display: grid;
+    gap: var(--space-s);
+
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    & .button {
+      inline-size: 100%;
+      justify-content: space-between;
+      text-align: start;
+    }
   }
 
   .tabs,
@@ -1556,12 +1653,6 @@
     }
   }
 
-  .tool-trust {
-    --cluster-space: var(--space-2xs) var(--space-m);
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-  }
-
   .tool-status {
     justify-self: start;
     padding: var(--space-3xs) var(--space-2xs);
@@ -1569,6 +1660,260 @@
     border-radius: var(--radius-control);
     color: var(--text-muted);
     font-size: var(--text-sm);
+  }
+
+  /* On a tint band the cards step back to --bg so they stay separate from it. */
+  [data-tone='tint'] .tool-item {
+    background: var(--bg);
+  }
+
+  /* ---------- Bento (home only) ---------- */
+
+  /* 4 + 2, then 2 + 4, repeating, for any number of tools; a lone last card spans the row. No
+     dense packing, so reading and focus order stay DOM order. */
+  .tool-list-bento {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      & > :last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+
+      & > :is(:nth-child(4n + 1), :nth-child(4n + 4)) {
+        grid-column: span 4;
+      }
+
+      & > :is(:nth-child(4n + 2), :nth-child(4n + 3)) {
+        grid-column: span 2;
+      }
+
+      & > :last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
+
+      /* Large cards put the preview beside the text; small ones keep it below. The last text row
+         takes the slack, so the preview fills the card's full height. */
+      & > :is(:nth-child(4n + 1), :nth-child(4n + 4), :last-child:nth-child(odd)) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: repeat(4, minmax(0, auto)) minmax(0, 1fr);
+        align-content: stretch;
+        column-gap: var(--space-l);
+
+        & > * {
+          grid-column: 1;
+        }
+
+        & > .tool-preview {
+          grid-column: 2;
+          grid-row: 1 / -1;
+          margin-block: 0;
+        }
+      }
+    }
+  }
+
+  /* ---------- Card previews ---------- */
+
+  /* Decorative and computed at build time (src/components/previews/). The card's own text says
+     everything; the well never takes the pointer, so the whole-card link still gets the click. */
+  .tool-preview {
+    display: grid;
+    place-items: center;
+    min-block-size: 8rem;
+    margin-block: var(--space-xs);
+    padding: var(--space-m);
+    border: var(--stroke-hairline) solid var(--border-subtle);
+    border-radius: var(--radius-control);
+    background-color: var(--surface-inset);
+    background-image: var(--dots);
+    background-size: 16px 16px;
+    color: var(--text);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    overflow: hidden;
+    pointer-events: none;
+    overflow-wrap: normal;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition: transform var(--duration-fast) var(--ease-standard);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .tool-item:hover .tool-preview {
+      transform: scale(1.02);
+    }
+  }
+
+  .preview-rows {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    max-inline-size: 100%;
+  }
+
+  .preview-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-xs);
+  }
+
+  .tool-preview code {
+    overflow-wrap: anywhere;
+  }
+
+  .preview-chip {
+    padding: var(--space-3xs) var(--space-2xs);
+    border: var(--stroke-hairline) solid var(--border);
+    border-radius: var(--radius-inline);
+    background: var(--bg);
+    color: var(--text);
+    font-size: var(--text-sm);
+  }
+
+  .preview-score {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-feature-settings: var(--font-features-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  code.preview-score {
+    padding: 0;
+    background: none;
+    font-size: var(--text-sm);
+  }
+
+  /* The winner, the peak or the computed name: accent and a text label, never colour alone. */
+  .preview-row[data-current] {
+    & .preview-chip {
+      border-color: var(--accent-border);
+    }
+
+    & .preview-score {
+      color: var(--accent-text);
+      font-weight: var(--weight-semibold);
+    }
+  }
+
+  .preview-label {
+    padding-inline: var(--space-2xs);
+    border-radius: var(--radius-pill);
+    background: var(--accent-tint);
+    color: var(--accent-text);
+    font-size: var(--text-xs);
+    line-height: var(--text-base--line-height);
+    font-weight: var(--weight-semibold);
+  }
+
+  .preview-source {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .preview-parts {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-s);
+  }
+
+  .preview-selector {
+    padding: 0;
+    background: none;
+    font-size: var(--text-lg);
+    line-height: var(--line-code);
+
+    & .part[data-kind='id'] {
+      border-radius: var(--radius-inline);
+      background: var(--accent-tint);
+      color: var(--accent-text);
+      text-decoration-color: var(--accent-text);
+    }
+  }
+
+  .preview-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .preview-key {
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--stroke-emphasis);
+    text-underline-offset: var(--underline-offset);
+
+    &[data-key='id'] {
+      padding-inline: var(--space-3xs);
+      border-radius: var(--radius-inline);
+      background: var(--accent-tint);
+      color: var(--accent-text);
+    }
+
+    &[data-key='class'] {
+      text-decoration-style: dashed;
+    }
+
+    &[data-key='type'] {
+      text-decoration-style: dotted;
+    }
+  }
+
+  .preview-graph {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-xs);
+    inline-size: 100%;
+  }
+
+  .preview-bars {
+    display: flex;
+    align-items: end;
+    gap: var(--space-3xs);
+    inline-size: 100%;
+    block-size: 4.5rem;
+  }
+
+  .preview-bar {
+    flex: 1 1 0;
+    min-inline-size: 0;
+    border-start-start-radius: 2px;
+    border-start-end-radius: 2px;
+    background: var(--border-strong);
+
+    &[data-level='1'] {
+      block-size: 17%;
+    }
+
+    &[data-level='2'] {
+      block-size: 33%;
+    }
+
+    &[data-level='3'] {
+      block-size: 50%;
+    }
+
+    &[data-level='4'] {
+      block-size: 67%;
+    }
+
+    &[data-level='5'] {
+      block-size: 83%;
+    }
+
+    &[data-level='6'] {
+      block-size: 100%;
+    }
+
+    &[data-current] {
+      background: var(--accent-solid);
+    }
   }
 
   @media (forced-colors: active) {
@@ -1592,6 +1937,24 @@
         border-color: Highlight;
         box-shadow: none;
       }
+    }
+
+    /* Previews keep real borders and lose the dot grid; bars use system colours. */
+    .tool-preview {
+      border-color: CanvasText;
+      background-image: none;
+    }
+
+    .preview-bar {
+      background: CanvasText;
+
+      &[data-current] {
+        background: Highlight;
+      }
+    }
+
+    :is(.preview-label, .preview-chip, .section-chip) {
+      border: var(--stroke-hairline) solid CanvasText;
     }
 
     /* The hatch and glow are decorative; the stage keeps real borders. */

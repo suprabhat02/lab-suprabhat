@@ -118,7 +118,7 @@ borders and focus indicators pass 3:1.
 | `--text-body`              | `#3d3631` / `#d6d0cc` | Prose and intro paragraphs; S                                  |      10.59 |     11.57 |     89.4 |   -77.5 | Headings                      |
 | `--text-muted`             | `#58514c` / `#bbb4b0` | Explanations, labels, nav at rest; S + F                       |       5.90 |      7.33 |     68.8 |   -59.2 | Hiding necessary instructions |
 | `--text-faint`             | `#706862` / `#8c847f` | Metadata, placeholders; S                                      |       4.88 |      4.81 |     69.5 |   -36.2 | Text on fills                 |
-| `--accent-text`            | `#b42300` / `#ff9874` | Eyebrows, winner label; bg, surface, accent-tint               |       6.24 |      8.90 |     77.0 |   -60.8 | Error or "loser" meaning      |
+| `--accent-text`            | `#b42300` / `#ff9874` | Eyebrows, winner label; bg, surface, accent-tint, inset        |       5.89 |      8.41 |     73.1 |   -60.3 | Error or "loser" meaning      |
 | `--accent`                 | `#b42300` / `#ff4d2a` | Alias of `--accent-solid`; as text only on bg, surface, subtle |       5.67 |      5.01 |     70.6 |   -40.7 | Link or nav text              |
 | `--accent-hover`           |                       | Interactive hover; bg, surface, accent-subtle                  |       7.18 |      7.93 |     77.2 |   -59.6 | Passive decoration            |
 | `--success`                |                       | Success text; S + success-subtle                               |       6.16 |      8.54 |     74.7 |   -64.1 | Meaning without words/icon    |
@@ -138,8 +138,8 @@ non-colour indicator. Status always has readable wording. With
 `prefers-contrast: more`, body, secondary and faint text become primary, and
 borders and control borders become `#3d3631` / `#d6d0cc`.
 
-Run `npm run contrast` for all 80 foreground/background pairs, both themes,
-plus the increased-contrast variant: **320 checks**. It resolves actual tokens,
+Run `npm run contrast` for all 81 foreground/background pairs, both themes,
+plus the increased-contrast variant: **324 checks**. It resolves actual tokens,
 converts OKLCH to sRGB using CSS Color 4 matrices, and fails on missing tokens,
 cycles, out-of-gamut colours or low WCAG contrast. `color-mix()` tokens
 (`--pattern-fg`, `--border-subtle`, `--marker`) are decorative and not gated.
@@ -233,8 +233,11 @@ rendered at build time as inline SVG. It adds no client JS.
 - Registered icons and their only uses: `sun` / `moon` (theme toggle, swapped
   by `[data-state]` in CSS), `copy` (Copy link buttons), `check` (registered for
   copy feedback, unused for now), `plus` (Add selector, Add declaration),
-  `arrow-up-right` (card corner, suprabhat-dev.com links), `chevron-right`
-  (breadcrumbs), and one per tool category.
+  `arrow-up-right` (card corner, external links and link rows),
+  `chevron-right` (breadcrumbs, internal link rows), one per tool category, and
+  the section-header chips: `layout-grid` (home Tools), `book-open` (tool
+  explainers), `link` (Related tools), `shield-check`, `hammer`, `user` (About),
+  `list-checks`, `flask-conical`, `package`, `flag` (Methodology).
 - Category icons: `CATEGORY_ICONS` (`CSS` → `braces`, `Accessibility` →
   `accessibility`) `satisfies Record<ToolCategory, IconName>`, and
   `ToolCategory` comes from the collection's `z.enum`. A new category fails the
@@ -285,7 +288,9 @@ One shape (a pill, `--radius-pill`), one set of states and six variants, all on
 - Uses: Compare selectors (primary); Add selector, Add declaration and Copy link
   (secondary, with an icon); Remove and Sort by specificity (ghost, small); the
   theme toggle (secondary, small, sun or moon icon; icon-only below 30rem, with
-  its accessible name kept).
+  its accessible name kept); the home link strip (outline, full-width in a
+  three-column strip); the tool aside's checks, report and related-tool rows
+  (link).
 
 ### Cards
 
@@ -379,17 +384,22 @@ Do not clip an outline to hide overflow.
 
 ## Layout
 
-The page should never look like a narrow column in an empty window.
+The page should never look like a narrow column in an empty window. Fix "half
+width" by composing the page (a header or contents column, an aside, a demo
+beside the text), never by stretching paragraphs: no paragraph is wider than
+75 characters.
 
-| Token              | Value                      | Use                                                    |
-| ------------------ | -------------------------- | ------------------------------------------------------ |
-| `--container-wide` | 90rem                      | `.wrap`: header, footer, hero, tool grid, workbenches  |
-| `--container-page` | 64rem                      | `.wrap.wrap-page`: About, Methodology, the Tools index |
-| `--measure`        | 68ch                       | Running text: `.prose`, explainers, `.home-body`       |
-| `--rail`           | 2.5rem                     | Hatched side rails                                     |
-| `--gutter`         | `clamp(1rem, 4vw, 2.5rem)` | Inline padding inside every container                  |
-| `--section-space`  | `clamp(4rem, 8vw, 8rem)`   | Between `.section`s (each pads half on both sides)     |
-| `--pattern-fg`     | see Colour                 | Rails, hairlines, the hero stage outline               |
+| Token              | Value                                | Use                                                          |
+| ------------------ | ------------------------------------ | ------------------------------------------------------------ |
+| `--container-wide` | 90rem                                | `.wrap`: every page, header and footer                       |
+| `--measure`        | 68ch                                 | Running text: `.prose`, explainers, leads, workbench `p`     |
+| `--measure-lead`   | 46rem                                | `.tool-lead` (about 73ch of Inter at 16px; rem for the swap) |
+| `--rail`           | 2.5rem                               | Hatched side rails                                           |
+| `--gutter`         | `clamp(1rem, 4vw, 2.5rem)`           | Inline padding inside every container                        |
+| `--section-space`  | `clamp(4rem, 8vw, 8rem)`             | Block padding at both ends of every `.section` band          |
+| `--seam`           | 1.5rem                               | The hatched strip between bands                              |
+| `--dots`           | `radial-gradient(--pattern-fg 1px…)` | The dot grid in card previews, at 16px                       |
+| `--pattern-fg`     | see Colour                           | Rails, hairlines, seams, dots, the hero stage outline        |
 
 - **Shell.** `BaseLayout` wraps header, main and footer in `.page-shell`. From
   `md` it is a three-column grid,
@@ -399,23 +409,134 @@ The page should never look like a narrow column in an empty window.
   no rails.
 - **Hairlines.** `.hairlines` draws 1px `--pattern-fg` rules above and below a
   row with `200vw` pseudo-elements from `-100vw`. They are symmetric, so RTL
-  needs nothing. The hero row and every section heading row
-  (`.section-heading.hairlines`) use them, and a heading row's own rule replaces
-  the section border above it.
+  needs nothing. The heroes' inner rows use them.
 - **Clipping.** `.page-shell` has `overflow-x: clip`. Never `hidden`: that makes
   it a scroll container and the sticky `.site-header` stops sticking.
-- **Rhythm.** A heading sits close to its own content (`xs` plus the row's
-  padding) and `--section-space` away from the section above.
 - **Home hero.** From `lg`, `minmax(0, 5fr) minmax(0, 7fr)`: the h1 and lede on
   the left, and on the right a Specificity duel rendered at build time with
   `buildDuel` and the `scoreView`/`verdictView` helpers (`HeroDuel.astro`). The
   duel sits on a hatched double bezel (1rem outer radius and 0.5rem padding,
   0.5rem inner radius, 1px `--pattern-fg` outlines) over a decorative
   `--glow`. The h1 is three fixed lines so the font swap can't change its line
-  count; its caps are in em, because `ch` follows the fallback's "0".
-- **Forced colors.** The hatch, glow and hairlines are hidden; the hero stage
-  gets a real `CanvasText` border, and cards and panes keep theirs.
-- Every new grid track uses `minmax(0, …)`. Workbenches keep their own tracks.
+  count. Its caps are in em, because `ch` follows the fallback's "0": the h1 at
+  11em (about 18ch) and the lede at 48em (about 75ch at 18px; in two columns the
+  5/12 column is narrower, so the column sets the width).
+- **Forced colors.** The hatch, glow, hairlines and dot grid are hidden; seams
+  become a real `CanvasText` rule; the hero stage and previews get real borders,
+  and cards and panes keep theirs.
+- Every grid track uses `minmax(0, …)`. Workbenches keep their own tracks, at
+  full width; their paragraphs still keep `--measure`.
+
+### Tone bands and seams
+
+- Every direct child of `main` is a band with `data-tone="plain"` (`--bg`) or
+  `data-tone="tint"` (`--surface`, the full column width between the rails).
+  Bands alternate in DOM order, starting with `plain` for the hero. Set the
+  attribute in the page's markup; `tests/e2e/a11y.spec.ts` checks the
+  alternation on every route.
+- On a tint band, cards (`.tool-item`) and workbench panes step back to `--bg`
+  so they stay separate from it. Every text colour on `--bg` and `--surface` is
+  in the contrast gate.
+- Every band that has a band after it draws the seam on its own `::after`: a
+  `--seam` (1.5rem) strip of `--hatch` with 1px `--pattern-fg` hairlines above
+  and below, full bleed (`200vw` from `-100vw`, clipped by `.page-shell`), inside
+  the band's end padding. No extra DOM. It hangs off the earlier band because a
+  deferred (`content-visibility: auto`) band would clip its own top edge.
+- Rhythm: `--section-space` at both ends inside a band, plus `--seam` at the
+  foot of a band that is followed by another. Heroes keep their own padding. The
+  specificity inspect band (`.section-tools`) ends `--space-l` after its panels,
+  so switching tabs doesn't open a gap (its e2e test).
+- Sections are not numbered; they aren't a sequence.
+- Below-the-fold bands that are heavy to render use `.section-deferred` (the
+  home Tools band, the specificity explainer), which keeps Lighthouse's blocking
+  time at 0.
+
+### Section header
+
+`SectionHeader.astro` (`title` or a default slot for markup such as a link,
+`id`, `icon`, optional `eyebrow` and `lead`, `level` 2 or 3, `size`
+`default` / `compact` / `display`) renders, in order:
+
+1. A decorative icon chip: `--accent-tint` fill, `--accent-text` icon, and a
+   faint accent ring. The icon is a registered `IconName`.
+2. An optional eyebrow in `--font-mono`, `--text-sm`, `--accent-text`, in
+   sentence case. It passes on `--bg`, `--surface` and `--accent-tint`. Use an
+   eyebrow only for text the page already has or computes (the tool category, a
+   tool count, "Explainer"), never for new claims.
+3. The heading: `--text-3xl` medium (`display`: 2.5rem, the home Tools heading;
+   `compact`: `--text-lg` semibold, for a side column).
+4. An optional lead in `--text-muted`, at `--measure`.
+
+The header sits `--space-m` from its content. It's used for every section
+heading on home, the tools index, About, Methodology and the tool pages'
+explainer and related tools.
+
+### Split layout
+
+`.section-split` holds a `.split-head` and a `.split-body`. From `lg` it is
+`minmax(0, 4fr) minmax(0, 8fr)` with `--space-l` between; below `lg` it is one
+column, header first. DOM order is visual order.
+
+- The head column is `position: sticky` below the site header, with a
+  `max-block-size` and its own scrolling, so a head taller than the viewport is
+  still reachable. It only sticks when the section is taller than the viewport.
+- **About and Methodology:** one tint band. The head is a static "On this page"
+  list (`PageToc.astro`) of the page's h2s, built from the same items the
+  headings are rendered from (an e2e test compares them). It's hidden below
+  `lg` (`.split-head-toc`); current-section highlighting is not wired. The body
+  is a column of `.split-block`s, each a `SectionHeader` and prose at
+  `--measure`.
+- **Tool explainers:** `ExplainerBand.astro` takes the title, lead and tool. The
+  head holds the section header, then the specificity explainer's "On this page"
+  list (it no longer sticks by itself), then `ToolAside.astro`: the by-line, the
+  "How this tool is checked" and "Report a wrong result" `.button-link` rows and
+  the Related tools `aside` (an h3, so it doesn't become the parent of the
+  explainer's own h3s). The body is the explainer prose. `ToolLayout` requires an
+  explainer for that reason.
+- **Tools index:** each category band is a split: the section header (category
+  icon, computed tool count as eyebrow) beside its plain card list.
+
+### Bento tool cards (home only)
+
+- `.tool-list-bento`: one column, two from `sm` (a lone last card spans both),
+  six from `lg` with spans 4 + 2, then 2 + 4, repeating by `:nth-child(4n + …)`,
+  and a lone last card spanning all six. No `grid-auto-flow: dense`, so reading
+  and focus order stay DOM order.
+- Card anatomy: category chip, arrow, title (the whole-card link overlay),
+  summary, preview, "Updated" line. Large cards (the 4-span ones) put the preview
+  in a second column the full height of the card; small cards keep it below the
+  summary.
+- Hover and focus are as in Cards above. On fine pointers the preview also scales
+  to 1.02 on hover; reduced motion removes it.
+- The tools index keeps plain cards without previews.
+
+### Card previews
+
+- One component per tool in `src/components/previews/`, picked by slug in
+  `ToolPreview.astro` with `satisfies Record<PreviewSlug, …>`. `PREVIEW_SLUGS`
+  (`src/lib/previews.ts`) is the registry; `previewFor` throws for a slug
+  without a preview, and every `ToolCard` calls it, so a new tool fails the build
+  until it has one. A unit test checks the registry against the collection.
+- Every value a preview shows is computed at build time by the repo's own code,
+  or is non-numeric illustration. Never hand-type a result.
+  - Specificity: `buildDuel(HERO_SELECTORS)`, the same call as the hero.
+  - Playground: `PLAYGROUND_SELECTOR` (the tool's starting selector) split into
+    parts by `calculate()`, with the `.part` underlines and an ID / Class / Type
+    legend.
+  - Stylesheet Audit: `analyze(DEFAULT_CSS)`. Bars are the real triples (each
+    column capped at nine, as the tool's graph does) in six `data-level` steps,
+    because the CSP forbids inline styles; the peak is labelled with its triple.
+  - Accessible Name: `analyze()` with the parse5 adapter on a fixed
+    `<button aria-label="Close">×</button>`.
+- The well is `--surface-inset` with `--dots` at 16px and `--radius-control`.
+  Text uses semantic tokens only; the accent marks the winner, peak or computed
+  name, always with a text label ("Wins", "Peak", "Name"). `--accent-text` on
+  `--surface-inset` is in the contrast gate.
+- Previews are `aria-hidden="true"`, contain nothing focusable and take no
+  pointer events, so the card's own text is what assistive technology reads and
+  the whole-card link still gets every click.
+- Forced colors: real borders, no dot grid, bars in `CanvasText` with the peak
+  in `Highlight`.
 
 ## Adding a tool: ten steps
 

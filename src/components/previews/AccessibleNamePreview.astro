@@ -1,0 +1,19 @@
+---
+// A small fixed button, named by the tool's own computation (parse5 adapter, as the page uses).
+import { parseHtml } from '../../lib/accname/adapters/parse5';
+import { analyze } from '../../lib/accname/model';
+
+const html = '<button aria-label="Close">×</button>';
+const result = analyze(html, 0, parseHtml);
+if (!result.ok) throw new Error(`The accessible-name preview failed: ${result.error.message}`);
+const { name } = result.value;
+---
+
+<div class="preview-rows">
+  <code class="preview-chip">{html}</code>
+  <div class="preview-row" data-current>
+    <span class="preview-label">Name</span>
+    <span class="preview-score">“{name.value}”</span>
+    {name.source && <span class="preview-source">from {name.source}</span>}
+  </div>
+</div>

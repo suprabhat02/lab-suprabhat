@@ -277,8 +277,13 @@ test('running-text links keep a 1px underline and fill with a tint on hover, eve
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.goto('/');
-  const wrapped = page.locator('main p a').filter({ hasText: 'why this lab exists' });
+  await page.goto('/accessible-name/');
+  // The first running-text link that breaks across lines at this width.
+  const index = await page
+    .locator('main .prose p a')
+    .evaluateAll((links) => links.findIndex((link) => link.getClientRects().length > 1));
+  expect(index).toBeGreaterThanOrEqual(0);
+  const wrapped = page.locator('main .prose p a').nth(index);
   expect(await wrapped.evaluate((el) => el.getClientRects().length)).toBeGreaterThan(1);
   const style = () =>
     wrapped.evaluate((el) => {
@@ -408,4 +413,110 @@ test('native mobile menu opens and closes by keyboard without scripting', async 
   } finally {
     await context.close();
   }
+});
+
+// ---------- Section rhythm, split layouts and bento (step 3) ----------
+
+test('top-level bands alternate plain and tint in DOM order, starting plain', async ({ page }) => {
+  for (const route of ROUTES) {
+    await page.goto(route);
+    const tones = await page
+      .locator('main > *')
+      .evaluateAll((children) => children.map((child) => child.getAttribute('data-tone')));
+    expect(tones.length, route).toBeGreaterThan(0);
+    tones.forEach((tone, i) => expect(tone, `${route}: band ${i + 1}`).toBe(i % 2 === 0 ? 'plain' : 'tint'));
+  }
+});
+
+test('a hatched seam sits between bands and nowhere else, and forced colors swap it for a rule', async ({
+  page,
+}) => {
+  const seams = () =>
+    page.locator('main > [data-tone]').evaluateAll((bands) =>
+      bands.map((band) => {
+        const after = getComputedStyle(band, '::after');
+        return { content: after.content, height: after.blockSize, hatch: after.backgroundImage };
+      }),
+    );
+  for (const route of ['/', '/tools/', '/specificity/']) {
+    await page.goto(route);
+    const all = await seams();
+    for (const seam of all.slice(0, -1)) {
+      expect(seam.content, route).not.toBe('none');
+      expect(seam.height, route).toBe('24px');
+      expect(seam.hatch, route).toContain('repeating-linear-gradient');
+    }
+    expect(all.at(-1)?.content, route).toBe('none');
+  }
+  await page.emulateMedia({ forcedColors: 'active' });
+  await page.goto('/');
+  const first = page.locator('main > [data-tone]').first();
+  await expect(first).toHaveCSS('border-bottom-style', 'solid');
+  expect(await first.evaluate((el) => getComputedStyle(el, '::after').display)).toBe('none');
+});
+
+test('"On this page" lists exactly the page headings, in order', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const route of ['/about/', '/methodology/']) {
+    await page.goto(route);
+    const nav = page.getByRole('navigation', { name: 'On this page' });
+    await expect(nav).toBeVisible();
+    const links = await nav
+      .getByRole('link')
+      .evaluateAll((as) => as.map((a) => ({ href: a.getAttribute('href'), text: a.textContent?.trim() })));
+    const headings = await page
+      .locator('main h2')
+      .evaluateAll((hs) => hs.map((h) => ({ href: `#${h.id}`, text: h.textContent?.trim() })));
+    expect(links, route).toEqual(headings);
+  }
+  // Below lg the list is hidden and the page reads straight down.
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto('/about/');
+  await expect(page.getByRole('navigation', { name: 'On this page' })).toBeHidden();
+});
+
+test('split layouts put the header column beside the body from 64rem, and stack in DOM order below', async ({
+  page,
+}) => {
+  for (const [width, beside] of [
+    [1440, true],
+    [768, false],
+  ] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ['/tools/', '/playground/']) {
+      await page.goto(route);
+      const split = page.locator('.section-split').first();
+      const head = await split.locator('.split-head').boundingBox();
+      const body = await split.locator('.split-body').boundingBox();
+      if (!head || !body) throw new Error(`Missing split columns on ${route}`);
+      if (beside) expect(head.x + head.width, route).toBeLessThanOrEqual(body.x);
+      else expect(body.y, route).toBeGreaterThanOrEqual(head.y + head.height);
+    }
+  }
+});
+
+test('home bento: 4 + 2 then 2 + 4 on wide screens, and every preview is decorative', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const cards = page.locator('.tool-list-bento > .tool-item');
+  const widths = await cards.evaluateAll((items) => items.map((item) => item.getBoundingClientRect().width));
+  const [a = 0, b = 0, c = 0, d = 0] = widths;
+  expect(a).toBeGreaterThan(b * 1.5);
+  expect(d).toBeGreaterThan(c * 1.5);
+  // Reading order stays DOM order: each card starts at or after the one before it.
+  const tops = await cards.evaluateAll((items) =>
+    items.map((item) => [item.getBoundingClientRect().top, item.getBoundingClientRect().left]),
+  );
+  for (let i = 1; i < tops.length; i++) {
+    const [top = 0, left = 0] = tops[i] ?? [];
+    const [prevTop = 0, prevLeft = 0] = tops[i - 1] ?? [];
+    expect(top > prevTop + 1 || (Math.abs(top - prevTop) <= 1 && left > prevLeft)).toBe(true);
+  }
+  const previews = page.locator('.tool-preview');
+  await expect(previews).toHaveCount(await cards.count());
+  for (const preview of await previews.all()) {
+    await expect(preview).toHaveAttribute('aria-hidden', 'true');
+    await expect(preview.locator('a, button, input, [tabindex]')).toHaveCount(0);
+  }
+  await expect(page.locator('.tool-list-bento .tool-item').first().locator('a')).toHaveCount(1);
 });

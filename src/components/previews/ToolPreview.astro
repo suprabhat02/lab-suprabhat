@@ -1,0 +1,25 @@
+---
+import AccessibleNamePreview from './AccessibleNamePreview.astro';
+import AuditPreview from './AuditPreview.astro';
+import PlaygroundPreview from './PlaygroundPreview.astro';
+import SpecificityPreview from './SpecificityPreview.astro';
+import type { PreviewSlug } from '../../lib/previews';
+
+interface Props {
+  slug: PreviewSlug;
+}
+
+// Every registered slug must have a component, and no component may lack a slug.
+const PREVIEWS = {
+  specificity: SpecificityPreview,
+  playground: PlaygroundPreview,
+  'stylesheet-audit': AuditPreview,
+  'accessible-name': AccessibleNamePreview,
+} satisfies Record<PreviewSlug, typeof SpecificityPreview>;
+
+const Preview = PREVIEWS[Astro.props.slug];
+---
+
+<div class="tool-preview" aria-hidden="true">
+  <Preview />
+</div>
