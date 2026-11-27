@@ -26,13 +26,13 @@ const tools = await getTools();
 
   <section class="section" aria-labelledby="tools-title">
     <div class="wrap flow">
-      <h2 id="tools-title">Tools</h2>
+      <h2 id="tools-title" class="home-heading">Tools</h2>
       <ul class="tool-list" role="list">
         {tools.map((tool) => (
           <ToolCard tool={tool} />
         ))}
       </ul>
-      <p class="prose">
+      <p class="prose home-body">
         <a href="/tools/">Browse all tools by topic</a>. More tools are on the way. Each one gets the same
         treatment: a tool that answers the question, and an explainer that teaches the idea behind it. Read
         <a href="/about/">why this lab exists</a>, or see more work on

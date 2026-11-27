@@ -116,10 +116,13 @@ export const contrastGroups = [
     backgrounds: [...surfaces, 'fill', 'fill-hover', 'fill-active'],
     minimum: 4.5,
   })),
-  { fg: 'text-faint', backgrounds: surfaces, minimum: 4.5 },
+  { fg: 'text-body', backgrounds: surfaces, minimum: 4.5 },
+  // Faint text never sits on the inset surface; text inputs use --bg so placeholders pass.
+  { fg: 'text-faint', backgrounds: ['bg', 'surface', 'surface-overlay'], minimum: 4.5 },
+  // Accent text is limited to these surfaces; elsewhere accent is an underline or the focus ring.
   ...['accent', 'accent-hover'].map((fg) => ({
     fg,
-    backgrounds: [...surfaces, 'accent-subtle'],
+    backgrounds: ['bg', 'surface', 'accent-subtle'],
     minimum: 4.5,
   })),
   ...['success', 'warning', 'danger', 'info'].map((fg) => ({
@@ -128,6 +131,7 @@ export const contrastGroups = [
     minimum: 4.5,
   })),
   { fg: 'on-accent', backgrounds: ['accent', 'accent-hover'], minimum: 4.5 },
+  { fg: 'on-primary', backgrounds: ['primary', 'primary-hover'], minimum: 4.5 },
   { fg: 'border-strong', backgrounds: ['bg', 'surface'], minimum: 3 },
   {
     fg: 'border-control-on-fill',

@@ -19,7 +19,7 @@ const contenders = html(duel.contenders.map((c, i) => contenderView(i, duel.cont
     <div class="contenders" role="group" aria-labelledby="tool-title" data-contenders set:html={contenders} />
     <p class="verdict" data-verdict set:html={html(verdictView(duel))} />
     <div class="duel-actions">
-      <button class="button js-only" type="submit">
+      <button class="button button-primary js-only" type="submit">
         Compare selectors
       </button>
       <button class="button js-only" type="button" data-add>

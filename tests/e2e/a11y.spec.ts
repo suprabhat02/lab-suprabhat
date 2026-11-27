@@ -149,7 +149,29 @@ test('header exposes every tool and marks the current page', async ({ page }) =>
     await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
     const current = nav.getByRole('link', { name: label, exact: true });
     await expect(current).toHaveAttribute('aria-current', 'page');
-    expect(await current.evaluate((el) => getComputedStyle(el).textDecorationLine)).toContain('underline');
+    // The current page is marked by weight, not colour; nav links have no underline at rest.
+    expect(await current.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('600');
+    expect(await current.evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe('none');
+  }
+});
+
+// Dark --fill-hover and --fill-active are the same gray, so these states must not rely on fill alone.
+test('selected, current and pressed states have a non-colour indicator in dark mode', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/specificity/');
+  const tab = page.locator('.tab[aria-selected="true"]');
+  const tabStyle = await tab.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { weight: style.fontWeight, border: style.borderBlockEndWidth };
+  });
+  expect(tabStyle).toEqual({ weight: '600', border: '3px' });
+  for (const name of ['Add selector', 'Compare selectors']) {
+    const button = page.getByRole('button', { name, exact: true });
+    await button.hover();
+    await page.mouse.down();
+    expect(await button.evaluate((el) => getComputedStyle(el).boxShadow), name).toContain('inset');
+    await page.mouse.up();
   }
 });
 

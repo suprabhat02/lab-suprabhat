@@ -36,7 +36,8 @@ describe('offline token contrast', () => {
     expect(() => assertContrast(contrastReport())).not.toThrow();
     expect(() => assertContrast(contrastReport(undefined, true))).not.toThrow();
     const source = readFileSync(new URL('../tokens.css', import.meta.url), 'utf8');
-    const regression = source.replace('--text: var(--gray-12)', '--text: var(--bg)');
+    const regression = source.replace('--text: light-dark(var(--gray-950), #ffffff)', '--text: var(--bg)');
+    expect(regression).not.toBe(source);
     expect(() => assertContrast(contrastReport(regression))).toThrow('Contrast failed');
   });
 });

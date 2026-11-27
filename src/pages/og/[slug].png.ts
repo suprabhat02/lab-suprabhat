@@ -47,7 +47,7 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     title: page.title,
     description: page.description,
     bgGradient: [rgb('--bg')],
-    border: { color: rgb('--border-subtle'), width: number('--og-border-width'), side: 'block-end' },
+    border: { color: rgb('--border'), width: number('--og-border-width'), side: 'block-end' },
     padding: number('--og-padding'),
     fonts: [FONT],
     font: {

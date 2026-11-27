@@ -39,14 +39,6 @@
     border-radius: var(--radius-shell);
     background: var(--surface);
     overflow-wrap: anywhere;
-
-    & h2 {
-      font-size: var(--step-2);
-    }
-
-    & h3 {
-      font-size: var(--step-1);
-    }
   }
 
   .workbench-output {
@@ -61,12 +53,21 @@
     gap: var(--space-2xs) var(--space-s);
     padding-block-end: var(--space-s);
     border-block-end: var(--stroke-hairline) solid var(--border-subtle);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
 
+    /* In-page navigation: no underline at rest. */
     & a {
       display: inline-flex;
       align-items: center;
       min-block-size: var(--target-min);
+      font-weight: var(--weight-medium);
+      text-decoration-line: none;
+
+      &:hover {
+        text-decoration-line: underline;
+        text-decoration-thickness: var(--stroke-hairline);
+      }
     }
   }
 
@@ -224,6 +225,19 @@
     flex-wrap: wrap;
     gap: var(--space-2xs) var(--space-m);
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+
+    & a {
+      color: var(--text-muted);
+      font-weight: var(--weight-regular);
+      text-decoration-line: none;
+
+      &:hover {
+        color: var(--text);
+        text-decoration-line: underline;
+        text-decoration-thickness: var(--stroke-hairline);
+      }
+    }
   }
 }

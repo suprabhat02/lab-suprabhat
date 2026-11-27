@@ -6,18 +6,28 @@ progressively enhanced. No decorative motion, shadows or gradients are required.
 
 ## Fonts
 
-| Role                                                                           | Family / token             | Weight token                              |
-| ------------------------------------------------------------------------------ | -------------------------- | ----------------------------------------- |
-| Body, explanations, prose                                                      | Inter / `--font-sans`      | `--weight-regular` 400                    |
-| Labels, buttons, navigation, summaries, table headers                          | Inter / `--font-sans`      | `--weight-medium` 500                     |
-| Headings, verdicts, `strong`, current/selected states                          | Inter / `--font-sans`      | `--weight-heading` 650                    |
-| Display h1                                                                     | Inter / `--font-sans`      | `--weight-display` 750                    |
-| Footer slogan                                                                  | Inter / `--font-sans`      | `--weight-heading` 650, display tracking  |
-| Code, CSS/HTML inputs, selectors, specificity triples, numeric data, lab/ logo | Geist Mono / `--font-mono` | 400; `--weight-semibold` 600 for emphasis |
+Typography matches tailwindcss.com: Inter 4.1 for text and IBM Plex Mono for code.
 
-Sans roles retain the existing 650 and 750 weights; `--weight-semibold` is for
-Geist Mono only. Tabular numerals belong on numeric data, not all prose. Mono
-ligatures are disabled. Font smoothing uses antialiasing on macOS.
+| Role                                                                           | Family / token                | Weight                                           |
+| ------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------ |
+| Body, explanations, prose                                                      | Inter / `--font-sans`         | `--weight-regular` 400                           |
+| Labels, buttons, navigation, summaries, page h1, home h2                       | Inter / `--font-sans`         | `--weight-medium` 500                            |
+| Section and card headings, running-text links, `strong`, current/selected      | Inter / `--font-sans`         | `--weight-semibold` 600                          |
+| Home hero h1                                                                   | Inter / `--font-sans`         | 500, then 400 from `lg`                          |
+| Code, CSS/HTML inputs, selectors, specificity triples, numeric data, lab/ logo | IBM Plex Mono / `--font-mono` | 400; 500 for inline prose code; 600 to emphasise |
+| Eyebrow labels (`.toc-title`, `.tool-category`)                                | IBM Plex Mono / `--font-mono` | 500, `--text-xs`, uppercase, `--tracking-widest` |
+
+`--weight-bold` (700) exists, but no role uses it. Tabular numerals belong on
+numeric data, not all prose. Mono ligatures are disabled. Font smoothing uses
+antialiasing on macOS.
+
+**OpenType features, copied from tailwindcss.com.** `html` sets
+`font-feature-settings: "cv02", "cv03", "cv04", "cv11"` (open 4, 6 and 9, and a
+single-storey a), `font-variation-settings: normal` and `font-optical-sizing:
+auto`. Optical size follows the rendered size; never pin `opsz`. Every mono
+element sets `"ss02", "zero"` (`--font-features-mono`): Plex's alternate
+lowercase and a slashed zero. Mono selectors outside `code` need that too, or
+they inherit Inter's `cv` settings.
 
 **Identifiers are always mono.** Any string where I, l, 1, 0 and O
 must be told apart (selectors, IDs, class names, at-rules, ARIA attributes,
@@ -26,82 +36,87 @@ specificity triples and data values) goes in `code` or another mono element.
 identifiers and triples in `code`, so engine messages need no markup. Native
 `<option>` text can't contain markup, so selects that list selectors use mono.
 
-Inter ships no italic here: italics are separate files, and the lab doesn't
-load them. The browser synthesises an oblique for `em` and `i`; the site has no
-long italic passages, so a separate download isn't justified.
+Upright only. The browser synthesises an oblique for `em` and `i`; the site has
+no long italic passages, so a separate download isn't justified.
 
-Both Fontsource variable families are self-hosted, OFL-1.1, with `font-display:
-swap` and separate unicode ranges. Never use a font CDN. Inter's `opsz.css`
-provides weight and optical-size axes and loads subsets on demand; only Latin
-is preloaded. Inter does not cover Arabic; Arabic and RTL roots use a system
-font stack. The site is English-only today.
+**Files.** `npm run fonts` (run before `dev` and `build`) writes
+`public/fonts/` and regenerates
+[fonts.generated.css](../src/styles/fonts.generated.css). Never hand-edit
+generated adjustments, and never use a font CDN.
 
-All pages preload exactly the two Latin files: Inter for prose and Mono for
-the above-fold logo/data. Match the font-face URL and anonymous `crossorigin`
-so preload and CSS share one request. The same-origin preview disables Vite's
-CORS middleware: its `Vary: Origin` header otherwise makes WebKit refetch an
+- Inter comes from `inter-ui` 4.1.1, the official rsms build. It's subset into
+  `inter-latin.woff2` (about 97 KB) and `inter-latin-ext.woff2`. The script fails
+  if either loses `opsz`, `wght` or a feature that applies to its glyphs, or if
+  the `unicode-range` in `tokens.css` drifts from the subset.
+- IBM Plex Mono comes from `@ibm/plex-mono` 2.5.0: Regular/Medium/SemiBold ×
+  Latin1/Latin2, copied **unmodified** with IBM's own unicode-ranges. "Plex" is
+  a Reserved Font Name, so never subset or rename these files. There is no
+  `local()` source, because an installed copy may lack `ss02`/`zero`.
+- `LICENSE-Inter.txt` and `LICENSE-IBM-Plex.txt` travel with the fonts (OFL-1.1).
+
+Every page preloads only `/fonts/inter-latin.woff2`, with anonymous
+`crossorigin` and the exact font-face URL so preload and CSS share one request.
+Plex is not preloaded. The same-origin preview disables Vite's CORS
+middleware: its `Vary: Origin` header otherwise makes WebKit refetch an
 anonymous preload as a CSS font request. Font tests count requests at a local
 forwarding origin, because WebKit's automation events also report memory-cache
 reads as transfers.
 
-Run `npm run fonts` to copy Mono assets (stale files in `public/fonts/` are
-removed) and regenerate [fonts.generated.css](../src/styles/fonts.generated.css);
-do not hand-edit generated adjustments. Inter's fallback metrics are measured
-from the installed Latin file at weight 400 and optical size 32, rather than
-the default optical size 14. The generator checks the file hash so an updated
-font must be remeasured. Arial, Segoe UI and Helvetica get matching faces, with
-Liberation Sans sharing Arial's. Geist Mono uses Consolas, Menlo and Courier
-New. Matching metrics reduces layout shifts but does not guarantee zero shift.
+Capsize generates fallbacks from the served Latin files. Inter gets Arial,
+Segoe UI and Helvetica (Liberation Sans shares Arial's), measured at the
+default instance (opsz 14, wght 400). Plex gets Consolas, Menlo and Courier New.
+Matching metrics reduces layout shifts but does not guarantee zero shift.
 
-The body requests `cv11`, `ss01`, and optical size 32. The installed Fontsource
-Inter subset has an `opsz` axis but lacks the `cv11` and `ss01` OpenType
-features, so those two requests have no effect. Prose uses `--measure: 46ch`.
+Inter does not cover Arabic. Arabic and RTL roots use a system font stack, and
+Arabic headings reset `letter-spacing` to 0 because negative tracking breaks
+letter joining. The site is English-only today.
 
 ## Colour
 
 ### Primitive ramp
 
-`--gray-1` through `--gray-12` use `light-dark(oklch(...), oklch(...))`,
-hue 35 and chroma no greater than .010. Use their semantic aliases in components.
+Tailwind gray, read from tailwindcss.com's production CSS. Use the semantic
+aliases in components, never the steps.
 
-| Step | Light L / dark L | Role                                         |
-| ---- | ---------------- | -------------------------------------------- |
-| 1    | 99% / 15.5%      | Light paper / dark page                      |
-| 2    | 97.5% / 18.5%    | Light page / dark panel                      |
-| 3    | 95% / 21.5%      | Insets, overlays, control fill               |
-| 4    | 92.5% / 24.5%    | Hover fill                                   |
-| 5    | 90% / 27.5%      | Active fill                                  |
-| 6    | 87% / 31%        | Decorative hairline                          |
-| 7    | 82% / 37%        | Ordinary separator                           |
-| 8    | 64% / 52%        | Strong outline on page/paper                 |
-| 9    | 52% / 64%        | Faint text, filled-control outline           |
-| 10   | 47% / 68%        | Reserved neutral step; no component role yet |
-| 11   | 43% / 80%        | Secondary text                               |
-| 12   | 20.5% / 95.5%    | Primary text                                 |
+| Step | Hex       | Main roles (light / dark)                                         |
+| ---- | --------- | ----------------------------------------------------------------- |
+| 50   | `#f9fafb` | Light surface                                                     |
+| 100  | `#f3f4f6` | Light inset and control fill                                      |
+| 200  | `#e5e7eb` | Light separator, hover fill                                       |
+| 300  | `#d1d5dc` | Light active fill / dark body text                                |
+| 400  | `#99a1af` | Dark muted and faint text; never light text (2.6:1)               |
+| 500  | `#6a7282` | Light faint text; control borders in both themes                  |
+| 600  | `#4a5565` | Light muted text / dark primary-button hover                      |
+| 700  | `#364153` | Light body text / dark primary button                             |
+| 800  | `#1e2939` | Light primary-button hover / dark inset, hover, active, separator |
+| 900  | `#101828` | Dark surface, overlay and fill                                    |
+| 950  | `#030712` | Light text / dark page                                            |
 
-Light elevation uses white-ish paper over a slightly darker page band, separated
-by a hairline. Dark elevation gets lighter: page -> panel -> overlay/inset.
-Do not copy the light mapping into dark mode or introduce drop shadows.
+The light page is white with gray-50 panels. Dark elevation gets lighter:
+page (950) → panel (900) → inset (800). Don't introduce drop shadows.
 
 ### Surfaces and boundaries
 
 In the contrast table below, **S** means `--bg`, `--surface`, `--surface-inset`,
 `--surface-overlay`. **F** means `--fill`, `--fill-hover`, `--fill-active`.
 
-| Token                                                                      | Use / allowed foreground                                                                    | Never use for                                     |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| `--bg`                                                                     | Page and header; S foregrounds below                                                        | Text                                              |
-| `--surface`                                                                | Panels, cards, explainer/footer bands; S foregrounds                                        | An input's only visual boundary                   |
-| `--surface-overlay`                                                        | Native menu surface; S foregrounds                                                          | A translucent effect                              |
-| `--surface-inset`                                                          | Code blocks and table headers; S foregrounds                                                | Primary action emphasis                           |
-| `--fill`, `--fill-hover`, `--fill-active`                                  | Controls and neutral selection; `--text` / `--text-muted`                                   | Small faint/status text without a checked pairing |
-| `--accent-subtle`                                                          | Accent context; `--accent` / `--accent-hover`                                               | Decorative score or syntax colours                |
-| `--success-subtle`, `--warning-subtle`, `--danger-subtle`, `--info-subtle` | Matching status foreground                                                                  | Unrelated status colours                          |
-| `--border-subtle`                                                          | Decorative panel/row/code separators; at least 1.28 light / 1.33 dark on page, panel, inset | The only outline of an input                      |
-| `--border`                                                                 | Nonessential separators; at least 1.51 / 1.68 on page, panel, inset                         | Essential control identification                  |
+| Token                                                                      | Light / dark                           | Use / allowed foreground                                  | Never use for                                  |
+| -------------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------- | ---------------------------------------------- |
+| `--bg`                                                                     | white / 950                            | Page, header, text inputs; S foregrounds below            | Text                                           |
+| `--surface`                                                                | 50 / 900                               | Panels, cards, explainer/footer bands; S foregrounds      | An input's only visual boundary                |
+| `--surface-overlay`                                                        | white / 900                            | Native menu surface; S foregrounds                        | A translucent effect                           |
+| `--surface-inset`                                                          | 100 / 800                              | Code blocks, inline code, table headers                   | Faint text or input backgrounds (4.39:1 light) |
+| `--fill`, `--fill-hover`, `--fill-active`                                  | 100, 200, 300 / 900, 800, 800          | Controls and neutral selection; `--text` / `--text-muted` | A selected or pressed state with no other cue  |
+| `--primary`, `--primary-hover`                                             | black, 800 / 700, 600                  | `.button-primary` only; `--on-primary` (white)            | More than one action per view                  |
+| `--accent-subtle`                                                          | unchanged                              | Accent context; `--accent` / `--accent-hover`             | Decorative score or syntax colours             |
+| `--success-subtle`, `--warning-subtle`, `--danger-subtle`, `--info-subtle` | unchanged                              | Matching status foreground                                | Unrelated status colours                       |
+| `--border-subtle`                                                          | 950 at 5% / white at 10% (`color-mix`) | Decorative hairlines                                      | The only outline of an input                   |
+| `--border`                                                                 | 200 / 800                              | Nonessential separators                                   | Essential control identification               |
 
-Surfaces have no standalone contrast requirement; their allowed foreground ratios
-are measured below. The decorative border figures are informational, not 3:1 claims.
+Dark hover and active fills are both gray-800, because gray-700 fails muted
+text (3.96:1) and control borders (2.13:1). Pressed buttons therefore add an
+inset ring. Selected tabs keep a 3px border and weight 600, and current links
+use weight 600 (the TOC also uses its rail border).
 
 ### Foreground contrast contract
 
@@ -110,78 +125,113 @@ contrast preference. APCA columns are the smallest-magnitude signed Lc across
 the same backgrounds (informational, not a gate). Text passes 4.5:1; essential
 borders and focus indicators pass 3:1.
 
-| Token                      | Use / allowed backgrounds                                         | WCAG light | WCAG dark | Lc light | Lc dark | Never use for                 |
-| -------------------------- | ----------------------------------------------------------------- | ---------: | --------: | -------: | ------: | ----------------------------- |
-| `--text`                   | Primary text; S + F                                               |      13.28 |     13.03 |     85.1 |   -94.6 | Disabled-state concealment    |
-| `--text-muted`             | Explanations, labels; S + F                                       |       6.02 |      7.94 |     68.6 |   -63.7 | Hiding necessary instructions |
-| `--text-faint`             | Tertiary metadata; S                                              |       4.77 |      5.20 |     67.6 |   -39.2 | Text on hover/active fills    |
-| `--accent`                 | Links, current navigation, primary action fill; S + accent-subtle |       5.67 |      5.01 |     70.6 |   -40.7 | Decorative numbers/syntax     |
-| `--accent-hover`           | Interactive hover; S + accent-subtle                              |       7.18 |      7.93 |     77.2 |   -59.6 | Passive decoration            |
-| `--success`                | Success text; S + success-subtle                                  |       6.11 |      8.54 |     74.2 |   -64.1 | Meaning without words/icon    |
-| `--warning`                | Warning text; S + warning-subtle                                  |       6.49 |      8.74 |     76.0 |   -64.8 | Meaning without words/icon    |
-| `--danger`                 | Error text; S + danger-subtle                                     |       6.97 |      7.57 |     76.2 |   -57.3 | Losing specificity scores     |
-| `--info`                   | Informational status; S + info-subtle                             |       6.48 |      8.23 |     75.6 |   -61.7 | Ordinary prose                |
-| `--on-accent`              | Text on accent or accent-hover fill                               |       6.60 |      5.91 |    -86.1 |    44.7 | Text on neutral surfaces      |
-| `--border-strong`          | Essential boundary; bg, surface                                   |       3.14 |      3.37 |     56.2 |   -23.5 | Outline on inset/fill         |
-| `--border-control-on-fill` | Filled-control boundary; S + F                                    |       4.09 |      4.41 |     58.0 |   -37.1 | Body text                     |
-| `--focus-ring`             | Focus colour; S + F                                               |       4.89 |      4.49 |     61.3 |   -39.3 | An outline shorthand          |
+| Token                      | Light / dark        | Use / allowed backgrounds                                 | WCAG light | WCAG dark | Lc light | Lc dark | Never use for                 |
+| -------------------------- | ------------------- | --------------------------------------------------------- | ---------: | --------: | -------: | ------: | ----------------------------- |
+| `--text`                   | 950 / white         | Headings, links, primary text; S + F                      |      13.67 |     14.67 |     81.2 |  -104.3 | Disabled-state concealment    |
+| `--text-body`              | 700 / 300           | Prose and intro paragraphs; S                             |       9.36 |      9.96 |     87.3 |   -77.3 | Headings                      |
+| `--text-muted`             | 600 / 400           | Explanations, labels, nav rails; S + F                    |       5.13 |      5.64 |     61.6 |   -47.5 | Hiding necessary instructions |
+| `--text-faint`             | 500 / 400           | Eyebrows, metadata, placeholders; bg, surface, overlay    |       4.63 |      6.82 |     70.5 |   -49.9 | Text on inset or fills        |
+| `--accent`                 | `#b42300`/`#ff4d2a` | Underlines and focus; as text only on bg, surface, subtle |       5.67 |      5.01 |     70.6 |   -40.7 | Link or nav text              |
+| `--accent-hover`           |                     | Interactive hover; bg, surface, accent-subtle             |       7.18 |      7.93 |     77.2 |   -59.6 | Passive decoration            |
+| `--success`                |                     | Success text; S + success-subtle                          |       6.16 |      7.69 |     74.7 |   -62.7 | Meaning without words/icon    |
+| `--warning`                |                     | Warning text; S + warning-subtle                          |       6.49 |      7.78 |     76.0 |   -63.3 | Meaning without words/icon    |
+| `--danger`                 |                     | Error text; S + danger-subtle                             |       6.97 |      6.68 |     76.2 |   -55.7 | Losing specificity scores     |
+| `--info`                   |                     | Informational status; S + info-subtle                     |       6.49 |      7.34 |     75.8 |   -60.2 | Ordinary prose                |
+| `--on-accent`              | white / 950         | Text on accent or accent-hover fill                       |       6.60 |      6.09 |    -86.1 |    44.8 | Text on neutral surfaces      |
+| `--on-primary`             | white               | Text on primary or primary-hover                          |      14.67 |      7.56 |   -104.3 |   -91.1 | Text on neutral surfaces      |
+| `--border-strong`          | 500                 | Essential boundary; bg, surface                           |       4.63 |      3.67 |     70.5 |   -27.0 | Light text                    |
+| `--border-control-on-fill` | 500                 | Form-control boundary; S + F                              |       3.28 |      3.03 |     48.9 |   -24.6 | Body text                     |
+| `--focus-ring`             | accent              | Focus colour; S + F                                       |       4.48 |      4.43 |     56.2 |   -39.1 | An outline shorthand          |
 
-Use `--focus-outline` for the complete 3px outline and preserve its offset.
-Accent is fixed at light `#b42300` / dark `#ff4d2a`. Scores, charts and syntax
-stay neutral; a deciding score also has a non-colour indicator. Status always
-has readable wording. With `prefers-contrast: more`, secondary text becomes
-primary and borders become stronger.
+Gray-500 text on gray-950 is only 4.16:1, which is why dark faint text is
+gray-400. Use `--focus-outline` for the complete 3px outline and preserve its
+offset. Accent works the way tailwindcss.com uses sky-400: running-text link
+underlines and the focus ring. Scores, charts and syntax stay neutral, and a
+deciding score also has a non-colour indicator. Status always has readable
+wording. With `prefers-contrast: more`, body, secondary and faint text become
+primary, and borders and control borders become gray-700 / gray-300.
 
-Run `npm run contrast` for all 66 foreground/background pairs, both themes,
-plus the increased-contrast variant: **264 checks**. It resolves actual tokens,
+Run `npm run contrast` for all 67 foreground/background pairs, both themes,
+plus the increased-contrast variant: **268 checks**. It resolves actual tokens,
 converts OKLCH to sRGB using CSS Color 4 matrices, and fails on missing tokens,
-cycles, out-of-gamut colours or low WCAG contrast. The APCA calculation reports
-0.0.98G-4g / apca-w3 0.1.9 signed Lc but never changes pass/fail.
-Build-time consumers must pass imported raw token CSS to `readTokens`;
-do not depend on a bundled module's filesystem-relative default.
+cycles, out-of-gamut colours or low WCAG contrast. `color-mix()` tokens
+(`--border-subtle`, `--marker`) are decorative and not gated. The APCA
+calculation reports 0.0.98G-4g / apca-w3 0.1.9 signed Lc but never changes
+pass/fail. Build-time consumers must pass imported raw token CSS to
+`readTokens`; do not depend on a bundled module's filesystem-relative default.
+
+### Links
+
+As on tailwindcss.com, **only links inside running text are underlined**:
+`--text` colour, weight 600, a 1px `--accent` underline at a 3px offset, and 2px
+on hover. That is the base `a` rule. These opt out:
+
+- Header nav: `--text-sm`, no underline at rest, a 1px underline on hover,
+  weight 600 for `aria-current`.
+- Footer, breadcrumbs, results nav: muted, no underline at rest, underline on hover.
+- TOC: Tailwind's docs-sidebar rail (see `.toc-link`).
+- Buttons and `.button-quiet`: never underlined.
+- Links inside headings: no underline styling.
+
+Selector-anatomy `.part` underlines, `.numeral[data-decided]` and the decided
+ladder outcome are state indicators, not link styling. Keep them.
 
 ## Type and rhythm
 
-Type interpolates from a 16px base / 1.2 ratio at 320px to 18px / 1.25 at 1280px.
-The rem bounds still respond to browser font-size preferences. The two sub-body
-steps are fixed at 12px and 14px (at the default root size) rather than fluid,
-because fractional small text renders soft, especially on Windows.
+Tailwind's fixed scale. Sizes step up at breakpoints instead of using `clamp()`.
+Every size has a matching `--text-<size>--line-height`.
 
-| Token       | Min rem | Max rem | Typical role            |
-| ----------- | ------: | ------: | ----------------------- |
-| `--step--2` |     .75 |     .75 | Small data annotations  |
-| `--step--1` |    .875 |    .875 | Metadata, code blocks   |
-| `--step-0`  |       1 |   1.125 | Body, UI                |
-| `--step-1`  |     1.2 |  1.4062 | Lead, workbench h3      |
-| `--step-2`  |    1.44 |  1.7578 | h3, workbench h2        |
-| `--step-3`  |   1.728 |  2.1973 | Section h2              |
-| `--step-4`  |  2.0736 |  2.7466 | Tool h1                 |
-| `--step-5`  |  2.4883 |  3.4332 | Home h1, footer display |
+| Token         |     Size | Line height | Typical role                                     |
+| ------------- | -------: | ----------: | ------------------------------------------------ |
+| `--text-xs`   |   .75rem |        1rem | Eyebrow labels (with a 1.5rem line height)       |
+| `--text-sm`   |  .875rem |     1.25rem | Metadata, nav, TOC, code blocks, explainer prose |
+| `--text-base` |     1rem |      1.5rem | Body, UI, card titles, tool intro                |
+| `--text-lg`   | 1.125rem |     1.75rem | Home lead, inner-page and explainer h2           |
+| `--text-xl`   |  1.25rem |     1.75rem | Logo, tabs, verdicts                             |
+| `--text-2xl`  |   1.5rem |        2rem | Metric values, accessible-name verdict           |
+| `--text-3xl`  | 1.875rem |     2.25rem | Tool and inner-page h1, explainer title          |
+| `--text-4xl`  |  2.25rem |      2.5rem | Home hero h1 (base), footer slogan               |
+| `--text-5xl`  |     3rem |           1 | Home hero h1 at `sm`, home footer slogan         |
+| `--text-6xl`  |  3.75rem |           1 | Home hero h1 at `lg`                             |
+| `--text-8xl`  |     6rem |           1 | Home hero h1 at `xl`                             |
 
-Line heights: display 1.1, heading 1.2, UI 1.4, body 1.6, code 1.5.
-Tracking: -.02em display, -.01em headings, normal for body/code.
+Breakpoints (literals in `@media`): sm 40rem, md 48rem, lg 64rem, xl 80rem,
+2xl 96rem. Tracking: `--tracking-tight` -.025em (h1, h2), `--tracking-tighter`
+-.05em (home hero and home h2), `--tracking-widest` .1em (eyebrows). `html` sets
+line-height 1.5; other line-height tokens are UI 1.4, body 1.6 and code 1.5.
+
+The explainer body follows Tailwind's `.prose`: .875rem with line-height 2 in
+`--text-body`, `h2` at `--text-lg` / 1.5556 with 5rem above, `h3` at
+`--text-base` with 4rem above (1.5rem straight after an h2), square `ul`
+markers in `--marker`, decimal `ol` markers in `--text` at 600. Inline code has
+no pill, and its backticks are drawn with `content: "`" / ""` so screen readers
+don't announce them. Home and card paragraphs keep their own roles.
+
 Specificity score numerals use a separate container-relative data-display scale.
 
-| Space token (`--space-`) | Min rem | Max rem |
-| ------------------------ | ------: | ------: |
-| 3xs                      |     .25 |   .2812 |
-| 2xs                      |      .5 |   .5625 |
-| xs                       |     .75 |   .8438 |
-| s                        |       1 |   1.125 |
-| m                        |     1.5 |  1.6875 |
-| l                        |       2 |    2.25 |
-| xl                       |       3 |   3.375 |
-| 2xl                      |       4 |     4.5 |
-| 3xl                      |       6 |    6.75 |
-| s-m                      |       1 |  1.6875 |
-| m-l                      |     1.5 |    2.25 |
-| l-xl                     |       2 |   3.375 |
-| xl-2xl                   |       3 |     4.5 |
+Spacing is fixed multiples of `--spacing: 0.25rem`:
+
+| Space token (`--space-`) |  Value | Pair token | Below `sm` | From `sm` |
+| ------------------------ | -----: | ---------- | ---------: | --------: |
+| 3xs                      | .25rem | s-m        |       1rem |    1.5rem |
+| 2xs                      |  .5rem | m-l        |     1.5rem |      2rem |
+| xs                       | .75rem | l-xl       |       2rem |      3rem |
+| s                        |   1rem | xl-2xl     |       3rem |      4rem |
+| m                        | 1.5rem |            |            |           |
+| l                        |   2rem |            |            |           |
+| xl                       |   3rem |            |            |           |
+| 2xl                      |   4rem |            |            |           |
+| 3xl                      |   6rem |            |            |           |
+| section                  |   5rem |            |            |           |
+
+`--gutter` is 1rem, then 1.5rem at `sm` and 2rem at `lg`.
 
 The parent owns rhythm:
 
 - `.flow`: normal siblings get `s`; preceding space for h2 is `l-xl`, for h3 `m`;
-  heading-to-content is `xs`. Override with `--flow-space` for a specific group.
+  heading-to-content is `xs`. Override with `--flow-space` for a group, or set
+  `--flow-heading-space` on a heading (or on the element after one) to change
+  its own preceding space.
 - `.stack`: column flex with `--stack-space` (default `s`).
 - `.cluster`: wrapping inline group with `--cluster-space` (default `2xs`).
 - `.region`: block padding `xl-2xl`, never viewport-height sections.

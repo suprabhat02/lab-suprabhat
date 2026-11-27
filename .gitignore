@@ -6,7 +6,7 @@ dist/
 # dependencies
 node_modules/
 
-# copied from @fontsource-variable/geist-mono by scripts/copy-fonts.mjs
+# written from inter-ui and @ibm/plex-mono by scripts/copy-fonts.mjs
 public/fonts/
 
 # test output

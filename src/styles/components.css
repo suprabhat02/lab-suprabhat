@@ -11,6 +11,7 @@
     color: var(--on-accent);
     border-radius: var(--radius-control);
     font-weight: var(--weight-medium);
+    text-decoration-line: none;
 
     &:focus {
       inset-block-start: var(--space-2xs);
@@ -23,11 +24,13 @@
     min-block-size: var(--control-size);
     color: var(--text);
     font-weight: var(--weight-semibold);
-    font-size: var(--step-1);
-    text-decoration: none;
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+    text-decoration-line: none;
 
     &:hover {
-      color: var(--accent);
+      text-decoration-line: underline;
+      text-decoration-thickness: var(--stroke-hairline);
     }
   }
 
@@ -40,14 +43,19 @@
     align-items: center;
     min-block-size: var(--control-size);
     padding-inline: var(--space-2xs);
-    color: var(--text-muted);
-    text-decoration: underline;
+    color: var(--text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: var(--text-base--line-height);
+    text-decoration-line: none;
 
-    &:hover,
+    &:hover {
+      text-decoration-line: underline;
+      text-decoration-thickness: var(--stroke-hairline);
+    }
+
     &[aria-current='page'] {
-      color: var(--accent);
-      text-decoration: underline;
-      text-decoration-thickness: var(--stroke-emphasis);
+      font-weight: var(--weight-semibold);
     }
   }
 
@@ -103,23 +111,26 @@
   }
 
   .footer-slogan {
-    font-family: var(--font-sans);
     max-inline-size: var(--measure-slogan);
-    font-size: var(--step-4);
-    font-weight: var(--weight-heading);
-    line-height: var(--line-display);
-    letter-spacing: var(--tracking-display);
+    color: var(--text);
+    font-size: var(--text-4xl);
+    font-weight: var(--weight-medium);
+    line-height: var(--text-4xl--line-height);
+    letter-spacing: var(--tracking-tighter);
+    text-wrap: balance;
   }
 
   .site-footer-home .footer-slogan {
-    font-size: var(--footer-display);
+    font-size: var(--text-5xl);
+    line-height: var(--text-5xl--line-height);
   }
 
   /* ---------- Controls ---------- */
 
   .label {
     display: block;
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
     font-weight: var(--weight-medium);
     color: var(--text-muted);
     letter-spacing: 0;
@@ -132,9 +143,10 @@
     padding: var(--space-2xs) var(--space-xs);
     border: var(--stroke-hairline) solid var(--border-control-on-fill);
     border-radius: var(--radius-control);
-    background: var(--surface-inset);
+    /* --bg, not the inset surface: faint placeholder text needs 4.5:1. */
+    background: var(--bg);
     color: var(--text);
-    font-size: var(--step-0);
+    font-size: var(--text-base);
     line-height: var(--line-ui);
 
     &:hover {
@@ -160,7 +172,7 @@
   .textarea {
     min-block-size: var(--textarea-min);
     resize: vertical;
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-code);
     white-space: pre;
     overflow-x: auto;
@@ -220,6 +232,7 @@
     background: var(--fill);
     color: var(--text);
     font-weight: var(--weight-medium);
+    text-decoration-line: none;
     cursor: pointer;
 
     &:hover {
@@ -227,13 +240,37 @@
       background: var(--fill-hover);
     }
 
+    /* Dark hover and active fills match, so pressed also gets an inset ring. */
     &:active {
       background: var(--fill-active);
+      box-shadow: inset 0 0 0 var(--stroke-hairline) var(--text);
     }
 
     &:disabled {
       opacity: 0.55;
       cursor: not-allowed;
+    }
+  }
+
+  /* Tailwind's primary action. Only the main action on a page uses it. */
+  .button-primary {
+    padding: var(--space-2xs) var(--space-s);
+    border-color: transparent;
+    border-radius: var(--radius-pill);
+    background: var(--primary);
+    color: var(--on-primary);
+    font-size: var(--text-sm);
+    line-height: var(--text-base--line-height);
+    font-weight: var(--weight-semibold);
+
+    &:hover {
+      border-color: transparent;
+      background: var(--primary-hover);
+    }
+
+    &:active {
+      background: var(--primary-hover);
+      box-shadow: inset 0 0 0 var(--stroke-emphasis) var(--on-primary);
     }
   }
 
@@ -244,9 +281,9 @@
     border: 0;
     background: transparent;
     color: var(--text-muted);
-    font-size: var(--step--1);
-    text-decoration: underline;
-    text-underline-offset: var(--underline-offset);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    text-decoration-line: none;
     cursor: pointer;
 
     &:hover {
@@ -260,7 +297,7 @@
     display: flex;
     gap: var(--space-2xs);
     align-items: baseline;
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-code);
 
     & .icon {
@@ -287,7 +324,8 @@
     border-radius: var(--radius-control);
     background: var(--surface);
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
   }
 
   .code {
@@ -295,7 +333,7 @@
     border-radius: var(--radius-control);
     background: var(--surface-inset);
     border: var(--stroke-hairline) solid var(--border-subtle);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-code);
     min-inline-size: 0;
     max-inline-size: 100%;
@@ -305,8 +343,8 @@
 
   .callout {
     max-inline-size: var(--measure-callout);
-    font-size: var(--step-1);
-    line-height: var(--line-body);
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
   }
 
   /* ---------- Tool hero and duel ---------- */
@@ -317,17 +355,32 @@
     padding-block: var(--space-xl-2xl);
   }
 
+  /* Tool and inner page intro, from tailwindcss.com's docs. The home page overrides it. */
   .tool-lead {
+    --flow-heading-space: var(--space-m);
     max-inline-size: var(--measure-lead);
-    color: var(--text-muted);
-    font-size: var(--step-1);
-    line-height: var(--line-body);
+    color: var(--text-body);
+    font-size: var(--text-base);
+    line-height: 1.75rem;
   }
 
   .breadcrumbs,
   .input-help {
     color: var(--text-faint);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .breadcrumbs a {
+    color: var(--text-muted);
+    font-weight: var(--weight-regular);
+    text-decoration-line: none;
+
+    &:hover {
+      color: var(--text);
+      text-decoration-line: underline;
+      text-decoration-thickness: var(--stroke-hairline);
+    }
   }
 
   .breadcrumbs li {
@@ -371,7 +424,7 @@
   }
 
   .input-selector {
-    font-size: var(--step-1);
+    font-size: var(--text-xl);
     min-block-size: var(--selector-size);
   }
 
@@ -445,32 +498,32 @@
   .numeral-caption {
     grid-row: 2;
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
 
     &[data-decided] {
       color: var(--text);
-      font-weight: var(--weight-heading);
+      font-weight: var(--weight-semibold);
     }
   }
 
   .outcome {
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .outcome-win {
     color: var(--text);
-    font-weight: var(--weight-heading);
+    font-weight: var(--weight-semibold);
   }
 
   .list-note {
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .verdict {
     max-inline-size: var(--measure-verdict);
-    font-size: var(--step-1);
+    font-size: var(--text-xl);
     font-weight: var(--weight-medium);
     line-height: var(--line-body);
   }
@@ -484,7 +537,7 @@
 
   .status {
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .share-fallback {
@@ -510,7 +563,7 @@
   }
 
   .fix-title {
-    font-size: var(--step-1);
+    font-size: var(--text-xl);
   }
 
   /* ---------- Tabs ---------- */
@@ -550,7 +603,7 @@
     border-block-end: var(--stroke-focus) solid transparent;
     background: none;
     color: var(--text-muted);
-    font-size: var(--step-1);
+    font-size: var(--text-xl);
     font-weight: var(--weight-medium);
     cursor: pointer;
 
@@ -560,7 +613,7 @@
 
     &[aria-selected='true'] {
       color: var(--text);
-      font-weight: var(--weight-heading);
+      font-weight: var(--weight-semibold);
       border-block-end-color: var(--text);
     }
   }
@@ -601,7 +654,7 @@
 
   .table {
     inline-size: 100%;
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-code);
 
     & :is(th, td) {
@@ -618,7 +671,7 @@
 
     & tfoot :is(th, td) {
       border-block-end: 0;
-      font-weight: var(--weight-heading);
+      font-weight: var(--weight-semibold);
     }
 
     & .num {
@@ -671,7 +724,7 @@
     gap: var(--space-s);
 
     & dd {
-      font-size: var(--step-3);
+      font-size: var(--text-3xl);
       font-weight: var(--weight-semibold);
     }
   }
@@ -682,12 +735,12 @@
   }
 
   .anatomy-title {
-    font-size: var(--step-1);
+    font-size: var(--text-xl);
   }
 
   .parts {
     font-family: var(--font-mono);
-    font-size: var(--step-2);
+    font-size: var(--text-2xl);
     line-height: var(--line-code);
     overflow-wrap: anywhere;
     white-space: pre-wrap;
@@ -785,8 +838,8 @@
   }
 
   .cascade-winner {
-    font-size: var(--step-1);
-    font-weight: var(--weight-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
     line-height: var(--line-ui);
   }
 
@@ -807,7 +860,7 @@
     color: var(--text-muted);
 
     &::marker {
-      font-weight: var(--weight-heading);
+      font-weight: var(--weight-semibold);
     }
 
     &[data-outcome='decided'] {
@@ -827,12 +880,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0 var(--space-s);
-    font-weight: var(--weight-heading);
+    font-weight: var(--weight-semibold);
   }
 
   .ladder-outcome {
     font-weight: var(--weight-regular);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .ladder-step[data-outcome='decided'] .ladder-outcome {
@@ -841,7 +894,7 @@
   }
 
   .ladder-text {
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-body);
   }
 
@@ -898,7 +951,7 @@
 
   .example-label {
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .example-code .code {
@@ -909,9 +962,107 @@
     max-inline-size: var(--measure);
   }
 
-  /* Section headings sit one step below the explainer's own title. */
-  .explainer-body > h2 {
-    font-size: var(--step-2);
+  /* ---------- Explainer: long-form prose, from tailwindcss.com's .prose ---------- */
+
+  .explainer-head {
+    & h2 {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    & p {
+      --flow-heading-space: var(--space-m);
+      color: var(--text-body);
+      font-size: var(--text-base);
+      line-height: 1.75rem;
+    }
+  }
+
+  .explainer-body {
+    color: var(--text-body);
+    font-size: var(--text-sm);
+    line-height: 2;
+
+    & :is(p, li) {
+      line-height: 2;
+    }
+
+    & > :is(h2, h3) {
+      font-weight: var(--weight-semibold);
+      line-height: 1.5556;
+      /* html already pads scrolling by the header; together they land headings 4.5rem from the top. */
+      scroll-margin-block-start: calc(4.5rem - var(--header-height) - var(--space-s));
+    }
+
+    & > h2 {
+      --flow-heading-space: 5rem;
+      font-size: var(--text-lg);
+      letter-spacing: var(--tracking-tight);
+    }
+
+    & > h3 {
+      --flow-heading-space: 4rem;
+      font-size: var(--text-base);
+    }
+
+    & > h2 + h3 {
+      --flow-heading-space: 1.5rem;
+    }
+
+    & > hr + h2 {
+      --flow-heading-space: 4rem;
+    }
+
+    & > :is(ul, ol):not([role='list']) {
+      display: block;
+      padding-inline-start: 1.5rem;
+    }
+
+    & > ul:not([role='list']) {
+      list-style-type: square;
+
+      & > li::marker {
+        color: var(--marker);
+      }
+    }
+
+    & > ol:not([role='list']) {
+      list-style-type: decimal;
+
+      & > li::marker {
+        color: var(--text);
+        font-weight: var(--weight-semibold);
+      }
+    }
+
+    & > :is(ul, ol):not([role='list']) > li {
+      padding-inline-start: 0.75rem;
+
+      & + li {
+        margin-block-start: 1rem;
+      }
+    }
+
+    /* Inline code: no pill, backticks drawn in CSS. The empty alt text keeps screen readers from saying "backtick". */
+    & > :is(p, ul, ol, h2, h3) code {
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      color: var(--text);
+      font-weight: var(--weight-medium);
+
+      &::before,
+      &::after {
+        content: '`' / '';
+      }
+    }
+
+    & pre code {
+      font-size: var(--text-sm);
+      line-height: 2;
+    }
   }
 
   .explainer {
@@ -937,8 +1088,8 @@
   }
 
   .toc {
-    font-size: var(--step--1);
-    line-height: var(--line-ui);
+    font-size: var(--text-sm);
+    line-height: var(--text-base--line-height);
 
     @media (width >= 64rem) {
       grid-area: nav;
@@ -957,37 +1108,52 @@
     cursor: pointer;
   }
 
-  .toc-title {
-    display: none;
-    color: var(--text-muted);
+  /* Eyebrow labels, from tailwindcss.com: mono, uppercase, widely tracked. */
+  .toc-title,
+  .tool-category {
+    color: var(--text-faint);
+    font-family: var(--font-mono);
+    font-feature-settings: var(--font-features-mono);
+    font-size: var(--text-xs);
+    line-height: var(--text-base--line-height);
     font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-widest);
+    text-transform: uppercase;
   }
 
+  .toc-title {
+    display: none;
+  }
+
+  /* Tailwind's docs sidebar: a hairline rail, with the current link drawing over it. */
   .toc-list {
     display: grid;
-    gap: var(--space-3xs);
+    gap: var(--space-2xs);
     margin: 0;
     padding: 0;
-
-    & li {
-      font-family: var(--font-sans);
-    }
+    border-inline-start: var(--stroke-hairline) solid color-mix(in oklab, var(--text) 10%, transparent);
   }
 
   .toc-link {
-    display: block;
-    padding-block: var(--space-3xs);
+    display: inline-block;
+    margin-inline-start: calc(-1 * var(--stroke-hairline));
+    padding-inline-start: var(--space-s);
+    border-inline-start: var(--stroke-hairline) solid transparent;
     color: var(--text-muted);
-    text-decoration: underline;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    line-height: var(--text-base--line-height);
+    text-decoration-line: none;
 
     &:hover {
+      border-inline-start-color: color-mix(in oklab, var(--text) 25%, transparent);
       color: var(--text);
-      text-decoration: underline;
     }
 
     &[aria-current='location'] {
-      color: var(--accent);
-      font-weight: var(--weight-heading);
+      border-inline-start-color: var(--text);
+      color: var(--text);
+      font-weight: var(--weight-semibold);
     }
   }
 
@@ -1015,12 +1181,53 @@
     padding-block: var(--space-xl-2xl);
   }
 
-  .hub-hero h1 {
-    font-size: var(--step-4);
+  /* Home page hero, from tailwindcss.com's home page. */
+  .hub-hero-home {
+    & h1 {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-tighter);
+      text-wrap: balance;
+
+      @media (width >= 40rem) {
+        font-size: var(--text-5xl);
+        line-height: var(--text-5xl--line-height);
+      }
+
+      @media (width >= 64rem) {
+        font-size: var(--text-6xl);
+        line-height: var(--text-6xl--line-height);
+        font-weight: var(--weight-regular);
+      }
+
+      @media (width >= 80rem) {
+        font-size: var(--text-8xl);
+        line-height: var(--text-8xl--line-height);
+      }
+    }
+
+    & .tool-lead {
+      max-inline-size: 48rem;
+      color: var(--text-muted);
+      font-size: var(--text-lg);
+      line-height: 1.75rem;
+      font-weight: var(--weight-medium);
+    }
   }
 
-  .hub-hero-home h1 {
-    font-size: var(--step-5);
+  .home-heading {
+    font-size: 2.5rem;
+    line-height: 2.5rem;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tighter);
+    text-wrap: balance;
+  }
+
+  .home-body {
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    line-height: 1.75rem;
   }
 
   .tabs,
@@ -1056,19 +1263,16 @@
       outline: var(--focus-outline);
       outline-offset: var(--stroke-focus);
     }
+
+    &:has(.tool-title a:hover) {
+      border-color: var(--border-strong);
+    }
   }
 
   .tool-title {
-    font-size: var(--step-2);
-
-    & a {
-      color: var(--text);
-    }
-
-    & a:hover,
-    & a:focus-visible {
-      color: var(--accent);
-    }
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    font-weight: var(--weight-semibold);
 
     & a::after {
       content: '';
@@ -1079,15 +1283,10 @@
     }
   }
 
-  .tool-category {
-    color: var(--text-muted);
-    font-size: var(--step--1);
-  }
-
   .tool-trust {
     --cluster-space: var(--space-2xs) var(--space-m);
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   .tool-status {
@@ -1096,7 +1295,7 @@
     border: var(--stroke-hairline) solid var(--border-subtle);
     border-radius: var(--radius-control);
     color: var(--text-muted);
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
   }
 
   @media (forced-colors: active) {
@@ -1106,6 +1305,10 @@
 
     .tab[aria-selected='true'] {
       border-block-end-color: Highlight;
+    }
+
+    .button-primary {
+      border-color: ButtonText;
     }
   }
 }

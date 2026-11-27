@@ -3,7 +3,7 @@
 ## No React, no shadcn, no Tailwind
 
 - **React and shadcn** would hydrate a framework runtime on a page that needs one small island. The whole interactive part ships about 1.7 KB of gzipped JS before interaction; React alone is several times the 15 KB budget.
-- **Tailwind** would hide the cascade behind utility classes. This site teaches specificity and layers, so its CSS is written by hand to show the approach: declared `@layer` order, `:where()` for zero-specificity base styles, no IDs in selectors, no `!important` except inside `prefers-reduced-motion`.
+- **Tailwind** would hide the cascade behind utility classes. This site teaches specificity and layers, so its CSS is written by hand to show the approach: declared `@layer` order, `:where()` for zero-specificity base styles, no IDs in selectors, no `!important` except inside `prefers-reduced-motion`. The typography, type scale, spacing and gray palette copy tailwindcss.com's values as plain CSS tokens; the Tailwind package is still not a dependency.
 
 ## Specificity library
 
@@ -11,24 +11,25 @@
 
 The parser loads on first interaction: about 19 KB gzipped, plus 14 KB for the tool controller.
 
-## Version notes (checked 2026-11-11 with `npm view`)
+## Version notes (checked 2026-11-11 with `npm view`; font rows 2026-11-27)
 
-| Package                         | Used                                                                                      | Note                                                                                                                                            |
-| ------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| astro                           | 7.4.10                                                                                    |                                                                                                                                                 |
-| @bramus/specificity             | 2.4.3                                                                                     |                                                                                                                                                 |
-| @astrojs/sitemap                | 3.7.4                                                                                     |                                                                                                                                                 |
-| astro-og-canvas                 | 0.13.3                                                                                    | Loads the Latin Figtree `woff2` directly; no TTF needed.                                                                                        |
-| @fontsource-variable/geist-mono | 5.3.0                                                                                     |                                                                                                                                                 |
-| @fontsource-variable/figtree    | 5.3.0                                                                                     | Upright `wght` 300-900 only; italics are not copied.                                                                                            |
-| @fontsource-variable/inter      | 5.3.0                                                                                     | UI uses `opsz.css`, with weight and optical-size axes.                                                                                          |
-| vitest                          | 5.1.0                                                                                     |                                                                                                                                                 |
-| @playwright/test                | 1.65.0                                                                                    |                                                                                                                                                 |
-| @axe-core/playwright            | 4.14.0                                                                                    |                                                                                                                                                 |
-| typescript                      | 6.0.3                                                                                     | **Not** the latest (7.0.2): `@astrojs/check` 0.9.12 allows `^5 \|\| ^6` and `typescript-eslint` 8.72.2 allows `<6.1.0`. Move to 7 when they do. |
-| eslint / typescript-eslint      | 10.14.0 / 8.72.2                                                                          | `npm audit` reports a moderate `minimatch` advisory in this dev-only chain; the only fix is downgrading ESLint. Nothing ships to users.         |
-| Node                            | 24 in CI                                                                                  | Local was 24.x; `engines` allows `>=22.23.4` (Astro's minimum).                                                                                 |
-| GitHub Actions                  | checkout v7, setup-node v7, upload-artifact v7, upload-pages-artifact v4, deploy-pages v4 | Latest majors at the time.                                                                                                                      |
+| Package                      | Used                                                                                      | Note                                                                                                                                            |
+| ---------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| astro                        | 7.4.10                                                                                    |                                                                                                                                                 |
+| @bramus/specificity          | 2.4.3                                                                                     |                                                                                                                                                 |
+| @astrojs/sitemap             | 3.7.4                                                                                     |                                                                                                                                                 |
+| astro-og-canvas              | 0.13.3                                                                                    | Loads the Latin Figtree `woff2` directly; no TTF needed.                                                                                        |
+| @fontsource-variable/figtree | 5.3.0                                                                                     | Upright `wght` 300-900 only; italics are not copied. OG images only.                                                                            |
+| inter-ui                     | 4.1.1 (exact)                                                                             | Official rsms Inter 4.1 variable build; subset at build time, keeping every layout feature.                                                     |
+| @ibm/plex-mono               | 2.5.0 (exact)                                                                             | IBM's own split files, copied unmodified.                                                                                                       |
+| subset-font / fontkitten     | 2.9.0 / 1.0.3 (exact, dev)                                                                | Subsetting and the GSUB/axis assertion. fontkitten was already installed through `@capsizecss/unpack`.                                          |
+| vitest                       | 5.1.0                                                                                     |                                                                                                                                                 |
+| @playwright/test             | 1.65.0                                                                                    |                                                                                                                                                 |
+| @axe-core/playwright         | 4.14.0                                                                                    |                                                                                                                                                 |
+| typescript                   | 6.0.3                                                                                     | **Not** the latest (7.0.2): `@astrojs/check` 0.9.12 allows `^5 \|\| ^6` and `typescript-eslint` 8.72.2 allows `<6.1.0`. Move to 7 when they do. |
+| eslint / typescript-eslint   | 10.14.0 / 8.72.2                                                                          | `npm audit` reports a moderate `minimatch` advisory in this dev-only chain; the only fix is downgrading ESLint. Nothing ships to users.         |
+| Node                         | 24 in CI                                                                                  | Local was 24.x; `engines` allows `>=22.23.4` (Astro's minimum).                                                                                 |
+| GitHub Actions               | checkout v7, setup-node v7, upload-artifact v7, upload-pages-artifact v4, deploy-pages v4 | Latest majors at the time.                                                                                                                      |
 
 ## Astro settings
 
@@ -44,8 +45,8 @@ The first version of the island was 14.6 KB gzipped, right at the budget. It's n
 ## Design details
 
 - **Numerals** use `clamp(4rem, 30cqi, 11rem)` instead of `14vw`: the selector cards sit side by side and can number up to eight, so sizing against the card (container query units) keeps three huge digits inside it at every width.
-- **Fallback fonts** are generated, not hand-tuned. `scripts/font-fallbacks.mjs` (run by `npm run fonts` before `dev` and `build`) reads Geist Mono's metrics from the served woff2 with `@capsizecss/unpack` and writes `src/styles/fonts.generated.css` with Capsize's `createFontStack`: `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override` for Consolas, Menlo (also matching DejaVu Sans Mono) and Courier New (also matching the metric-compatible Liberation Mono and Cousine). Courier New's metrics come from `@capsizecss/metrics`; Consolas and Menlo aren't in that collection, so their metrics are written into the script from the font files. `ui-monospace` can't be referenced from `@font-face`, so it stays in the stack after the adjusted faces. An e2e test checks fallback widths stay within 2% of Geist Mono, and that delaying the web font by 1.5 s causes no layout shift.
-- **Fonts:** Mono subsets are copied to `public/fonts/` by `scripts/copy-fonts.mjs`. Inter's `opsz.css` is bundled by Vite; its Latin file is preloaded and other subsets load on demand.
+- **Fallback fonts** are generated, not hand-tuned. `scripts/font-fallbacks.mjs` (run by `npm run fonts` before `dev` and `build`, after `copy-fonts.mjs`) reads the served Latin files with `@capsizecss/unpack` and writes `src/styles/fonts.generated.css` with Capsize's `createFontStack`: `size-adjust`, `ascent-override`, `descent-override` and `line-gap-override` for Inter (Arial, Segoe UI, Helvetica, with Liberation Sans sharing Arial's) and IBM Plex Mono (Consolas, Menlo, also matching DejaVu Sans Mono, and Courier New, also matching the metric-compatible Liberation Mono and Cousine). Courier New's metrics come from `@capsizecss/metrics`; Consolas and Menlo aren't in that collection, so their metrics are written into the script from the font files. `ui-monospace` can't be referenced from `@font-face`, so it stays in the stack after the adjusted faces. An e2e test checks fallback widths stay within 2% of each web font, and that delaying the web fonts by 1.5 s causes no layout shift.
+- **Fonts:** `scripts/copy-fonts.mjs` writes everything in `public/fonts/`: the two Inter subsets, IBM's Plex Mono files and both OFL licences. Only `inter-latin.woff2` is preloaded.
 - **`[hidden]`** lives in the `utilities` layer. In `reset` it lost to components that set `display`, which is exactly the kind of layer-order surprise the tool explains.
 - **Nested `@media` declarations** expand to an `:is()` of the parent list, matching how browsers treat nested declarations blocks.
 - **Final review:** removed the boxed background and border from the nesting callout. It's now a plain, slightly larger paragraph.
@@ -98,7 +99,7 @@ measurable benefit. The 12px and 14px sub-body steps are now whole pixels.
 The prose measure moved from 66ch to 46ch after measuring characters per line.
 Italics are synthesised rather than downloaded.
 
-## Design-system color gate
+## Design-system color gate (historical, superseded by Tailwind gray below)
 
 The warm OKLCH ramp uses hue 35 and chroma at most .010. Components consume
 semantic tokens, not numbered grays. In light mode the page is a step-2 band
@@ -125,7 +126,7 @@ underline styles, labels and selected point shapes still convey meaning.
 The fixed LiveExample canvas is demonstration content and intentionally
 keeps its original white/dark colors.
 
-## Design-system rhythm
+## Design-system rhythm (historical, superseded by Tailwind gray below)
 
 Type interpolates from 16px at 320px to 18px at 1280px, with ratios 1.2 and
 1.25. Section space now uses rem/vi pairs rather than viewport height.
@@ -138,6 +139,68 @@ escalation. Flow owns prose margins; components use grid/flex gaps. Hidden
 siblings do not add flow gaps, and the hidden utility follows all primitives.
 Both workbench panes are inline-size containers; metrics and pane grids use
 container queries, while page columns still use viewport queries.
+
+## Official Inter and IBM Plex Mono builds (Tailwind typography)
+
+Fontsource builds were dropped because they strip the OpenType features this
+design needs. Measured with fontkitten on 2026-11-27:
+
+| File                                           |   Bytes | Axes      | GSUB features | `cv02`-`cv04`, `cv11` | `ss02`, `zero` |
+| ---------------------------------------------- | ------: | --------- | ------------: | --------------------- | -------------- |
+| Fontsource Inter 5.3.0 `inter-latin-opsz`      |  72,920 | opsz/wght |             8 | none                  | none           |
+| Fontsource Geist Mono 5.3.0 Latin              |  23,128 | wght      |             5 | none                  | none           |
+| inter-ui 4.1.1 `InterVariable.woff2` (full)    | 352,240 | opsz/wght |            39 | all                   | both           |
+| Served `inter-latin.woff2` (our subset)        |  99,004 | opsz/wght |            37 | all                   | both           |
+| Served `inter-latin-ext.woff2` (our subset)    |  66,436 | opsz/wght |            14 | `cv11` only           | `ss02` only    |
+| IBM `IBMPlexMono-Regular-Latin1.woff2` (as-is) |  17,544 | none      |            20 | n/a                   | both           |
+
+So the previous `font-feature-settings: 'cv11', 'ss01'` did nothing. The site
+now copies tailwindcss.com's settings: Inter with `"cv02", "cv03", "cv04",
+"cv11"`, `font-variation-settings: normal` and `font-optical-sizing: auto`, and
+IBM Plex Mono with `"ss02", "zero"` on every mono element.
+
+`copy-fonts.mjs` subsets Inter with `subset-font`, which keeps every layout
+feature, then fails the build unless `opsz`, `wght` and each feature survived.
+A subset only keeps a feature if it still holds a glyph the feature acts on.
+Shaping with HarfBuzz shows `cv02`, `cv03` and `cv04` change only 4, 6 and 9,
+and `zero` changes only 0. So the Latin-ext files can't contain them, and the
+script requires them only in the Latin files. The script also checks that the
+`unicode-range` in `tokens.css` matches each subset.
+
+IBM Plex Mono is **not** subset. "Plex" is a Reserved Font Name under its OFL
+licence, and subsetting counts as modification, which would require renaming.
+IBM's own pre-split Latin1/Latin2 files and unicode-ranges are copied
+unmodified, with no `local()` source, since an installed copy may lack `ss02`
+and `zero`. Both OFL licence files are copied next to the fonts. Only
+`inter-latin.woff2` is preloaded. Plex loads on demand (the `lab/` logo uses
+SemiBold), and metric-matched fallbacks keep the swap free of layout shift.
+Capsize's Arial fallback for Inter is 90.44% / 22.52% / 0% / 107.12%, close to
+tailwindcss.com's 89.79% / 22.36% / 0% / 107.89%.
+
+## Tailwind type scale, gray palette and spacing
+
+Values were read from tailwindcss.com's production CSS on 2026-11-27. The fluid
+Utopia scale was replaced by Tailwind's fixed `--text-*` scale, which steps up at
+breakpoints. The warm hue-35 ramp was replaced by Tailwind gray (`--gray-50`
+to `--gray-950`), keeping the semantic token names. Spacing uses fixed
+multiples of `--spacing: 0.25rem`. The old `--step-*`, `--weight-heading` and
+`--weight-display` names are aliases for one release.
+
+Two pairs in the specified palette failed the contrast gate:
+
+- Light `--text-faint` (gray-500) on `--surface-inset` (gray-100) is 4.39:1, so
+  text inputs use `--bg` and faint text is gated on `--bg`, `--surface` and
+  `--surface-overlay` only.
+- Dark `--accent` on gray-800 is 4.43:1. Accent is no longer link or nav text
+  (it marks running-text underlines and the focus ring), so accent text is gated
+  on `--bg`, `--surface` and `--accent-subtle`. The focus ring keeps its 3:1 check
+  on every surface and fill (at least 4.43:1).
+
+Dark gray-700 fails both muted text (3.96:1) and the 3:1 control border
+(2.13:1), so the dark fills are gray-900 / gray-800 / gray-800. Because dark
+hover and active share a colour, pressed buttons add an inset ring, selected
+tabs keep their 3px border and weight 600, and current nav and TOC links use
+weight 600 (the TOC also uses its rail border).
 
 ## Workbench surfaces and type (historical baseline)
 
