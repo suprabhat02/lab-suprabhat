@@ -147,15 +147,44 @@ export const contrastGroups = [
     minimum: 3,
   },
   { fg: 'focus-ring', backgrounds: [...surfaces, 'fill', 'fill-hover', 'fill-active'], minimum: 3 },
+  // Translucent washes, written `wash/backdrop`: the link hover tint over the surfaces running text
+  // sits on.
+  ...['text', 'text-body'].map((fg) => ({
+    fg,
+    backgrounds: ['link-tint/bg', 'link-tint/surface'],
+    minimum: 4.5,
+  })),
 ];
+
+const MIX = /^color-mix\(in oklab,\s*(.+?)\s+([\d.]+)%,\s*transparent\)$/;
+
+/** Resolves `token` or `wash/backdrop` to encoded sRGB. A wash is `color-mix(in oklab, C p%, transparent)`,
+ * which is C at alpha p; browsers composite it over the backdrop in encoded sRGB.
+ * @param {Map<string, string>} tokens @param {string} spec @param {'light' | 'dark'} theme
+ * @returns {number[]} */
+export function surfaceColor(tokens, spec, theme) {
+  const [top = '', backdrop] = spec.split('/');
+  const value = resolveToken(tokens, `--${top}`, theme);
+  const mix = MIX.exec(value);
+  if (!mix) {
+    if (backdrop) throw new Error(`--${top} is opaque; drop the /${backdrop} backdrop.`);
+    return toSrgb(value);
+  }
+  if (!backdrop) throw new Error(`Translucent --${top} needs a backdrop, e.g. ${top}/bg.`);
+  const inner = /^var\((--[\w-]+)\)$/.exec(mix[1] ?? '')?.[1];
+  const color = toSrgb(inner ? resolveToken(tokens, inner, theme) : (mix[1] ?? ''));
+  const alpha = Number(mix[2]) / 100;
+  const under = surfaceColor(tokens, backdrop, theme);
+  return color.map((channel, i) => channel * alpha + (under[i] ?? 0) * (1 - alpha));
+}
 
 export function contrastReport(source = readFileSync(tokenFile, 'utf8'), moreContrast = false) {
   const tokens = readTokens(source, moreContrast);
   return contrastGroups.flatMap(({ fg, backgrounds, minimum }) =>
     backgrounds.map((bg) => {
-      const values = ['light', 'dark'].map((theme) => {
-        const text = toSrgb(resolveToken(tokens, `--${fg}`, theme));
-        const background = toSrgb(resolveToken(tokens, `--${bg}`, theme));
+      const values = /** @type {const} */ (['light', 'dark']).map((theme) => {
+        const text = surfaceColor(tokens, fg, theme);
+        const background = surfaceColor(tokens, bg, theme);
         return { ratio: wcagContrast(text, background), lc: apcaLc(text, background) };
       });
       return { fg, bg, minimum, light: values[0], dark: values[1] };

@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import ToolLayout from '../../layouts/ToolLayout.astro';
 import ToolWorkbench from '../../components/ToolWorkbench.astro';
 import ExplainerBand from '../../components/ExplainerBand.astro';
+import Icon from '../../components/Icon.astro';
 import { analyze, DEFAULT_CSS } from '../../lib/audit/model';
 import { auditView } from '../../lib/audit/views';
 import { renderToString } from '../../lib/view/h';
@@ -47,7 +48,13 @@ const output = auditView(result.value).map(renderToString).join('');
         </p>
       </div>
       <div class="duel-actions js-only">
-        <button class="button" type="button" data-audit-copy aria-describedby="audit-copy-status">
+        <button
+          class="button button-secondary"
+          type="button"
+          data-audit-copy
+          aria-describedby="audit-copy-status"
+        >
+          <Icon name="copy" size={16} />
           Copy link
         </button>
         <p class="status" id="audit-copy-status" data-audit-copy-status role="status"></p>

@@ -27,6 +27,7 @@
     font-size: var(--text-xl);
     line-height: var(--text-xl--line-height);
     text-decoration-line: none;
+    background-image: none;
 
     &:hover {
       text-decoration-line: underline;
@@ -49,6 +50,7 @@
     font-weight: var(--weight-medium);
     line-height: var(--text-base--line-height);
     text-decoration-line: none;
+    background-image: none;
 
     &:hover {
       color: var(--text);
@@ -71,30 +73,10 @@
     }
   }
 
-  .theme-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    min-block-size: var(--control-size);
-    padding-inline: var(--space-xs);
-    border: var(--stroke-emphasis) solid var(--border-strong);
-    border-radius: var(--radius-control);
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-
-    &:hover {
-      color: var(--text);
-      border-color: var(--text-muted);
-    }
-
-    & .theme-toggle-icon {
-      fill: currentColor;
-    }
-
-    &[aria-pressed='true'] {
-      color: var(--text);
-    }
+  /* The toggle is a .button-secondary.button-sm; it shows the icon for the current theme. */
+  .theme-toggle[data-state='dark'] .theme-icon-light,
+  .theme-toggle[data-state='light'] .theme-icon-dark {
+    display: none;
   }
 
   :root:not([data-js]) .theme-toggle {
@@ -104,8 +86,8 @@
   /* On very narrow screens keep the accessible name but show only the icon. */
   @media (width < 30rem) {
     .theme-toggle {
-      min-inline-size: var(--control-size);
-      justify-content: center;
+      min-inline-size: var(--control-compact);
+      padding-inline: 0;
     }
 
     .theme-toggle-text {
@@ -231,74 +213,173 @@
     }
   }
 
+  /* ---------- Buttons: one pill shape, six variants, three sizes ---------- */
+
+  /* Variants set the --button-* properties; states swap them. A transparent border keeps the box the
+     same size when forced-colors mode turns it into a real ButtonText border. */
   .button {
+    --button-size: var(--control-size);
+    --button-bg: var(--fill);
+    --button-ring: var(--border);
+    --button-fg: var(--text);
+    --button-shadow: 0 0 transparent;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2xs);
-    min-block-size: var(--control-size);
-    padding-inline: var(--space-s);
-    border: var(--stroke-hairline) solid var(--border-control-on-fill);
-    border-radius: var(--radius-control);
-    background: var(--fill);
-    color: var(--text);
-    font-weight: var(--weight-medium);
-    text-decoration-line: none;
-    cursor: pointer;
-
-    &:hover {
-      border-color: var(--text);
-      background: var(--fill-hover);
-    }
-
-    /* Dark hover and active fills match, so pressed also gets an inset ring. */
-    &:active {
-      background: var(--fill-active);
-      box-shadow: inset 0 0 0 var(--stroke-hairline) var(--text);
-    }
-
-    &:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-  }
-
-  /* The one primary action per view, in vermilion. */
-  .button-primary {
-    padding: var(--space-2xs) var(--space-s);
-    border-color: transparent;
+    min-block-size: var(--button-size);
+    padding-inline: 1.125rem;
+    border: var(--stroke-hairline) solid transparent;
     border-radius: var(--radius-pill);
-    background: var(--accent-solid);
-    color: var(--on-accent);
+    background-color: var(--button-bg);
+    background-clip: padding-box;
+    background-image: none;
+    box-shadow:
+      inset 0 0 0 var(--stroke-hairline) var(--button-ring),
+      var(--button-shadow);
+    color: var(--button-fg);
     font-size: var(--text-sm);
-    line-height: var(--text-base--line-height);
-    font-weight: var(--weight-semibold);
-
-    &:hover {
-      border-color: transparent;
-      background: var(--accent-solid-hover);
-    }
-
-    &:active {
-      background: var(--accent-solid-hover);
-      box-shadow: inset 0 0 0 var(--stroke-emphasis) var(--on-accent);
-    }
-  }
-
-  .button-quiet {
-    min-block-size: var(--control-compact);
-    min-inline-size: var(--control-size);
-    padding-inline: var(--space-2xs);
-    border: 0;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
     line-height: var(--text-sm--line-height);
     text-decoration-line: none;
     cursor: pointer;
 
-    &:hover {
-      color: var(--text);
+    & .icon {
+      flex: none;
+    }
+
+    &:is(:disabled, [aria-disabled='true']) {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        background-color var(--duration-fast) var(--ease-standard),
+        box-shadow var(--duration-fast) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard),
+        color var(--duration-fast) var(--ease-standard);
+
+      & .icon {
+        transition: transform var(--duration-fast) var(--ease-standard);
+      }
+    }
+  }
+
+  .button-sm {
+    --button-size: var(--control-compact);
+    padding-inline: 0.75rem;
+  }
+
+  .button-lg {
+    --button-size: var(--control-large);
+    padding-inline: 1.5rem;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  /* Hover and pressed styles never apply to a disabled button. */
+  .button:not(:disabled, [aria-disabled='true']):hover {
+    --button-bg: var(--fill-hover);
+    --button-ring: var(--accent-border);
+  }
+
+  /* The default look of .button; the class makes the choice explicit. */
+  .button-secondary {
+    --button-bg: var(--fill);
+    --button-ring: var(--border);
+  }
+
+  .button-outline {
+    --button-bg: transparent;
+    --button-ring: var(--border-strong);
+
+    &:not(:disabled, [aria-disabled='true']):hover {
+      --button-bg: var(--fill);
+    }
+  }
+
+  .button-ghost {
+    --button-bg: transparent;
+    --button-ring: transparent;
+
+    &:not(:disabled, [aria-disabled='true']):hover {
+      --button-bg: var(--fill);
+      --button-ring: transparent;
+    }
+  }
+
+  /* After the variants' hover: pressed adds a --text ring, so it never relies on a fill change alone. */
+  .button:not(:disabled, [aria-disabled='true']):is(:active, [aria-pressed='true']) {
+    --button-bg: var(--fill-active);
+    --button-ring: var(--text);
+  }
+
+  /* The one primary action per view, in vermilion. */
+  .button-primary {
+    --button-bg: var(--accent-solid);
+    --button-ring: transparent;
+    --button-fg: var(--on-accent);
+    --button-shadow: var(--shadow-primary);
+    font-weight: var(--weight-semibold);
+
+    &:not(:disabled, [aria-disabled='true']) {
+      &:hover {
+        --button-bg: var(--accent-solid-hover);
+        --button-ring: transparent;
+        --button-shadow: var(--shadow-primary), var(--glow-primary);
+      }
+
+      &:active,
+      &[aria-pressed='true'] {
+        --button-bg: var(--accent-solid-hover);
+        --button-ring: var(--on-accent);
+        --button-shadow: var(--shadow-primary);
+      }
+    }
+  }
+
+  /* Looks like a running-text link; its trailing icon nudges on hover. */
+  .button-link {
+    --button-bg: transparent;
+    --button-ring: transparent;
+    padding-inline: 0;
+    font-weight: var(--weight-semibold);
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--stroke-hairline);
+    text-decoration-color: var(--accent-vivid);
+    text-underline-offset: var(--link-underline-offset);
+
+    &:not(:disabled, [aria-disabled='true']):is(:hover, :active, [aria-pressed='true']) {
+      --button-bg: transparent;
+      --button-ring: transparent;
+    }
+  }
+
+  /* Square at its size (a circle, with the pill radius). Needs an accessible name: aria-label or
+     visually hidden text. tests/e2e/a11y.spec.ts fails any .button-icon without one. */
+  .button-icon {
+    min-inline-size: var(--button-size);
+    padding-inline: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .button-primary:not(:disabled, [aria-disabled='true']) {
+      &:hover {
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .button-link:not(:disabled, [aria-disabled='true']):hover .icon {
+      transform: translateX(2px);
+    }
+
+    .button-link:not(:disabled, [aria-disabled='true']):hover .lucide-arrow-up-right {
+      transform: translate(2px, -2px);
     }
   }
 
@@ -386,6 +467,7 @@
     color: var(--text-muted);
     font-weight: var(--weight-regular);
     text-decoration-line: none;
+    background-image: none;
 
     &:hover {
       color: var(--text);
@@ -397,12 +479,22 @@
   .breadcrumbs li {
     display: inline-flex;
     gap: var(--space-2xs);
-    align-items: baseline;
+    align-items: center;
   }
 
-  .breadcrumbs li + li::before {
-    content: '\203a';
+  .breadcrumb-separator {
     color: var(--text-faint);
+  }
+
+  /* An outbound link's arrow sits in the text, after the label. */
+  .icon-external {
+    display: inline-block;
+    margin-inline-start: 0.125em;
+    vertical-align: -0.125em;
+
+    &:dir(rtl) {
+      transform: scaleX(-1);
+    }
   }
 
   .related-tools {
@@ -1155,6 +1247,7 @@
     font-weight: var(--weight-regular);
     line-height: var(--text-base--line-height);
     text-decoration-line: none;
+    background-image: none;
 
     &:hover {
       border-inline-start-color: color-mix(in oklab, var(--text) 25%, transparent);
@@ -1379,13 +1472,73 @@
     background: var(--surface);
     overflow-wrap: anywhere;
 
+    /* Hover, and keyboard focus without the lift. */
+    &:is(:hover, :focus-within, :has(a:focus-visible)) {
+      border-color: var(--accent-border);
+      box-shadow: var(--shadow-card-hover);
+
+      & .tool-arrow {
+        opacity: 1;
+      }
+    }
+
     &:has(a:focus-visible) {
       outline: var(--focus-outline);
       outline-offset: var(--stroke-emphasis);
     }
 
-    &:has(.tool-title a:hover) {
-      border-color: var(--border-strong);
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        border-color var(--duration-fast) var(--ease-standard),
+        box-shadow var(--duration-fast) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard);
+
+      & .tool-arrow {
+        transition:
+          opacity var(--duration-fast) var(--ease-standard),
+          transform var(--duration-fast) var(--ease-standard);
+      }
+
+      &:is(:hover, :focus-within) .tool-arrow {
+        transform: translate(2px, -2px);
+      }
+    }
+  }
+
+  /* The lift only for a real hovering pointer, so touch screens don't keep a stuck hover. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .tool-item:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .tool-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+
+  /* The category chip. On the tools index it's the icon alone, and decorative. */
+  .tool-category {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: 0 var(--space-2xs);
+    border-radius: var(--radius-pill);
+    background: var(--accent-tint);
+
+    &[aria-hidden='true'] {
+      padding: var(--space-3xs);
+    }
+  }
+
+  .tool-arrow {
+    color: var(--text-muted);
+    opacity: 0.6;
+
+    &:dir(rtl) {
+      scale: -1 1;
     }
   }
 
@@ -1427,8 +1580,18 @@
       border-block-end-color: Highlight;
     }
 
-    .button-primary {
+    .button {
       border-color: ButtonText;
+      box-shadow: none;
+    }
+
+    .tool-item {
+      box-shadow: none;
+
+      &:is(:hover, :focus-within, :has(a:focus-visible)) {
+        border-color: Highlight;
+        box-shadow: none;
+      }
     }
 
     /* The hatch and glow are decorative; the stage keeps real borders. */

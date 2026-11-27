@@ -131,6 +131,8 @@ test.describe('font loading', () => {
     for (const selector of ['.nav-link', '.site-footer a']) {
       await page.locator(selector).first().hover();
       expect(await decoration(selector), `${selector}:hover`).toBe('none');
+      // Navigation keeps its own hover; the running-text tint never reaches it.
+      await expect(page.locator(selector).first()).toHaveCSS('background-image', 'none');
     }
     await page.locator('main p a').first().hover();
     expect(await decoration('main p a')).toBe('underline');

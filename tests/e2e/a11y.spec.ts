@@ -199,6 +199,145 @@ test('forced colors hides the decorative hatch but keeps the hero stage bordered
   for (const selector of ['.hero-stage', '.hero-panel', '.hero-contender']) {
     await expect(page.locator(selector).first()).toHaveCSS('border-top-style', 'solid');
   }
+  // No link tint, no button ring or glow, no card shadow: real borders and system colours instead.
+  const link = page.locator('main p a').first();
+  await link.hover();
+  await expect(link).toHaveCSS('background-image', 'none');
+  await expect(link).toHaveCSS('text-decoration-line', 'underline');
+  const toggle = page.locator('[data-theme-toggle]');
+  await expect(toggle).toHaveCSS('box-shadow', 'none');
+  await expect(toggle).toHaveCSS('border-top-style', 'solid');
+  const card = page.locator('.tool-item').first();
+  await card.hover();
+  await expect(card).toHaveCSS('box-shadow', 'none');
+});
+
+const BUTTON_ROUTES = ['/', '/specificity/', '/accessible-name/', '/stylesheet-audit/'];
+
+test('every button is a pill of at least 24px, and icon-only buttons are named', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const route of BUTTON_ROUTES) {
+    await page.goto(route);
+    const buttons = page.locator('.button:visible');
+    expect(await buttons.count(), route).toBeGreaterThan(0);
+    for (const button of await buttons.all()) {
+      const box = await button.boundingBox();
+      if (!box) throw new Error(`Missing button box on ${route}`);
+      expect(box.width, route).toBeGreaterThanOrEqual(24);
+      expect(box.height, route).toBeGreaterThanOrEqual(24);
+      // 9999px clamps to half the height, so the computed radius is the pill value itself.
+      await expect(button).toHaveCSS('border-top-left-radius', '9999px');
+    }
+    // The .button-icon convention: no visible text, so it must carry a name.
+    for (const icon of await page.locator('.button-icon').all()) {
+      await expect(icon, route).toHaveAccessibleName(/\S/);
+    }
+  }
+});
+
+test('button states: ring, primary lift and glow, and no motion when reduced', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/specificity/');
+  const primary = page.getByRole('button', { name: 'Compare selectors', exact: true });
+  const secondary = page.getByRole('button', { name: 'Add selector', exact: true });
+  const ring = (el: Element, token: string) => {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${token})`;
+    el.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return getComputedStyle(el).boxShadow.includes(color);
+  };
+  expect(await secondary.evaluate(ring, '--border')).toBe(true);
+  await secondary.hover();
+  await expect.poll(() => secondary.evaluate(ring, '--accent-border')).toBe(true);
+  await primary.hover();
+  await expect
+    .poll(() => primary.evaluate((el) => getComputedStyle(el).transform))
+    .toBe('matrix(1, 0, 0, 1, 0, -1)');
+  // The hovered primary adds the accent glow: 0 8px 24px -8px.
+  await expect
+    .poll(() => primary.evaluate((el) => getComputedStyle(el).boxShadow))
+    .toContain('0px 8px 24px -8px');
+  expect(await primary.evaluate((el) => getComputedStyle(el).transitionProperty)).toBe(
+    'background-color, box-shadow, transform, color',
+  );
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.mouse.move(0, 0);
+  await primary.hover();
+  await expect(primary).toHaveCSS('transform', 'none');
+  // utilities.css forces 0.01ms under reduced motion; anything under a millisecond is instant.
+  expect(await primary.evaluate((el) => parseFloat(getComputedStyle(el).transitionDuration))).toBeLessThan(
+    0.001,
+  );
+});
+
+test('running-text links keep a 1px underline and fill with a tint on hover, even when wrapped', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/');
+  const wrapped = page.locator('main p a').filter({ hasText: 'why this lab exists' });
+  expect(await wrapped.evaluate((el) => el.getClientRects().length)).toBeGreaterThan(1);
+  const style = () =>
+    wrapped.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return {
+        line: s.textDecorationLine,
+        thickness: s.textDecorationThickness,
+        size: s.backgroundSize,
+        clone:
+          s.getPropertyValue('box-decoration-break') || s.getPropertyValue('-webkit-box-decoration-break'),
+        color: s.color,
+      };
+    });
+  const rest = await style();
+  expect(rest).toMatchObject({ line: 'underline', thickness: '1px', size: '100% 0%', clone: 'clone' });
+  await wrapped.hover();
+  await expect.poll(async () => (await style()).size).toBe('100% 100%');
+  const hover = await style();
+  expect(hover.thickness).toBe('1px');
+  expect(hover.color).toBe(rest.color);
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
+test('tool cards: accent border, shadow and arrow on hover; focus gets the colours without the lift', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  const card = page.locator('.tool-item').first();
+  const arrow = card.locator('.tool-arrow');
+  await expect(card.locator('.tool-category svg')).toHaveAttribute('aria-hidden', 'true');
+  await expect(arrow).toHaveCSS('opacity', '0.6');
+  const accentBorder = await card.evaluate((el) => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--accent-border)';
+    el.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
+  await card.hover();
+  await expect(card).toHaveCSS('border-top-color', accentBorder);
+  await expect(arrow).toHaveCSS('opacity', '1');
+  await expect
+    .poll(() => card.evaluate((el) => getComputedStyle(el).transform))
+    .toBe('matrix(1, 0, 0, 1, 0, -2)');
+  expect(await card.evaluate((el) => getComputedStyle(el).boxShadow)).not.toBe('none');
+
+  await page.mouse.move(0, 0);
+  await page.keyboard.press('Tab');
+  await card.locator('.tool-title a').focus();
+  await expect(card).toHaveCSS('border-top-color', accentBorder);
+  await expect(card).toHaveCSS('transform', 'none');
+  // The whole-card link overlay still takes the click.
+  await card.scrollIntoViewIfNeeded();
+  const box = await card.boundingBox();
+  if (!box) throw new Error('Missing tool card.');
+  await page.mouse.click(box.x + box.width - 12, box.y + box.height - 12);
+  await expect(page).toHaveURL(/\/specificity\/$/);
 });
 
 // Pressed and selected states must not rely on a fill change alone.

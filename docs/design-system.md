@@ -138,11 +138,16 @@ non-colour indicator. Status always has readable wording. With
 `prefers-contrast: more`, body, secondary and faint text become primary, and
 borders and control borders become `#3d3631` / `#d6d0cc`.
 
-Run `npm run contrast` for all 76 foreground/background pairs, both themes,
-plus the increased-contrast variant: **304 checks**. It resolves actual tokens,
+Run `npm run contrast` for all 80 foreground/background pairs, both themes,
+plus the increased-contrast variant: **320 checks**. It resolves actual tokens,
 converts OKLCH to sRGB using CSS Color 4 matrices, and fails on missing tokens,
 cycles, out-of-gamut colours or low WCAG contrast. `color-mix()` tokens
 (`--pattern-fg`, `--border-subtle`, `--marker`) are decorative and not gated.
+A translucent wash that text sits on is gated as `wash/backdrop`: `--link-tint`
+(`color-mix(in oklab, var(--accent-vivid) 16%, transparent)`) is composited over
+`--bg` and `--surface` in encoded sRGB, as browsers paint it, and `--text` /
+`--text-body` must pass 4.5:1 on it (lowest: 9.27 light, 10.36 dark). A wash
+without a backdrop, or a backdrop on an opaque token, is an error.
 The APCA calculation reports 0.0.98G-4g / apca-w3 0.1.9 signed Lc but never
 changes pass/fail. Build-time consumers must pass imported raw token CSS to
 `readTokens`; do not depend on a bundled module's filesystem-relative default.
@@ -151,18 +156,18 @@ changes pass/fail. Build-time consumers must pass imported raw token CSS to
 
 Vermilion, used in a few fixed places only:
 
-| Token                  | Light / dark          | Use                                                     |
-| ---------------------- | --------------------- | ------------------------------------------------------- |
-| `--accent-solid`       | `#b42300` / `#ff4d2a` | `.button-primary` fill, nav current bar, `accent-color` |
-| `--accent-solid-hover` | `#981c00` / `#ff6e4a` | `.button-primary` hover and active                      |
-| `--on-accent`          | `#ffffff` / `#0c0a09` | Text on the solid fills                                 |
-| `--accent-text`        | `#b42300` / `#ff9874` | Small accent text: eyebrows, the hero "Wins" label      |
-| `--accent-vivid`       | `#ff4d2a`             | Decorative only: running-text link underlines           |
-| `--accent-tint`        | `#fff7f4` / `#1c0f0c` | Callout and eyebrow backgrounds                         |
-| `--accent-border`      | `#ee4b2b` / `#b94129` | Meaningful borders                                      |
-| `--glow`               | `#ffe0d8` / `#521a0f` | The hero's radial glow (decorative)                     |
-| `--selection-bg`       | `#ffd1c6` / `#642114` | `::selection`, with `--text`                            |
-| `--focus-ring`         | `#b42300` / `#ff4d2a` | 2px focus outline at a 2px offset                       |
+| Token                  | Light / dark          | Use                                                      |
+| ---------------------- | --------------------- | -------------------------------------------------------- |
+| `--accent-solid`       | `#b42300` / `#ff4d2a` | `.button-primary` fill, nav current bar, `accent-color`  |
+| `--accent-solid-hover` | `#981c00` / `#ff6e4a` | `.button-primary` hover and active                       |
+| `--on-accent`          | `#ffffff` / `#0c0a09` | Text on the solid fills                                  |
+| `--accent-text`        | `#b42300` / `#ff9874` | Small accent text: eyebrows, the hero "Wins" label       |
+| `--accent-vivid`       | `#ff4d2a`             | Decorative only: link underlines and the link hover tint |
+| `--accent-tint`        | `#fff7f4` / `#1c0f0c` | Callout and eyebrow backgrounds                          |
+| `--accent-border`      | `#ee4b2b` / `#b94129` | Meaningful borders                                       |
+| `--glow`               | `#ffe0d8` / `#521a0f` | The hero's radial glow (decorative)                      |
+| `--selection-bg`       | `#ffd1c6` / `#642114` | `::selection`, with `--text`                             |
+| `--focus-ring`         | `#b42300` / `#ff4d2a` | 2px focus outline at a 2px offset                        |
 
 The places: one primary button per view; eyebrow labels (`.tool-category`,
 `.toc-title`); running-text link underlines; the focus ring (an outline, so
@@ -181,9 +186,18 @@ link's bar.
 ### Links
 
 As on tailwindcss.com, **only links inside running text are underlined**, and
-they stay underlined: the accent against body text is only about 2.7:1, so colour
-alone can't mark a link. The base `a` rule gives `--text` colour, weight 600, a
-1px `--accent-vivid` underline at a 3px offset, and 2px on hover. These opt out:
+they stay underlined at rest (WCAG 1.4.1): the accent against body text is only
+about 2.7:1, so colour alone can't mark a link. The base `a` rule gives `--text`
+colour, weight 600 and a 1px `--accent-vivid` underline at a 3px offset.
+
+On hover the underline stays 1px and the text colour doesn't change. A
+`--link-tint` wash fills upward from the underline: `background-size` goes from
+`100% 0%` to `100% 100%` over 150ms `cubic-bezier(0.4, 0, 0.2, 1)`, anchored at
+the bottom. `box-decoration-break: clone` (with the `-webkit-` prefix) repeats it
+on every line of a wrapped link. Under `prefers-reduced-motion: reduce` it
+appears instantly; under `forced-colors: active` there is no tint and the link
+is `LinkText` with its native underline. Every opt-out below also sets
+`background-image: none`, so the tint never reaches navigation.
 
 - Header nav: `--text-sm` in `--text-muted`, never underlined. Hover turns the
   text `--text` on a `--fill-hover` pill (0.5rem radius); only `color` and
@@ -192,13 +206,106 @@ alone can't mark a link. The base `a` rule gives `--text` colour, weight 600, a
   weight 600 and a 2px `--accent-solid` `border-block-end` (a border, not a
   shadow, so forced colors keep it).
 - Footer: muted, never underlined; hover turns it `--text`.
-- Breadcrumbs, results nav: muted, no underline at rest, underline on hover.
+- Brand, breadcrumbs, results nav: no underline at rest, underline on hover.
+  Breadcrumb separators are a decorative `chevron-right` icon.
 - TOC: Tailwind's docs-sidebar rail (see `.toc-link`).
-- Buttons and `.button-quiet`: never underlined.
-- Links inside headings: no underline styling.
+- Buttons: never underlined, except `.button-link`.
+- Links inside headings (including the card title link): no underline, no tint.
+- Links to suprabhat-dev.com end with a decorative `arrow-up-right` icon
+  (`.icon-external`, mirrored in RTL).
 
 Selector-anatomy `.part` underlines, `.numeral[data-decided]` and the decided
 ladder outcome are state indicators, not link styling. Keep them.
+
+### Icons
+
+Lucide via `@lucide/astro` (pinned, ISC; see [third-party.md](./third-party.md)),
+rendered at build time as inline SVG. It adds no client JS.
+
+- Use `<Icon name size label? />` (`src/components/Icon.astro`). `name` is an
+  `IconName` from `src/lib/icons.ts`. Icon.astro maps every name to a per-icon
+  import (`@lucide/astro/icons/<name>`) with `satisfies Record<IconName, …>`, so
+  an unregistered name or a missing mapping fails `astro check`.
+- `size` is 16, 20 (default) or 24; stroke width 1.75; colour `currentColor`.
+- Decorative by default (`aria-hidden="true"`, `focusable="false"`). Pass
+  `label` only when the icon carries meaning on its own; it then renders
+  `role="img"` and `aria-label`. An icon next to visible text is decorative.
+- Registered icons and their only uses: `sun` / `moon` (theme toggle, swapped
+  by `[data-state]` in CSS), `copy` (Copy link buttons), `check` (registered for
+  copy feedback, unused for now), `plus` (Add selector, Add declaration),
+  `arrow-up-right` (card corner, suprabhat-dev.com links), `chevron-right`
+  (breadcrumbs), and one per tool category.
+- Category icons: `CATEGORY_ICONS` (`CSS` → `braces`, `Accessibility` →
+  `accessibility`) `satisfies Record<ToolCategory, IconName>`, and
+  `ToolCategory` comes from the collection's `z.enum`. A new category fails the
+  build until it has an icon.
+- Lucide's template leaves whitespace text nodes inside each `<svg>`. They are
+  never rendered or read, but text checks over `textContent` must skip SVGs.
+
+### Buttons
+
+One shape (a pill, `--radius-pill`), one set of states and six variants, all on
+`.button`. Inputs, selects and textareas are not buttons: they keep
+`--radius-control` and a 3:1 `--border-control-on-fill` border.
+
+| Variant (`.button` +) | Rest                                                            | Hover                                                   | Pressed (`:active`, `[aria-pressed='true']`) |
+| --------------------- | --------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------- |
+| `.button-primary`     | `--accent-solid`, `--on-accent`, top highlight and small shadow | `--accent-solid-hover`, `translateY(-1px)`, accent glow | `translateY(0)`, no glow, `--on-accent` ring |
+| `.button-secondary`   | `--fill`, 1px `--border` ring (the default)                     | `--fill-hover`, `--accent-border` ring                  | `--fill-active`, `--text` ring               |
+| `.button-outline`     | transparent, `--border-strong` ring                             | `--fill`, `--accent-border` ring                        | `--fill-active`, `--text` ring               |
+| `.button-ghost`       | transparent, no ring                                            | `--fill`                                                | `--fill-active`, `--text` ring               |
+| `.button-link`        | a 1px `--accent-vivid` underline, no fill                       | its icon moves 2px (`arrow-up-right` moves up and out)  | no ring                                      |
+| `.button-icon`        | square at its size; a circle with the pill                      | per the variant it's combined with                      | per the variant                              |
+
+| Size         | Height                    | Inline padding | Text          |
+| ------------ | ------------------------- | -------------- | ------------- |
+| `.button-sm` | `--control-compact` 2rem  | 0.75rem        | `--text-sm`   |
+| default      | `--control-size` 2.75rem  | 1.125rem       | `--text-sm`   |
+| `.button-lg` | `--control-large` 3.25rem | 1.5rem         | `--text-base` |
+
+- The ring is `box-shadow: inset 0 0 0 1px`, not a border. Every button also has
+  a transparent 1px border and `background-clip: padding-box`, so
+  `forced-colors: active` can swap in a real `ButtonText` border, with no box
+  shadow, without changing the size.
+- Icon-to-label gap is `--space-2xs`. Targets are at least 24×24 CSS px (WCAG
+  2.5.8); the default is 44px.
+- `:focus-visible` keeps the site outline (2px `--focus-ring`, 2px offset), which
+  follows the pill. Don't put a button in a box that clips overflow without
+  padding for the outline.
+- `:disabled` and `[aria-disabled='true']`: opacity 0.55, `cursor: not-allowed`,
+  and no hover or pressed styles.
+- Transitions: only `background-color`, `box-shadow`, `transform` and `color`,
+  150ms `cubic-bezier(0.4, 0, 0.2, 1)`, under
+  `prefers-reduced-motion: no-preference`. With `reduce`, no transform and no
+  transition.
+- One `.button-primary` per view.
+- `.button-icon` has no visible text, so it **must** have `aria-label` or
+  visually hidden text. `tests/e2e/a11y.spec.ts` fails any `.button-icon`
+  without an accessible name.
+- Uses: Compare selectors (primary); Add selector, Add declaration and Copy link
+  (secondary, with an icon); Remove and Sort by specificity (ghost, small); the
+  theme toggle (secondary, small, sun or moon icon; icon-only below 30rem, with
+  its accessible name kept).
+
+### Cards
+
+`.tool-item` on the home page and the tools index. The whole-card link overlay
+(`.tool-title a::after`) stays the only link.
+
+- A category chip at the top-left: the category icon (and, on the home page,
+  the category name) in `--accent-text` on `--accent-tint`. On the tools index
+  the chip is the icon alone and `aria-hidden`, because the section heading
+  names the category.
+- `arrow-up-right` at the top-right in `--text-muted` at 60% opacity.
+- `:hover`, `:focus-within` and `:has(a:focus-visible)`: border `--accent-border`,
+  shadow `--shadow-card-hover`, arrow at full opacity and moved
+  `translate(2px, -2px)` (motion only without `reduce`). Only `:hover` lifts,
+  `translateY(-2px)`, and only inside `(hover: hover) and (pointer: fine)` with
+  no reduced-motion preference, so touch screens never keep a stuck hover.
+- `forced-colors: active`: no shadow; the border turns `Highlight` on hover and
+  focus.
+- No JS: the hover is pure CSS. The pointer spotlight was left out of this
+  release, because it would have added client JS to the zero-JS home page.
 
 ## Type and rhythm
 

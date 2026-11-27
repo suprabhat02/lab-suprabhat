@@ -1,0 +1,41 @@
+---
+import Accessibility from '@lucide/astro/icons/accessibility';
+import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import Braces from '@lucide/astro/icons/braces';
+import Check from '@lucide/astro/icons/check';
+import ChevronRight from '@lucide/astro/icons/chevron-right';
+import Copy from '@lucide/astro/icons/copy';
+import Moon from '@lucide/astro/icons/moon';
+import Plus from '@lucide/astro/icons/plus';
+import Sun from '@lucide/astro/icons/sun';
+import type { IconName } from '../lib/icons';
+
+interface Props {
+  name: IconName;
+  size?: 16 | 20 | 24;
+  /** Only for an icon that carries meaning on its own. An icon next to visible text is decorative. */
+  label?: string;
+  class?: string;
+}
+
+// Per-icon imports keep the build to these SVGs; `satisfies` makes this cover the registry exactly.
+const ICONS = {
+  accessibility: Accessibility,
+  'arrow-up-right': ArrowUpRight,
+  braces: Braces,
+  check: Check,
+  'chevron-right': ChevronRight,
+  copy: Copy,
+  moon: Moon,
+  plus: Plus,
+  sun: Sun,
+} satisfies Record<IconName, typeof Sun>;
+
+const { name, size = 20, label, class: className } = Astro.props;
+const Component = ICONS[name];
+const a11y = label
+  ? { role: 'img' as const, 'aria-label': label }
+  : { 'aria-hidden': 'true' as const, focusable: 'false' as const };
+---
+
+<Component size={size} stroke-width={1.75} class={['icon', className].filter(Boolean).join(' ')} {...a11y} />

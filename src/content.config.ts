@@ -9,7 +9,8 @@ const tools = defineCollection({
     slug: z.string().regex(/^[a-z0-9-]+$/),
     summary: z.string().max(160),
     status: z.enum(['live', 'in-progress']),
-    category: z.string(),
+    // An enum, not a string: each category needs an icon (src/lib/icons.ts), so a new one fails the build.
+    category: z.enum(['CSS', 'Accessibility']),
     order: z.number().int().nonnegative(),
     navLabel: z.string().min(1),
     related: z.array(reference('tools')).min(2).max(3),
