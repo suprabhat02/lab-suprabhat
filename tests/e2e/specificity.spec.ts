@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
+import { buildDuel } from '../../src/lib/app/model';
+import { calculate } from '../../src/lib/cascade/specificity';
 
 /** Presses Tab (or Shift+Tab) until `target` has focus, failing after `max` presses. */
 async function tabTo(page: Page, target: Locator, max = 40, key = 'Tab') {
@@ -28,6 +30,36 @@ async function expectManualCopy(page: Page) {
   expect(selection[0]).toBe(0);
   expect(selection[1]).toBe(selection[2]);
 }
+
+test.describe('home hero duel', () => {
+  test('renders without JavaScript, with buildDuel numbers and a text winner label', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    try {
+      await page.goto('http://localhost:4322/');
+      const figure = page.locator('figure[data-hero-duel]');
+      await expect(figure.locator('figcaption')).toHaveText('Which selector wins? Computed at build time.');
+      const selectors = await figure.locator('.hero-selector').allTextContents();
+      expect(selectors).toHaveLength(2);
+      const duel = buildDuel(selectors, calculate);
+      if (!duel.comparison) throw new Error('The hero selectors must both be valid.');
+      for (const [index, contender] of duel.contenders.entries()) {
+        const card = figure.locator('.hero-contender').nth(index);
+        await expect(card.locator('.numeral')).toHaveText((contender.best?.value ?? []).map(String));
+        const won = index === duel.comparison.effectiveWinner;
+        await expect(card.locator('.outcome')).toHaveText(won ? 'Wins' : 'Loses');
+        if (won) await expect(card).toHaveAttribute('data-winner');
+      }
+      await expect(figure.locator('.hero-verdict')).toHaveText(duel.comparison.reason.replace(/`/g, ''));
+      await expect(page.getByRole('link', { name: 'View the full tool', exact: true })).toHaveAttribute(
+        'href',
+        '/specificity/',
+      );
+    } finally {
+      await context.close();
+    }
+  });
+});
 
 test.describe('duel', () => {
   test('pre-renders the default result', async ({ page }) => {

@@ -149,13 +149,59 @@ test('header exposes every tool and marks the current page', async ({ page }) =>
     await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
     const current = nav.getByRole('link', { name: label, exact: true });
     await expect(current).toHaveAttribute('aria-current', 'page');
-    // The current page is marked by weight, not colour; nav links have no underline at rest.
+    // The current page is marked by weight and an accent bar, not colour alone; nav links have no underline.
     expect(await current.evaluate((el) => getComputedStyle(el).fontWeight)).toBe('600');
     expect(await current.evaluate((el) => getComputedStyle(el).textDecorationLine)).toBe('none');
+    expect(await current.evaluate((el) => getComputedStyle(el).borderBlockEndWidth)).toBe('2px');
   }
 });
 
-// Dark --fill-hover and --fill-active are the same gray, so these states must not rely on fill alone.
+test('selection and focus-ring tokens resolve to the accent palette in both themes', async ({ page }) => {
+  const expected = {
+    light: { selection: 'rgb(255, 209, 198)', focus: 'rgb(180, 35, 0)' },
+    dark: { selection: 'rgb(100, 33, 20)', focus: 'rgb(255, 77, 42)' },
+  };
+  for (const theme of THEMES) {
+    await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+    await page.goto('/about/');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+    const resolved = await page.evaluate(() => {
+      const probe = document.createElement('div');
+      document.body.append(probe);
+      const read = (token: string) => {
+        probe.style.backgroundColor = `var(${token})`;
+        return getComputedStyle(probe).backgroundColor;
+      };
+      const values = { selection: read('--selection-bg'), focus: read('--focus-ring') };
+      probe.remove();
+      return values;
+    });
+    expect(resolved).toEqual(expected[theme]);
+    const link = page.locator('main p a').first();
+    // A key press first, so the scripted focus counts as keyboard focus in every engine.
+    await page.keyboard.press('Tab');
+    await link.focus();
+    expect(await link.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+    const outline = await link.evaluate((el) => {
+      const style = getComputedStyle(el);
+      return { color: style.outlineColor, width: style.outlineWidth, offset: style.outlineOffset };
+    });
+    expect(outline).toEqual({ color: expected[theme].focus, width: '2px', offset: '2px' });
+  }
+});
+
+test('forced colors hides the decorative hatch but keeps the hero stage bordered', async ({ page }) => {
+  await page.emulateMedia({ forcedColors: 'active' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  expect(await seriousViolations(page)).toEqual([]);
+  await expect(page.locator('.page-rail').first()).toHaveCSS('visibility', 'hidden');
+  for (const selector of ['.hero-stage', '.hero-panel', '.hero-contender']) {
+    await expect(page.locator(selector).first()).toHaveCSS('border-top-style', 'solid');
+  }
+});
+
+// Pressed and selected states must not rely on a fill change alone.
 test('selected, current and pressed states have a non-colour indicator in dark mode', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
   await page.setViewportSize({ width: 1440, height: 900 });

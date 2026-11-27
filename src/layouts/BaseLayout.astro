@@ -115,10 +115,16 @@ const ldJson = JSON.stringify(graph(nodes)).replace(/</g, '\\u003c');
   </head>
   <body>
     <SkipLink />
-    <SiteHeader path={path} />
-    <main class="site-main" id="main" tabindex="-1">
-      <slot />
-    </main>
-    <SiteFooter home={path === '/'} />
+    <div class="page-shell">
+      <div class="page-rail" aria-hidden="true"></div>
+      <div class="page-column">
+        <SiteHeader path={path} />
+        <main class="site-main" id="main" tabindex="-1">
+          <slot />
+        </main>
+        <SiteFooter home={path === '/'} />
+      </div>
+      <div class="page-rail" aria-hidden="true"></div>
+    </div>
   </body>
 </html>

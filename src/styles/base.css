@@ -36,6 +36,7 @@
 
   /* Font settings copied from tailwindcss.com. Optical size follows font-optical-sizing, not a fixed opsz. */
   :where(html) {
+    accent-color: var(--accent-solid);
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
@@ -99,13 +100,14 @@
     line-height: var(--line-body);
   }
 
-  /* Running-text links. Navigation, TOC, buttons, breadcrumbs and footer links opt out in components.css. */
+  /* Running-text links keep a permanent underline: the accent against body text is only about 2.7:1.
+     Navigation, TOC, buttons, breadcrumbs and footer links opt out in components.css. */
   :where(a) {
     color: var(--text);
     font-weight: var(--weight-semibold);
     text-decoration-line: underline;
     text-decoration-thickness: var(--stroke-hairline);
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--accent-vivid);
     text-underline-offset: var(--link-underline-offset);
   }
 
@@ -119,9 +121,10 @@
     text-decoration: none;
   }
 
+  /* An outline, not a box-shadow, so forced-colors mode still draws it. */
   :where(:focus-visible) {
     outline: var(--focus-outline);
-    outline-offset: var(--stroke-focus);
+    outline-offset: var(--stroke-emphasis);
     border-radius: var(--radius-focus);
   }
 
@@ -197,7 +200,7 @@
   }
 
   :where(::selection) {
-    background: var(--fill-active);
+    background: var(--selection-bg);
     color: var(--text);
   }
 

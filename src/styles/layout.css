@@ -1,7 +1,63 @@
 @layer layout {
+  /* clip, not hidden: hidden would make this a scroll container and break the sticky header. */
+  .page-shell {
+    overflow-x: clip;
+
+    @media (width >= 48rem) {
+      display: grid;
+      grid-template-columns: var(--rail) minmax(0, var(--container-wide)) var(--rail);
+      justify-content: center;
+    }
+  }
+
+  .page-column {
+    min-inline-size: 0;
+  }
+
+  .page-rail {
+    display: none;
+
+    @media (width >= 48rem) {
+      display: block;
+      border-inline: var(--stroke-hairline) solid var(--pattern-fg);
+      background-image: var(--hatch);
+      background-size: 10px 10px;
+      background-attachment: fixed;
+    }
+  }
+
+  /* Full-bleed 1px rules above and below a row; .page-shell clips them to the viewport. */
+  .hairlines {
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset-inline-start: -100vw;
+      inline-size: 200vw;
+      block-size: var(--stroke-hairline);
+      background: var(--pattern-fg);
+      pointer-events: none;
+    }
+
+    &::before {
+      inset-block-start: 0;
+    }
+
+    &::after {
+      inset-block-end: 0;
+    }
+  }
+
   .wrap {
-    inline-size: min(100% - 2 * var(--gutter), var(--max-width));
+    inline-size: min(100% - 2 * var(--gutter), var(--container-wide));
     margin-inline: auto;
+  }
+
+  /* About, Methodology and the Tools index. */
+  .wrap-page {
+    inline-size: min(100% - 2 * var(--gutter), var(--container-page));
   }
 
   .grid {
@@ -96,12 +152,33 @@
     }
   }
 
+  /* Half the space on each side, so adjacent sections sit --section-space apart. */
   .section {
-    padding-block: var(--space-xl-2xl);
+    padding-block: calc(var(--section-space) / 2);
   }
 
-  .section + .section {
+  /* A heading row's own top hairline already separates it from the section above. */
+  .section + .section:not(:has(.section-heading)) {
     border-block-start: var(--stroke-hairline) solid var(--border-subtle);
+  }
+
+  .section-heading {
+    padding-block: var(--space-xs);
+  }
+
+  .hub-hero > .hairlines {
+    padding-block: var(--space-l-xl);
+  }
+
+  @media (forced-colors: active) {
+    .page-rail {
+      visibility: hidden;
+    }
+
+    .hairlines::before,
+    .hairlines::after {
+      display: none;
+    }
   }
 
   /* Below-the-fold sections: skip style and layout until they're near the viewport. */
@@ -235,8 +312,6 @@
 
       &:hover {
         color: var(--text);
-        text-decoration-line: underline;
-        text-decoration-thickness: var(--stroke-hairline);
       }
     }
   }

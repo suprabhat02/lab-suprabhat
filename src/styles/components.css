@@ -43,19 +43,31 @@
     align-items: center;
     min-block-size: var(--control-size);
     padding-inline: var(--space-2xs);
-    color: var(--text);
+    border-radius: 0.5rem;
+    color: var(--text-muted);
     font-size: var(--text-sm);
     font-weight: var(--weight-medium);
     line-height: var(--text-base--line-height);
     text-decoration-line: none;
 
     &:hover {
-      text-decoration-line: underline;
-      text-decoration-thickness: var(--stroke-hairline);
+      color: var(--text);
+      background-color: var(--fill-hover);
     }
 
+    /* A border, not a box-shadow, so forced-colors mode still draws the bar. */
     &[aria-current='page'] {
+      border-block-end: var(--stroke-emphasis) solid var(--accent-solid);
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
+      color: var(--text);
       font-weight: var(--weight-semibold);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
@@ -216,7 +228,6 @@
     & input {
       inline-size: var(--check-size);
       block-size: var(--check-size);
-      accent-color: var(--text);
     }
   }
 
@@ -252,25 +263,25 @@
     }
   }
 
-  /* Tailwind's primary action. Only the main action on a page uses it. */
+  /* The one primary action per view, in vermilion. */
   .button-primary {
     padding: var(--space-2xs) var(--space-s);
     border-color: transparent;
     border-radius: var(--radius-pill);
-    background: var(--primary);
-    color: var(--on-primary);
+    background: var(--accent-solid);
+    color: var(--on-accent);
     font-size: var(--text-sm);
     line-height: var(--text-base--line-height);
     font-weight: var(--weight-semibold);
 
     &:hover {
       border-color: transparent;
-      background: var(--primary-hover);
+      background: var(--accent-solid-hover);
     }
 
     &:active {
-      background: var(--primary-hover);
-      box-shadow: inset 0 0 0 var(--stroke-emphasis) var(--on-primary);
+      background: var(--accent-solid-hover);
+      box-shadow: inset 0 0 0 var(--stroke-emphasis) var(--on-accent);
     }
   }
 
@@ -1111,7 +1122,7 @@
   /* Eyebrow labels, from tailwindcss.com: mono, uppercase, widely tracked. */
   .toc-title,
   .tool-category {
-    color: var(--text-faint);
+    color: var(--accent-text);
     font-family: var(--font-mono);
     font-feature-settings: var(--font-features-mono);
     font-size: var(--text-xs);
@@ -1181,9 +1192,13 @@
     padding-block: var(--space-xl-2xl);
   }
 
-  /* Home page hero, from tailwindcss.com's home page. */
+  /* Home page hero, from tailwindcss.com's home page. The h1 is three fixed lines, so the swap
+     from the metric-matched fallback can't change the line count (the fallback is up to 11% wider
+     at display sizes). Each step keeps the widest line, 6.35em in the fallback, inside the column.
+     The caps are about 18ch and 50ch of Inter, in em because ch follows the fallback's "0". */
   .hub-hero-home {
     & h1 {
+      max-inline-size: 11em;
       font-size: var(--text-4xl);
       line-height: var(--text-4xl--line-height);
       font-weight: var(--weight-medium);
@@ -1196,24 +1211,129 @@
       }
 
       @media (width >= 64rem) {
-        font-size: var(--text-6xl);
-        line-height: var(--text-6xl--line-height);
         font-weight: var(--weight-regular);
       }
 
       @media (width >= 80rem) {
-        font-size: var(--text-8xl);
-        line-height: var(--text-8xl--line-height);
+        font-size: var(--text-6xl);
+        line-height: var(--text-6xl--line-height);
+      }
+
+      @media (width >= 90rem) {
+        font-size: var(--text-7xl);
+        line-height: var(--text-7xl--line-height);
       }
     }
 
+    & .hero-line {
+      display: block;
+    }
+
     & .tool-lead {
-      max-inline-size: 48rem;
+      max-inline-size: 32em;
       color: var(--text-muted);
       font-size: var(--text-lg);
       line-height: 1.75rem;
       font-weight: var(--weight-medium);
     }
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--space-xl);
+
+    @media (width >= 64rem) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: center;
+      gap: var(--space-2xl);
+    }
+  }
+
+  .hero-demo {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: var(--space-s);
+    min-inline-size: 0;
+
+    /* Decorative glow; .page-shell clips any overhang. */
+    &::before {
+      content: '';
+      position: absolute;
+      inset: calc(-1 * var(--space-xl)) -10%;
+      z-index: -1;
+      background: radial-gradient(closest-side, var(--glow), transparent);
+      pointer-events: none;
+    }
+  }
+
+  .hero-duel {
+    --score-size: clamp(2.5rem, 22cqi, 4.5rem);
+    --contender-min: 14rem;
+    display: grid;
+    gap: var(--space-xs);
+
+    & figcaption {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+
+    & .numeral {
+      font-size: var(--score-size);
+    }
+
+    & .contenders {
+      gap: var(--space-s);
+    }
+
+    /* Selectors are LTR content, even on an RTL page. */
+    & code {
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+  }
+
+  /* Double bezel: a hatched outer frame around an inner panel. */
+  .hero-stage {
+    padding: 0.5rem;
+    border-radius: 1rem;
+    outline: var(--stroke-hairline) solid var(--pattern-fg);
+    background-image: var(--hatch);
+    background-size: 10px 10px;
+  }
+
+  .hero-panel {
+    display: grid;
+    gap: var(--space-m);
+    padding: var(--space-s-m);
+    border-radius: 0.5rem;
+    outline: var(--stroke-hairline) solid var(--pattern-fg);
+    background: var(--bg);
+  }
+
+  .hero-contender {
+    padding: var(--space-s);
+    border: var(--stroke-hairline) solid var(--border);
+    border-radius: var(--radius-card);
+
+    &[data-winner] {
+      border-color: var(--accent-border);
+
+      & .outcome-win {
+        color: var(--accent-text);
+      }
+    }
+  }
+
+  .hero-selector {
+    font-size: var(--text-lg);
+  }
+
+  .hero-verdict {
+    color: var(--text-body);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
   }
 
   .home-heading {
@@ -1261,7 +1381,7 @@
 
     &:has(a:focus-visible) {
       outline: var(--focus-outline);
-      outline-offset: var(--stroke-focus);
+      outline-offset: var(--stroke-emphasis);
     }
 
     &:has(.tool-title a:hover) {
@@ -1309,6 +1429,18 @@
 
     .button-primary {
       border-color: ButtonText;
+    }
+
+    /* The hatch and glow are decorative; the stage keeps real borders. */
+    .hero-demo::before {
+      display: none;
+    }
+
+    .hero-stage,
+    .hero-panel {
+      outline: 0;
+      border: var(--stroke-hairline) solid CanvasText;
+      background-image: none;
     }
   }
 }

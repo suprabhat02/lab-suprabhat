@@ -47,7 +47,7 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <section class="hub-hero" aria-labelledby="tools-page-title">
-    <div class="wrap flow">
+    <div class="wrap wrap-page hairlines flow">
       <h1 id="tools-page-title">All tools</h1>
       <p class="tool-lead">
         Each tool answers one question and explains the answer. Read{' '}
@@ -59,8 +59,10 @@ const jsonLd = [
 
   {categories.map((category) => (
     <section class="section" aria-labelledby={category.id}>
-      <div class="wrap flow">
-        <h2 id={category.id}>{category.name}</h2>
+      <div class="wrap wrap-page flow">
+        <h2 id={category.id} class="section-heading hairlines">
+          {category.name}
+        </h2>
         <ul class="tool-list" role="list">
           {category.tools.map((tool) => (
             <ToolCard tool={tool} variant="index" />
