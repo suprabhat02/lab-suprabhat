@@ -37,32 +37,38 @@ test.describe('font loading', () => {
       try {
         await page.goto(`http://127.0.0.1:${address.port}${path}`);
         await page.evaluate(() => document.fonts.ready);
+        expect(await page.evaluate(() => document.fonts.check('16px "Inter Variable"'))).toBe(true);
         const sans = await page
-          .locator('body, h1, h2, .site-nav a, button, p:not(.parts)')
+          .locator('body, h1, h2, .site-nav a, button, p:not(.parts, .tool-category, .toc-title)')
           .evaluateAll((elements) =>
             elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
           );
         for (const item of sans) expect(item.family, item.tag).toMatch(/^["']?Inter Variable["']?,/);
-        const settings = await page.locator('body').evaluate((body) => {
-          const style = getComputedStyle(body);
+        // Copied from tailwindcss.com: Inter's cv features, and optical size from font-optical-sizing alone.
+        const settings = await page.locator('html').evaluate((html) => {
+          const style = getComputedStyle(html);
           return { features: style.fontFeatureSettings, variations: style.fontVariationSettings };
         });
-        expect(settings.features).toContain('"cv11"');
-        expect(settings.features).toContain('"ss01"');
-        expect(settings.variations).toBe('"opsz" 32');
+        expect(settings.features).toBe('"cv02", "cv03", "cv04", "cv11"');
+        expect(settings.variations).toBe('normal');
         const mono = await page
           .locator(
-            'code, textarea, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd, [data-fix-target]',
+            'code, textarea, .brand, .input-selector, .parts, .numeral, .selector-scores dd, .audit-metrics dd, [data-fix-target]',
           )
           .evaluateAll((elements) =>
-            elements.map((el) => ({ tag: el.tagName, family: getComputedStyle(el).fontFamily })),
+            elements.map((el) => {
+              const style = getComputedStyle(el);
+              return { tag: el.tagName, family: style.fontFamily, features: style.fontFeatureSettings };
+            }),
           );
-        for (const item of mono) expect(item.family, item.tag).toMatch(/^["']?Geist Mono Variable["']?,/);
+        expect(mono.length).toBeGreaterThan(0);
+        for (const item of mono) {
+          expect(item.family, item.tag).toMatch(/^["']?IBM Plex Mono["']?,/);
+          expect(item.features, item.tag).toBe('"ss02", "zero"');
+        }
         const preloads = page.locator('link[rel="preload"][as="font"]');
         const expected = await preloads.evaluateAll((els) => els.map((el) => el.getAttribute('href') ?? ''));
-        expect(expected).toHaveLength(2);
-        expect(expected[0]).toMatch(/inter-latin-opsz-normal.*\.woff2$/);
-        expect(expected[1]).toBe('/fonts/geist-mono-latin-wght-normal.woff2');
+        expect(expected).toEqual(['/fonts/inter-latin.woff2']);
         for (const preload of await preloads.all()) await expect(preload).toHaveAttribute('crossorigin');
         // Each preload must be byte-for-byte the URL its @font-face requests, or the file downloads twice.
         const faces = await page.evaluate(() =>
@@ -77,9 +83,15 @@ test.describe('font loading', () => {
         );
         expect(faces.filter((face) => expected.includes(face.url))).toEqual([
           { family: 'Inter Variable', url: expected[0] },
-          { family: 'Geist Mono Variable', url: expected[1] },
         ]);
-        expect(requests.map((url) => new URL(url).pathname).sort()).toEqual([...expected].sort());
+        // English pages need only the Latin files: Inter Latin plus whichever Plex Latin1 weights are used.
+        const paths = requests.map((url) => new URL(url).pathname);
+        expect(paths).toContain('/fonts/inter-latin.woff2');
+        for (const file of paths) {
+          expect(file).toMatch(
+            /^\/fonts\/(inter-latin|IBMPlexMono-(Regular|Medium|SemiBold)-Latin1)\.woff2$/,
+          );
+        }
         expect(new Set(requests).size).toBe(requests.length);
       } finally {
         await page.goto('about:blank');
@@ -91,9 +103,38 @@ test.describe('font loading', () => {
     });
   }
 
+  test('code uses IBM Plex Mono with ss02 and the slashed zero', async ({ page }) => {
+    await page.goto('/specificity/');
+    const code = await page
+      .locator('code')
+      .first()
+      .evaluate((el) => {
+        const style = getComputedStyle(el);
+        return { family: style.fontFamily, features: style.fontFeatureSettings };
+      });
+    expect(code.family).toMatch(/^["']?IBM Plex Mono["']?,/);
+    expect(code.features).toBe('"ss02", "zero"');
+  });
+
+  test('only running-text links are underlined at rest', async ({ page }) => {
+    await page.goto('/');
+    const decoration = (selector: string) =>
+      page
+        .locator(selector)
+        .first()
+        .evaluate((el) => getComputedStyle(el).textDecorationLine);
+    expect(await decoration('main p a')).toBe('underline');
+    expect(await decoration('.nav-link')).toBe('none');
+    expect(await decoration('.site-footer a')).toBe('none');
+    expect(await decoration('.tool-title a')).toBe('none');
+  });
+
   test('Arabic and RTL roots use the system font stack', async ({ page }) => {
     await page.goto('/');
-    for (const attributes of [{ lang: 'ar', dir: 'ltr' }, { lang: 'en', dir: 'rtl' }]) {
+    for (const attributes of [
+      { lang: 'ar', dir: 'ltr' },
+      { lang: 'en', dir: 'rtl' },
+    ]) {
       const family = await page.evaluate(({ lang, dir }) => {
         document.documentElement.lang = lang;
         document.documentElement.dir = dir;
@@ -104,7 +145,7 @@ test.describe('font loading', () => {
     }
   });
 
-  test('the fallback stack matches Geist Mono widths closely', async ({ page }) => {
+  test('the fallback stack matches IBM Plex Mono widths closely', async ({ page }) => {
     await page.goto('/specificity/');
     await page.evaluate(() => document.fonts.ready);
     const widths = await page.evaluate(() => {
@@ -120,11 +161,11 @@ test.describe('font loading', () => {
       };
       const stack = getComputedStyle(document.documentElement).getPropertyValue('--font-mono');
       return {
-        geist: measure(stack),
-        fallback: measure(stack.replace(/'Geist Mono Variable',\s*'Geist Mono',/, '')),
+        plex: measure(stack),
+        fallback: measure(stack.replace(/'IBM Plex Mono',/, '')),
       };
     });
-    expect(Math.abs(widths.fallback - widths.geist) / widths.geist).toBeLessThan(0.02);
+    expect(Math.abs(widths.fallback - widths.plex) / widths.plex).toBeLessThan(0.02);
   });
 
   test('the sans fallback stack matches Inter widths closely', async ({ page }) => {

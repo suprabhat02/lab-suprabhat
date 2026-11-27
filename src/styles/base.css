@@ -19,6 +19,8 @@
 
   :where(input, button, textarea, select) {
     font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
     color: inherit;
   }
 
@@ -32,12 +34,20 @@
     navigation: auto;
   }
 
+  /* Font settings copied from tailwindcss.com. Optical size follows font-optical-sizing, not a fixed opsz. */
   :where(html) {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: var(--root-font-size);
+    font-feature-settings: var(--font-features-sans);
+    font-variation-settings: normal;
     font-optical-sizing: auto;
+    font-size: var(--root-font-size);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    tab-size: 4;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
     scroll-padding-block-start: calc(var(--header-height) + var(--space-s));
@@ -52,42 +62,33 @@
 
   :where(body) {
     min-block-size: 100dvh;
-    font-family: var(--font-sans);
-    font-feature-settings: 'cv11', 'ss01';
-    font-variation-settings: 'opsz' 32;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: var(--step-0);
+    font-size: var(--text-base);
     font-weight: var(--weight-regular);
-    line-height: var(--line-body);
-    text-rendering: optimizeLegibility;
   }
 
   :where(h1, h2, h3, h4) {
-    font-family: var(--font-sans);
-    line-height: var(--line-heading);
-    letter-spacing: var(--tracking-heading);
-    font-weight: var(--weight-heading);
+    color: var(--text);
+    font-weight: var(--weight-semibold);
     text-wrap: balance;
   }
 
+  /* Inner-page roles from tailwindcss.com's docs; the home page overrides h1 and h2. */
   :where(h1) {
-    font-size: var(--step-4);
-    font-weight: var(--weight-display);
-    letter-spacing: var(--tracking-display);
-    line-height: var(--line-display);
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
   }
 
   :where(h2) {
-    font-size: var(--step-3);
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+    letter-spacing: var(--tracking-tight);
   }
 
-  :where(h3) {
-    font-size: var(--step-2);
-  }
-
-  :where(h4) {
-    font-size: var(--step-1);
+  :where(h3, h4) {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
   }
 
   :where(p, li) {
@@ -95,19 +96,27 @@
   }
 
   :where(p, figcaption, .prose li, .explainer li, .fix, .ladder-text) {
-    font-family: var(--font-sans);
     line-height: var(--line-body);
   }
 
+  /* Running-text links. Navigation, TOC, buttons, breadcrumbs and footer links opt out in components.css. */
   :where(a) {
-    color: var(--accent);
+    color: var(--text);
+    font-weight: var(--weight-semibold);
+    text-decoration-line: underline;
     text-decoration-thickness: var(--stroke-hairline);
-    text-underline-offset: var(--underline-offset);
+    text-decoration-color: var(--accent);
+    text-underline-offset: var(--link-underline-offset);
   }
 
   :where(a:hover) {
-    color: var(--accent-hover);
     text-decoration-thickness: var(--stroke-emphasis);
+  }
+
+  :where(h1, h2, h3, h4) :where(a) {
+    color: inherit;
+    font-weight: inherit;
+    text-decoration: none;
   }
 
   :where(:focus-visible) {
@@ -118,6 +127,7 @@
 
   :where(code, kbd, samp, pre) {
     font-family: var(--font-mono);
+    font-feature-settings: var(--font-features-mono);
     font-variant-ligatures: none;
     font-size: inherit;
   }
@@ -134,12 +144,12 @@
   :where(pre) {
     overflow-x: auto;
     tab-size: 2;
-    font-size: var(--step--1);
+    font-size: var(--text-sm);
     line-height: var(--line-code);
   }
 
   :where(strong, b) {
-    font-weight: var(--weight-heading);
+    font-weight: var(--weight-semibold);
   }
 
   :where(
@@ -160,6 +170,8 @@
     .audit-table td:nth-child(3)
   ) {
     font-family: var(--font-mono);
+    /* Otherwise they inherit Inter's cv settings from html. */
+    font-feature-settings: var(--font-features-mono);
     font-variant-ligatures: none;
   }
 
@@ -174,7 +186,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  :where(button, label, summary, select, .nav-link) {
+  :where(button, label, summary, select) {
     font-weight: var(--weight-medium);
     line-height: var(--line-ui);
   }

@@ -1,26 +1,96 @@
 @layer reset, tokens, base, layout, components, utilities;
 
-/* Self-hosted, upright only: only the subsets a page uses are downloaded. Italics are synthesized. */
+/* Self-hosted, upright only: only the subsets a page uses are downloaded. Italics are synthesized.
+   Inter is subset by scripts/copy-fonts.mjs, which fails the build if these unicode-ranges drift. */
 @font-face {
-  font-family: 'Geist Mono Variable';
+  font-family: 'Inter Variable';
   font-style: normal;
-  font-display: swap;
   font-weight: 100 900;
-  src: url('/fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122,
+    U+2190-2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'Geist Mono Variable';
+  font-family: 'Inter Variable';
   font-style: normal;
-  font-display: swap;
   font-weight: 100 900;
-  src: url('/fonts/geist-mono-latin-ext-wght-normal.woff2') format('woff2-variations');
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-0130, U+0132-0151, U+0154-024F;
+}
+
+/* IBM's own split files, unmodified (Plex is a Reserved Font Name); ranges are IBM's.
+   No local(): an installed copy may be a version without ss02 and zero. */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-Regular-Latin1.woff2') format('woff2');
   unicode-range:
-    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF,
-    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-Regular-Latin2.woff2') format('woff2');
+  unicode-range:
+    U+0100-0101, U+0104-0130, U+0132-0151, U+0154-017F, U+018F, U+0192, U+01A0-01A1, U+01AF-01B0, U+01FA-01FF,
+    U+0218-021B, U+0237, U+0259, U+1E80-1E85, U+1E9E, U+20A1, U+20A4, U+20A6, U+20A8-20AA, U+20AD-20AE,
+    U+20B1-20B2, U+20B4-20B5, U+20B8-20BA, U+20BD, U+20BF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-Medium-Latin1.woff2') format('woff2');
+  unicode-range:
+    U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-Medium-Latin2.woff2') format('woff2');
+  unicode-range:
+    U+0100-0101, U+0104-0130, U+0132-0151, U+0154-017F, U+018F, U+0192, U+01A0-01A1, U+01AF-01B0, U+01FA-01FF,
+    U+0218-021B, U+0237, U+0259, U+1E80-1E85, U+1E9E, U+20A1, U+20A4, U+20A6, U+20A8-20AA, U+20AD-20AE,
+    U+20B1-20B2, U+20B4-20B5, U+20B8-20BA, U+20BD, U+20BF;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-SemiBold-Latin1.woff2') format('woff2');
+  unicode-range:
+    U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A,
+    U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/IBMPlexMono-SemiBold-Latin2.woff2') format('woff2');
+  unicode-range:
+    U+0100-0101, U+0104-0130, U+0132-0151, U+0154-017F, U+018F, U+0192, U+01A0-01A1, U+01AF-01B0, U+01FA-01FF,
+    U+0218-021B, U+0237, U+0259, U+1E80-1E85, U+1E9E, U+20A1, U+20A4, U+20A6, U+20A8-20AA, U+20AD-20AE,
+    U+20B1-20B2, U+20B4-20B5, U+20B8-20BA, U+20BD, U+20BF;
 }
 
 /* Metric-matched fallbacks live in fonts.generated.css (scripts/font-fallbacks.mjs). */
@@ -29,40 +99,49 @@
   :root {
     color-scheme: dark;
 
-    --gray-1: light-dark(oklch(99% 0.002 35), oklch(15.5% 0.004 35));
-    --gray-2: light-dark(oklch(97.5% 0.003 35), oklch(18.5% 0.005 35));
-    --gray-3: light-dark(oklch(95% 0.004 35), oklch(21.5% 0.006 35));
-    --gray-4: light-dark(oklch(92.5% 0.005 35), oklch(24.5% 0.007 35));
-    --gray-5: light-dark(oklch(90% 0.006 35), oklch(27.5% 0.008 35));
-    --gray-6: light-dark(oklch(87% 0.007 35), oklch(31% 0.008 35));
-    --gray-7: light-dark(oklch(82% 0.008 35), oklch(37% 0.009 35));
-    --gray-8: light-dark(oklch(64% 0.009 35), oklch(52% 0.01 35));
-    --gray-9: light-dark(oklch(52% 0.009 35), oklch(64% 0.008 35));
-    --gray-10: light-dark(oklch(47% 0.009 35), oklch(68% 0.008 35));
-    --gray-11: light-dark(oklch(43% 0.008 35), oklch(80% 0.006 35));
-    --gray-12: light-dark(oklch(20.5% 0.005 35), oklch(95.5% 0.003 35));
+    /* Tailwind gray, read from tailwindcss.com's production CSS. */
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5dc;
+    --gray-400: #99a1af;
+    --gray-500: #6a7282;
+    --gray-600: #4a5565;
+    --gray-700: #364153;
+    --gray-800: #1e2939;
+    --gray-900: #101828;
+    --gray-950: #030712;
 
-    /* Light: paper (1) rises above a page band (2) with a step-6 hairline.
-       Dark: elevation gets lighter, page (1) -> panel (2) -> inset/overlay (3). */
-    --bg: light-dark(var(--gray-2), var(--gray-1));
-    --surface: light-dark(var(--gray-1), var(--gray-2));
-    --surface-overlay: var(--gray-3);
-    --surface-inset: var(--gray-3);
-    --fill: var(--gray-3);
-    --fill-hover: var(--gray-4);
-    --fill-active: var(--gray-5);
-    --border-subtle: var(--gray-6);
-    --border: var(--gray-7);
-    --border-strong: var(--gray-8);
-    /* Step 8 fails 3:1 on the light inset; filled controls need step 9. */
-    --border-control-on-fill: var(--gray-9);
-    --text: var(--gray-12);
-    --text-muted: var(--gray-11);
-    --text-faint: var(--gray-9);
+    --bg: light-dark(#ffffff, var(--gray-950));
+    --surface: light-dark(var(--gray-50), var(--gray-900));
+    --surface-overlay: light-dark(#ffffff, var(--gray-900));
+    --surface-inset: light-dark(var(--gray-100), var(--gray-800));
+    /* Dark gray-700 fails muted text and control borders, so dark hover and active share gray-800;
+       pressed and selected states always add a non-colour indicator. */
+    --fill: light-dark(var(--gray-100), var(--gray-900));
+    --fill-hover: light-dark(var(--gray-200), var(--gray-800));
+    --fill-active: light-dark(var(--gray-300), var(--gray-800));
+    --border-subtle: light-dark(
+      color-mix(in oklab, var(--gray-950) 5%, transparent),
+      color-mix(in oklab, #ffffff 10%, transparent)
+    );
+    --border: light-dark(var(--gray-200), var(--gray-800));
+    --border-strong: var(--gray-500);
+    --border-control-on-fill: var(--gray-500);
+    --text: light-dark(var(--gray-950), #ffffff);
+    --text-body: light-dark(var(--gray-700), var(--gray-300));
+    --text-muted: light-dark(var(--gray-600), var(--gray-400));
+    /* Dark gray-500 is 4.16:1 on gray-950, so dark faint text shares gray-400 with muted. */
+    --text-faint: light-dark(var(--gray-500), var(--gray-400));
+    --marker: color-mix(in oklab, var(--text-body) 25%, transparent);
+    /* Accent marks running-text underlines and focus; it is not used for link or nav text. */
     --accent: light-dark(#b42300, #ff4d2a);
     --accent-hover: light-dark(oklch(44% 0.15 33), oklch(78% 0.12 33));
     --accent-subtle: light-dark(oklch(95% 0.02 33), oklch(24% 0.03 33));
-    --on-accent: light-dark(#ffffff, var(--gray-1));
+    --on-accent: light-dark(#ffffff, var(--gray-950));
+    --primary: light-dark(#000000, var(--gray-700));
+    --primary-hover: light-dark(var(--gray-800), var(--gray-600));
+    --on-primary: #ffffff;
     --focus-ring: var(--accent);
     --success: light-dark(oklch(45% 0.1 155), oklch(78% 0.12 155));
     --success-subtle: light-dark(oklch(95% 0.02 155), oklch(24% 0.03 155));
@@ -91,10 +170,13 @@
     --radius-shell: 12px;
     --radius-inline: 4px;
     --radius-focus: 2px;
+    --radius-pill: 9999px;
     --stroke-hairline: 1px;
     --stroke-emphasis: 2px;
     --stroke-focus: 3px;
+    /* State indicators (selector anatomy); running-text links use --link-underline-offset. */
     --underline-offset: 0.2em;
+    --link-underline-offset: 3px;
     --root-font-size: 100%;
     --inline-code-size: 0.95em;
     --inline-icon-offset: 0.15em;
@@ -103,57 +185,96 @@
       'Inter Variable', 'Inter Variable Fallback: Arial', 'Inter Variable Fallback: Segoe UI',
       'Inter Variable Fallback: Helvetica', system-ui, sans-serif;
     --font-mono:
-      'Geist Mono Variable', 'Geist Mono', 'Geist Mono Variable Fallback: Consolas',
-      'Geist Mono Variable Fallback: Menlo', 'Geist Mono Variable Fallback: Courier New', ui-monospace,
-      monospace;
+      'IBM Plex Mono', 'IBM Plex Mono Fallback: Consolas', 'IBM Plex Mono Fallback: Menlo',
+      'IBM Plex Mono Fallback: Courier New', ui-monospace, monospace;
+    --font-features-sans: 'cv02', 'cv03', 'cv04', 'cv11';
+    --font-features-mono: 'ss02', 'zero';
     /* Deprecated for one release; remove in the release after the design-system release. */
     --font: var(--font-sans);
     --font-prose: var(--font-sans);
+
     --weight-regular: 400;
     --weight-medium: 500;
-    --weight-heading: 650;
-    --weight-display: 750;
-    /* Geist Mono emphasis only (logo, deciding numerals, metrics). */
     --weight-semibold: 600;
+    --weight-bold: 700;
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --weight-heading: var(--weight-semibold);
+    --weight-display: var(--weight-bold);
 
-    /* Utopia interpolation: 320 -> 1280px, 16 -> 18px, ratios 1.2 -> 1.25. */
-    /* Sub-body steps are whole pixels at the default root size, not fluid: fractional small text renders soft. */
-    --step--2: 0.75rem;
-    --step--1: 0.875rem;
-    --step-0: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
-    --step-1: clamp(1.2rem, 1.1312rem + 0.3438vi, 1.4062rem);
-    --step-2: clamp(1.44rem, 1.3341rem + 0.5297vi, 1.7578rem);
-    --step-3: clamp(1.728rem, 1.5716rem + 0.7821vi, 2.1973rem);
-    --step-4: clamp(2.0736rem, 1.8493rem + 1.1216vi, 2.7466rem);
-    --step-5: clamp(2.4883rem, 2.1734rem + 1.5748vi, 3.4332rem);
-    --footer-display: var(--step-5);
+    /* Tailwind's fixed scale; sizes step up at breakpoints instead of interpolating. */
+    --text-xs: 0.75rem;
+    --text-xs--line-height: 1rem;
+    --text-sm: 0.875rem;
+    --text-sm--line-height: 1.25rem;
+    --text-base: 1rem;
+    --text-base--line-height: 1.5rem;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: 1.75rem;
+    --text-xl: 1.25rem;
+    --text-xl--line-height: 1.75rem;
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: 2rem;
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: 2.25rem;
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: 2.5rem;
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1;
+    --text-6xl: 3.75rem;
+    --text-6xl--line-height: 1;
+    --text-8xl: 6rem;
+    --text-8xl--line-height: 1;
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --step--2: var(--text-xs);
+    --step--1: var(--text-sm);
+    --step-0: var(--text-base);
+    --step-1: var(--text-xl);
+    --step-2: var(--text-2xl);
+    --step-3: var(--text-3xl);
+    --step-4: var(--text-4xl);
+    --step-5: var(--text-5xl);
+
+    --tracking-tight: -0.025em;
+    --tracking-tighter: -0.05em;
+    --tracking-widest: 0.1em;
+    /* Deprecated for one release; remove in the release after the design-system release. */
+    --tracking-display: var(--tracking-tighter);
+    --tracking-heading: var(--tracking-tight);
+
     --line-display: 1.1;
     --line-heading: 1.2;
     --line-ui: 1.4;
     --line-body: 1.6;
     --line-code: 1.5;
-    --tracking-display: -0.02em;
-    --tracking-heading: -0.01em;
 
-    --space-3xs: clamp(0.25rem, 0.2396rem + 0.0521vi, 0.2812rem);
-    --space-2xs: clamp(0.5rem, 0.4792rem + 0.1042vi, 0.5625rem);
-    --space-xs: clamp(0.75rem, 0.7188rem + 0.1562vi, 0.8438rem);
-    --space-s: clamp(1rem, 0.9583rem + 0.2083vi, 1.125rem);
-    --space-m: clamp(1.5rem, 1.4375rem + 0.3125vi, 1.6875rem);
-    --space-l: clamp(2rem, 1.9167rem + 0.4167vi, 2.25rem);
-    --space-xl: clamp(3rem, 2.875rem + 0.625vi, 3.375rem);
-    --space-2xl: clamp(4rem, 3.8333rem + 0.8333vi, 4.5rem);
-    --space-3xl: clamp(6rem, 5.75rem + 1.25vi, 6.75rem);
-    --space-s-m: clamp(1rem, 0.7708rem + 1.1458vi, 1.6875rem);
-    --space-m-l: clamp(1.5rem, 1.25rem + 1.25vi, 2.25rem);
-    --space-l-xl: clamp(2rem, 1.5417rem + 2.2917vi, 3.375rem);
-    --space-xl-2xl: clamp(3rem, 2.5rem + 2.5vi, 4.5rem);
-    --space-section: var(--space-xl-2xl);
+    /* Reference values: @media can't read custom properties, so queries repeat the literal. */
+    --breakpoint-sm: 40rem;
+    --breakpoint-md: 48rem;
+    --breakpoint-lg: 64rem;
+    --breakpoint-xl: 80rem;
+    --breakpoint-2xl: 96rem;
+
+    --spacing: 0.25rem;
+    --space-3xs: calc(var(--spacing) * 1);
+    --space-2xs: calc(var(--spacing) * 2);
+    --space-xs: calc(var(--spacing) * 3);
+    --space-s: calc(var(--spacing) * 4);
+    --space-m: calc(var(--spacing) * 6);
+    --space-l: calc(var(--spacing) * 8);
+    --space-xl: calc(var(--spacing) * 12);
+    --space-2xl: calc(var(--spacing) * 16);
+    --space-3xl: calc(var(--spacing) * 24);
+    /* Pairs take their small value, then their large value from the sm breakpoint. */
+    --space-s-m: var(--space-s);
+    --space-m-l: var(--space-m);
+    --space-l-xl: var(--space-l);
+    --space-xl-2xl: var(--space-xl);
+    --space-section: calc(var(--spacing) * 20);
 
     --measure: 46ch;
     /* Stable while proportional fallback glyph widths change during font swap. */
     --measure-lead: 48rem;
-    --gutter: var(--space-s-m);
+    --gutter: var(--space-s);
     --max-width: 90rem;
     --header-height: 4rem;
     --control-size: 2.75rem;
@@ -196,6 +317,22 @@
     --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
+  @media (width >= 40rem) {
+    :root {
+      --space-s-m: var(--space-m);
+      --space-m-l: var(--space-l);
+      --space-l-xl: var(--space-xl);
+      --space-xl-2xl: var(--space-2xl);
+      --gutter: var(--space-m);
+    }
+  }
+
+  @media (width >= 64rem) {
+    :root {
+      --gutter: var(--space-l);
+    }
+  }
+
   :root:lang(ar),
   :root[dir='rtl'] {
     --font-sans: ui-sans-serif, 'Segoe UI', 'Noto Sans Arabic', 'Arabic Typesetting', system-ui, sans-serif;
@@ -217,9 +354,11 @@
 
   @media (prefers-contrast: more) {
     :root {
+      --text-body: var(--text);
       --text-muted: var(--text);
       --text-faint: var(--text);
-      --border-strong: var(--gray-9);
+      --border-strong: light-dark(var(--gray-700), var(--gray-300));
+      --border-control-on-fill: light-dark(var(--gray-700), var(--gray-300));
       --border-subtle: var(--border-strong);
       --border: var(--border-strong);
     }
